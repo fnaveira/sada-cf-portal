@@ -110,7 +110,7 @@ function seedData() {
   const players = [
     [1,"Carlos Caamaño","Caamaño",1,"portero",50,"disponible"],
     [2,"Miguel Ángel Garea Parga","Garea",2,"defensa,centrocampista",46,"disponible"],
-    [3,"David Mourelo Mouzo","Mourelo",3,"defensa,centrocampista,delantero",37,"disponible"],
+    [3,"David Mourelo Mouzo","Mourelo",3,"defensa,centrocampista,delantero",37,"no_disponible"],
     [4,"Alfonso Martínez Váquez","Alfonso",4,"delantero,defensa",39,"disponible"],
     [5,"Carlos M. Álvarez Labora","Carlitos",5,"delantero,defensa",56,"disponible"],
     [6,"Diego Fernández Cabana","Diego",6,"centrocampista,defensa",46,"disponible"],
@@ -118,7 +118,7 @@ function seedData() {
     [8,"Iván Fernández Álvarez","Iván",9,"portero,defensa,centrocampista,delantero",46,"disponible"],
     [9,"Gonzalo Ferro Rozas","Ferro",10,"delantero,centrocampista",46,"disponible"],
     [10,"Miguel Boo Fernández","Boo",11,"delantero,defensa",41,"disponible"],
-    [11,"Santiago Seijo Cancelo","Santi",14,"centrocampista,defensa",46,"disponible"],
+    [11,"Santiago Seijo Cancelo","Santi",14,"centrocampista,defensa",46,"no_disponible"],
     [12,"Sergio Seijo Cancelo","Sergio",15,"centrocampista,defensa",38,"disponible"],
     [13,"Bernardo Gómez Cagiao","Berni",16,"defensa,centrocampista",40,"disponible"],
     [14,"Jose Luis Mallo López","Mallo",19,"delantero,defensa",42,"disponible"],
@@ -127,21 +127,24 @@ function seedData() {
     [17,"Alberto Durán Alfonsín","Durán",24,"centrocampista",42,"disponible"],
     [18,"Alberto Roibás Naveiro","Roibás",25,"defensa,centrocampista",45,"disponible"],
     [19,"Pablo Graña Pita","Graña",26,"centrocampista,defensa",42,"disponible"],
-    [20,"Javier Vizoso Guerra","Vizoso",27,"centrocampista",55,"disponible"],
+    [20,"Javier Vizoso Guerra","Vizoso",27,"centrocampista",55,"lesionado"],
     [21,"Francisco Lata Cortes","Lata",30,"defensa,centrocampista",41,"disponible"],
-    [22,"Manuel Cortes","Manolo",13,"portero",50,"disponible"]
+    [22,"Manuel Cortes","Manolo",13,"portero",50,"disponible"],
+    [23,"Arturo",null,28,"centrocampista",25,"disponible"]
   ];
   for (const p of players) insertPlayer.run(...p);
 
   const insertConv = db.prepare('INSERT INTO convocatoria (playerId) VALUES (?)');
-  for (const id of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]) insertConv.run(id);
+  for (const id of [2,4,6,7,10,14,15,16,19,20,22,23]) insertConv.run(id);
 
     db.prepare('INSERT INTO formation (id, name, positions) VALUES (1, ?, ?)').run(
-    '4-4-2',
+    '4-2-3-1',
     JSON.stringify([
-      {playerId:1,x:50,y:85},{playerId:3,x:20,y:65},{playerId:18,x:37,y:65},{playerId:7,x:63,y:65},
-      {playerId:21,x:80,y:65},{playerId:6,x:20,y:42},{playerId:11,x:37,y:42},{playerId:15,x:63,y:42},
-      {playerId:20,x:80,y:42},{playerId:10,x:38,y:22},{playerId:19,x:62,y:22}
+      {playerId:22,x:50,y:85},
+      {playerId:4,x:20,y:65},{playerId:2,x:37,y:65},{playerId:10,x:63,y:65},{playerId:7,x:80,y:65},
+      {playerId:15,x:32,y:48},{playerId:16,x:68,y:48},
+      {playerId:14,x:18,y:35},{playerId:6,x:50,y:32},{playerId:20,x:82,y:35},
+      {playerId:19,x:50,y:18}
     ])
   );
 

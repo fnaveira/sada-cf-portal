@@ -591,10 +591,10 @@ const Admin = {
 
         const lesionados = PLAYERS.filter(p => p.status === 'lesionado').sort(sortFn);
         const lesionadosIds = lesionados.map(p => p.id);
-        const noDisponibles = PLAYERS.filter(p => p.status === 'no_disponible').sort(sortFn);
-        const titularesPlayers = PLAYERS.filter(p => titulares.includes(p.id) && !lesionadosIds.includes(p.id)).sort(sortFn);
+        const noDisponibles = PLAYERS.filter(p => p.status === 'no_disponible' && !CONVOCATORIA.includes(p.id)).sort(sortFn);
+        const titularesPlayers = PLAYERS.filter(p => titulares.includes(p.id)).sort(sortFn);
         const convocados = PLAYERS.filter(p => CONVOCATORIA.includes(p.id) && !titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
-        const noConvocados = PLAYERS.filter(p => !CONVOCATORIA.includes(p.id) && p.status === 'disponible').sort(sortFn);
+        const noConvocados = PLAYERS.filter(p => !CONVOCATORIA.includes(p.id) && p.status === 'disponible' && !lesionadosIds.includes(p.id)).sort(sortFn);
 
         titularesCount.textContent = titularesPlayers.length;
         disponiblesCount.textContent = convocados.length;
