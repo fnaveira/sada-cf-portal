@@ -109,26 +109,26 @@ function seedData() {
   const insertPlayer = db.prepare('INSERT INTO players (id, name, nickname, number, position, age, status, goals, yellowCards, redCards) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, 0)');
   const players = [
     [1,"Carlos Caamaño","Caamaño",1,"portero",50,"disponible"],
-    [2,"Miguel Ángel Garea Parga","Garea",2,"defensa",46,"disponible"],
-    [3,"David Mourelo Mouzo","Mourelo",3,"defensa",37,"disponible"],
-    [4,"Alfonso Martínez Váquez","Alfonso",4,"delantero",39,"disponible"],
-    [5,"Carlos M. Álvarez Labora","Carlitos",5,"delantero",56,"disponible"],
-    [6,"Diego Fernández Cabana","Diego",6,"centrocampista",46,"disponible"],
-    [7,"Miguel Amor Haz","Amor",7,"defensa",46,"disponible"],
-    [8,"Iván Fernández Álvarez","Iván",9,"portero",46,"disponible"],
-    [9,"Gonzalo Ferro Rozas","Ferro",10,"delantero",46,"disponible"],
-    [10,"Miguel Boo Fernández","Boo",11,"delantero",41,"disponible"],
-    [11,"Santiago Seijo Cancelo","Santi",14,"centrocampista",46,"disponible"],
-    [12,"Sergio Seijo Cancelo","Sergio",15,"centrocampista",38,"disponible"],
-    [13,"Bernardo Gómez Cagiao","Berni",16,"defensa",40,"disponible"],
-    [14,"Jose Luis Mallo López","Mallo",19,"delantero",42,"disponible"],
-    [15,"Antonio Seoane Barros","Seoane",21,"centrocampista",39,"disponible"],
-    [16,"César Freire Lesta","César",23,"defensa",46,"disponible"],
+    [2,"Miguel Ángel Garea Parga","Garea",2,"defensa,centrocampista",46,"disponible"],
+    [3,"David Mourelo Mouzo","Mourelo",3,"defensa,centrocampista,delantero",37,"disponible"],
+    [4,"Alfonso Martínez Váquez","Alfonso",4,"delantero,defensa",39,"disponible"],
+    [5,"Carlos M. Álvarez Labora","Carlitos",5,"delantero,defensa",56,"disponible"],
+    [6,"Diego Fernández Cabana","Diego",6,"centrocampista,defensa",46,"disponible"],
+    [7,"Miguel Amor Haz","Amor",7,"defensa,centrocampista,delantero",46,"disponible"],
+    [8,"Iván Fernández Álvarez","Iván",9,"portero,defensa,centrocampista,delantero",46,"disponible"],
+    [9,"Gonzalo Ferro Rozas","Ferro",10,"delantero,centrocampista",46,"disponible"],
+    [10,"Miguel Boo Fernández","Boo",11,"delantero,defensa",41,"disponible"],
+    [11,"Santiago Seijo Cancelo","Santi",14,"centrocampista,defensa",46,"disponible"],
+    [12,"Sergio Seijo Cancelo","Sergio",15,"centrocampista,defensa",38,"disponible"],
+    [13,"Bernardo Gómez Cagiao","Berni",16,"defensa,centrocampista",40,"disponible"],
+    [14,"Jose Luis Mallo López","Mallo",19,"delantero,defensa",42,"disponible"],
+    [15,"Antonio Seoane Barros","Seoane",21,"centrocampista,defensa",39,"disponible"],
+    [16,"César Freire Lesta","César",23,"defensa,centrocampista,delantero",46,"disponible"],
     [17,"Alberto Durán Alfonsín","Durán",24,"centrocampista",42,"disponible"],
-    [18,"Alberto Roibás Naveiro","Roibás",25,"defensa",45,"disponible"],
-    [19,"Pablo Graña Pita","Graña",26,"centrocampista",42,"disponible"],
+    [18,"Alberto Roibás Naveiro","Roibás",25,"defensa,centrocampista",45,"disponible"],
+    [19,"Pablo Graña Pita","Graña",26,"centrocampista,defensa",42,"disponible"],
     [20,"Javier Vizoso Guerra","Vizoso",27,"centrocampista",55,"disponible"],
-    [21,"Francisco Lata Cortes","Lata",30,"defensa",41,"disponible"],
+    [21,"Francisco Lata Cortes","Lata",30,"defensa,centrocampista",41,"disponible"],
     [22,"Manuel Cortes","Manolo",13,"portero",50,"disponible"]
   ];
   for (const p of players) insertPlayer.run(...p);
@@ -166,8 +166,8 @@ function seedData() {
   const insertNews = db.prepare('INSERT INTO news (id, title, summary, date, tag) VALUES (?, ?, ?, ?, ?)');
   [
     [1,"Victoria importante en la jornada anterior","El equipo se impuso 3-1 en un gran partido que mostró la mejor versión del equipo. Los goles fueron obra de Sergio Seijo, Pablo Graña y Miguel Boo.","2026-07-25","Crónica"],
-    [2,"Debut de David Mourelo","David Mourelo debutó con el primer equipo en el último partido. Mostró gran seguridad en el mediocampo.","2026-07-22","Fichaje"],
-    [3,"Yonattan Carro, baja temporal","Yonattan Carro sufre una distensión muscular que le tendrá entre 2 y 3 semanas de baja. El equipo le desea una pronta recuperación.","2026-07-18","Bajas"],
+    [2,"Debut de Julio","Julio debuta en el amistoso contra el SPM con gran rendimiento.","2026-07-22","Fichaje"],
+    [3,"Vizoso, baja temporal","Vizoso recae de un problema en el tendon de aquiles que le tendrá entre 2 y 3 semanas de baja. El equipo le desea una pronta recuperación.","2026-07-18","Bajas"],
     [4,"Temporada 2026/27 - Objetivo: ascenso","La directiva del club ha confirmado que el objetivo de la temporada será el ascenso de categoría. Se ha reforzado la plantilla con varios fichajes estratégicos.","2026-07-10","Club"]
   ].forEach(n => insertNews.run(...n));
 

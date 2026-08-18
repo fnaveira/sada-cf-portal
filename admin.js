@@ -158,13 +158,13 @@ const Admin = {
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Posición</label>
-                        <select id="pPosition" required>
-                            <option value="portero">Portero</option>
-                            <option value="defensa">Defensa</option>
-                            <option value="centrocampista">Centrocampista</option>
-                            <option value="delantero">Delantero</option>
-                        </select>
+                        <label>Posiciones</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" name="pPosition" value="portero"> Portero</label>
+                            <label class="checkbox-label"><input type="checkbox" name="pPosition" value="defensa"> Defensa</label>
+                            <label class="checkbox-label"><input type="checkbox" name="pPosition" value="centrocampista"> Centrocampista</label>
+                            <label class="checkbox-label"><input type="checkbox" name="pPosition" value="delantero"> Delantero</label>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Estado</label>
@@ -182,11 +182,13 @@ const Admin = {
 
         document.getElementById('playerForm').onsubmit = async (e) => {
             e.preventDefault();
+            const checked = [...document.querySelectorAll('input[name="pPosition"]:checked')].map(c => c.value);
+            if (checked.length === 0) { alert('Selecciona al menos una posición'); return; }
             const data = {
                 name: document.getElementById('pName').value,
                 nickname: document.getElementById('pNickname').value || null,
                 number: parseInt(document.getElementById('pNumber').value),
-                position: document.getElementById('pPosition').value,
+                position: checked.join(','),
                 age: document.getElementById('pAge').value ? parseInt(document.getElementById('pAge').value) : null,
                 status: document.getElementById('pStatus').value
             };
@@ -205,6 +207,7 @@ const Admin = {
 
         const modal = document.getElementById('modal');
         document.getElementById('modalTitle').textContent = 'Editar Jugador';
+        const positions = player.position ? player.position.split(',') : [];
         document.getElementById('modalBody').innerHTML = `
             <form id="editPlayerForm" class="modal-form">
                 <div class="form-row">
@@ -229,13 +232,13 @@ const Admin = {
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Posición</label>
-                        <select id="epPosition" required>
-                            <option value="portero" ${player.position === 'portero' ? 'selected' : ''}>Portero</option>
-                            <option value="defensa" ${player.position === 'defensa' ? 'selected' : ''}>Defensa</option>
-                            <option value="centrocampista" ${player.position === 'centrocampista' ? 'selected' : ''}>Centrocampista</option>
-                            <option value="delantero" ${player.position === 'delantero' ? 'selected' : ''}>Delantero</option>
-                        </select>
+                        <label>Posiciones</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" name="epPosition" value="portero" ${positions.includes('portero') ? 'checked' : ''}> Portero</label>
+                            <label class="checkbox-label"><input type="checkbox" name="epPosition" value="defensa" ${positions.includes('defensa') ? 'checked' : ''}> Defensa</label>
+                            <label class="checkbox-label"><input type="checkbox" name="epPosition" value="centrocampista" ${positions.includes('centrocampista') ? 'checked' : ''}> Centrocampista</label>
+                            <label class="checkbox-label"><input type="checkbox" name="epPosition" value="delantero" ${positions.includes('delantero') ? 'checked' : ''}> Delantero</label>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Estado</label>
@@ -253,11 +256,13 @@ const Admin = {
 
         document.getElementById('editPlayerForm').onsubmit = async (e) => {
             e.preventDefault();
+            const checked = [...document.querySelectorAll('input[name="epPosition"]:checked')].map(c => c.value);
+            if (checked.length === 0) { alert('Selecciona al menos una posición'); return; }
             const data = {
                 name: document.getElementById('epName').value,
                 nickname: document.getElementById('epNickname').value || null,
                 number: parseInt(document.getElementById('epNumber').value),
-                position: document.getElementById('epPosition').value,
+                position: checked.join(','),
                 age: document.getElementById('epAge').value ? parseInt(document.getElementById('epAge').value) : null,
                 status: document.getElementById('epStatus').value,
                 goals: player.goals || 0, yellowCards: player.yellowCards || 0, redCards: player.redCards || 0
@@ -582,11 +587,12 @@ const Admin = {
         const lesionadosCount = document.getElementById('lesionadosCount');
 
         const positionOrder = { portero: 0, defensa: 1, centrocampista: 2, delantero: 3 };
-        const sortFn = (a, b) => positionOrder[a.position] - positionOrder[b.position];
+        const sortFn = (a, b) => positionOrder[getPrimaryPosition(a.position)] - positionOrder[getPrimaryPosition(b.position)];
 
         const lesionados = PLAYERS.filter(p => p.status === 'lesionado').sort(sortFn);
+        const lesionadosIds = lesionados.map(p => p.id);
         const noDisponibles = PLAYERS.filter(p => p.status === 'no_disponible').sort(sortFn);
-        const titularesPlayers = PLAYERS.filter(p => titulares.includes(p.id)).sort(sortFn);
+        const titularesPlayers = PLAYERS.filter(p => titulares.includes(p.id) && !lesionadosIds.includes(p.id)).sort(sortFn);
         const convocados = PLAYERS.filter(p => CONVOCATORIA.includes(p.id) && !titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
         const noConvocados = PLAYERS.filter(p => !CONVOCATORIA.includes(p.id) && p.status === 'disponible').sort(sortFn);
 
@@ -617,8 +623,6 @@ const Admin = {
 
         disponiblesList.innerHTML = convocados.map(p =>
             renderRow(p, 'danger', 'times', 'Quitar de convocatoria', `Admin.removeConvocado(${p.id})`)
-        ).join('') + lesionados.map(p =>
-            renderRow(p, 'success', 'plus', 'Añadir a suplentes', `Admin.addFromLesion(${p.id})`)
         ).join('');
 
         noConvocadosList.innerHTML = noConvocados.map(p =>
@@ -721,7 +725,7 @@ const Admin = {
         };
 
         const slot = formations[FORMATION.name] || formations['4-4-2'];
-        const positions = slot[player.position] || slot.centrocampista;
+        const positions = slot[getPrimaryPosition(player.position)] || slot.centrocampista;
         const pos = positions[index % positions.length];
         return { x: pos.x, y: pos.y };
     },
@@ -729,6 +733,11 @@ const Admin = {
     renderAdminPitch() {
         const pitch = document.getElementById('adminPitch');
         pitch.innerHTML = '<div class="pitch-lines"></div>';
+
+        const onDrag = (e) => {
+            if (e.target.closest('.pitch-player')) e.preventDefault();
+        };
+        pitch.ondragover = onDrag;
 
         FORMATION.positions.forEach((pos, idx) => {
             const player = PLAYERS.find(p => p.id === pos.playerId);
@@ -742,29 +751,42 @@ const Admin = {
                 <div class="pitch-player-number">${player.number}</div>
                 <div class="pitch-player-name">${player.nickname || player.name.split(' ')[0]}</div>
             `;
-            el.draggable = true;
             el.dataset.idx = idx;
 
-            el.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', idx);
-                el.style.opacity = '0.5';
+            const onMove = (clientX, clientY) => {
+                const rect = pitch.getBoundingClientRect();
+                const x = Math.round(((clientX - rect.left) / rect.width) * 100);
+                const y = Math.round(((clientY - rect.top) / rect.height) * 100);
+                FORMATION.positions[idx].x = Math.max(5, Math.min(95, x));
+                FORMATION.positions[idx].y = Math.max(5, Math.min(95, y));
+                el.style.left = FORMATION.positions[idx].x + '%';
+                el.style.top = FORMATION.positions[idx].y + '%';
+            };
+
+            const stopDrag = async () => {
+                document.removeEventListener('mousemove', mouseMove);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchmove', touchMove);
+                document.removeEventListener('touchend', stopDrag);
+                await Api.saveFormation(FORMATION.name, FORMATION.positions);
+            };
+
+            const mouseMove = (e) => onMove(e.clientX, e.clientY);
+            const touchMove = (e) => { e.preventDefault(); onMove(e.touches[0].clientX, e.touches[0].clientY); };
+
+            el.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                document.addEventListener('mousemove', mouseMove);
+                document.addEventListener('mouseup', stopDrag);
             });
-            el.addEventListener('dragend', () => { el.style.opacity = '1'; });
+
+            el.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                document.addEventListener('touchmove', touchMove, { passive: false });
+                document.addEventListener('touchend', stopDrag);
+            }, { passive: false });
 
             pitch.appendChild(el);
-        });
-
-        pitch.addEventListener('dragover', (e) => e.preventDefault());
-        pitch.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const idx = parseInt(e.dataTransfer.getData('text/plain'));
-            const rect = pitch.getBoundingClientRect();
-            const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
-            const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
-            FORMATION.positions[idx].x = Math.max(5, Math.min(95, x));
-            FORMATION.positions[idx].y = Math.max(5, Math.min(95, y));
-            Api.saveFormation(FORMATION.name, FORMATION.positions);
-            this.renderAdminPitch();
         });
 
         document.getElementById('formationSelect').value = FORMATION.name;
@@ -774,7 +796,7 @@ const Admin = {
         const grouped = { portero: [], defensa: [], centrocampista: [], delantero: [] };
         FORMATION.positions.forEach(pos => {
             const player = PLAYERS.find(p => p.id === pos.playerId);
-            if (player) grouped[player.position].push(pos);
+            if (player) grouped[getPrimaryPosition(player.position)].push(pos);
         });
 
         const newPositions = [];

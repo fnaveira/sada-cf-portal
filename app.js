@@ -140,12 +140,13 @@ function initNavigation() {
 // CONVOCATORIA
 function renderConvocatoria() {
     const container = document.getElementById("convocatoriaList");
-    const convocados = CONVOCATORIA.map(id => PLAYERS.find(p => p.id === id)).filter(Boolean);
     const titulares = FORMATION.positions.map(p => p.playerId);
-    const suplentes = convocados.filter(p => !titulares.includes(p.id));
+    const convocados = CONVOCATORIA.map(id => PLAYERS.find(p => p.id === id)).filter(Boolean);
+    const suplentes = convocados.filter(p => !titulares.includes(p.id) && p.status === 'disponible');
 
     const positionOrder = { portero: 0, defensa: 1, centrocampista: 2, delantero: 3 };
-    convocados.sort((a, b) => positionOrder[a.position] - positionOrder[b.position]);
+    const sortByPos = (a, b) => positionOrder[getPrimaryPosition(a.position)] - positionOrder[getPrimaryPosition(b.position)];
+    convocados.sort(sortByPos);
 
     const posLabels = { portero: 'GK', defensa: 'DEF', centrocampista: 'MED', delantero: 'DEL' };
 
@@ -192,7 +193,7 @@ function renderConvocatoria() {
                             </div>
                             <div class="conv-player-label">
                                 <span class="conv-player-name">${pName}</span>
-                                <span class="conv-player-pos">${posLabels[player.position] || ''}</span>
+                                <span class="conv-player-pos">${posLabels[getPrimaryPosition(player.position)] || ''}</span>
                             </div>
                         </div>`;
                 }).join('')}
@@ -237,7 +238,7 @@ function renderPlayers(filter = "todos") {
     const container = document.getElementById("playersGrid");
     const filtered = filter === "todos"
         ? PLAYERS
-        : PLAYERS.filter(p => p.position === filter);
+        : PLAYERS.filter(p => p.position && p.position.includes(filter));
 
     container.innerHTML = filtered.map(player => {
         const statusClass = player.status === 'lesionado' ? 'lesionado' : player.status === 'no_disponible' ? 'no-disponible' : '';
@@ -487,7 +488,19 @@ function formatPosition(pos) {
         centrocampista: "Centrocampista",
         delantero: "Delantero"
     };
+    if (pos && pos.includes(',')) {
+        return pos.split(',').map(p => map[p] || p).join(' / ');
+    }
     return map[pos] || pos;
+}
+
+function getPrimaryPosition(pos) {
+    if (!pos) return '';
+    return pos.split(',')[0];
+}
+
+function hasPosition(player, position) {
+    return player.position && player.position.includes(position);
 }
 
 function getInitials(name) {
