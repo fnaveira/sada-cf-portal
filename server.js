@@ -114,7 +114,7 @@ function seedData() {
     [4,"Alfonso Martínez Váquez","Alfonso",4,"delantero,defensa",39,"disponible"],
     [5,"Carlos M. Álvarez Labora","Carlitos",5,"delantero,defensa",56,"no_disponible"],
     [6,"Diego Fernández Cabana","Diego",6,"centrocampista,defensa",46,"disponible"],
-    [7,"Miguel Amor Haz","Amor",7,"defensa,centrocampista,delantero",46,"disponible"],
+    [7,"Miguel Amor Haz","Miguel",7,"defensa,centrocampista,delantero",46,"disponible"],
     [8,"Iván Fernández Álvarez","Iván",9,"portero,defensa,centrocampista,delantero",46,"no_disponible"],
     [9,"Gonzalo Ferro Rozas","Ferro",10,"delantero,centrocampista",46,"lesionado"],
     [10,"Miguel Boo Fernández","Boo",11,"delantero,defensa",41,"disponible"],
