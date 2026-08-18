@@ -1,8 +1,21 @@
 const Admin = {
     async renderAdminPlayers() {
         const tbody = document.getElementById('adminPlayersBody');
+        const filter = this._currentPlayerFilter || 'todos';
+        const positionOrder = { portero: 0, defensa: 1, centrocampista: 2, delantero: 3 };
 
-        tbody.innerHTML = PLAYERS.map(p => {
+        let filtered = filter === 'todos'
+            ? [...PLAYERS]
+            : PLAYERS.filter(p => p.position && p.position.includes(filter));
+
+        filtered.sort((a, b) => {
+            const pa = positionOrder[getPrimaryPosition(a.position)] ?? 99;
+            const pb = positionOrder[getPrimaryPosition(b.position)] ?? 99;
+            if (pa !== pb) return pa - pb;
+            return a.number - b.number;
+        });
+
+        tbody.innerHTML = filtered.map(p => {
             const statusIcon = p.status === 'lesionado' ? '🤕' : p.status === 'no_disponible' ? '🚫' : '✅';
             return `
             <tr>
@@ -1180,12 +1193,15 @@ const Admin = {
                 if (tab.dataset.tab === 'adminConvocatoria') this.renderAdminConvocatoria();
                 if (tab.dataset.tab === 'adminClub') this.renderClubAdmin();
                 if (tab.dataset.tab === 'adminNews') this.renderAdminNews();
+                if (tab.dataset.tab === 'adminPhotos') this.renderAdminPhotos();
+                if (tab.dataset.tab === 'adminCronica') { this.renderCronicaForm(); this.loadCronicaHistory(); }
             });
         });
 
         document.getElementById('addPlayerBtn').addEventListener('click', () => this.showAddPlayerModal());
         document.getElementById('addUserBtn').addEventListener('click', () => this.showAddUserModal());
         document.getElementById('addNewsBtn').addEventListener('click', () => this.showAddNewsModal());
+        document.getElementById('addPhotoBtn').addEventListener('click', () => this.showUploadPhotoModal());
 
         document.getElementById('saveFormationBtn').addEventListener('click', async () => {
             FORMATION.name = document.getElementById('formationSelect').value;
@@ -1214,5 +1230,169 @@ const Admin = {
         });
 
         this.loadAndApplyAppearance();
+    },
+
+    exitAdmin() {
+        const sections = document.querySelectorAll(".section");
+        sections.forEach(s => s.classList.remove("active"));
+        document.getElementById("convocatoria").classList.add("active");
+        document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
+        document.querySelector('.nav-link[data-section="convocatoria"]').classList.add("active");
+    },
+
+    _currentPlayerFilter: 'todos',
+
+    filterPlayers(filter) {
+        this._currentPlayerFilter = filter;
+        document.querySelectorAll('.pos-filter').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.pos-filter[data-filter="${filter}"]`).classList.add('active');
+        this.renderAdminPlayers();
+    },
+
+    // PHOTOS ADMIN
+    showUploadPhotoModal() {
+        const modal = document.getElementById('modal');
+        document.getElementById('modalTitle').textContent = 'Subir Foto';
+        document.getElementById('modalBody').innerHTML = `
+            <form id="uploadPhotoForm" class="modal-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Título (opcional)</label>
+                    <input type="text" id="photoTitle" placeholder="Título de la foto">
+                </div>
+                <div class="form-group">
+                    <label>Descripción (opcional)</label>
+                    <input type="text" id="photoDesc" placeholder="Descripción">
+                </div>
+                <div class="form-group">
+                    <label>Archivo</label>
+                    <input type="file" id="photoFile" accept="image/*" required>
+                </div>
+                <button type="submit" class="btn-primary"><i class="fas fa-upload"></i> Subir</button>
+            </form>
+        `;
+        modal.style.display = 'flex';
+
+        document.getElementById('uploadPhotoForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const fd = new FormData();
+            fd.append('photo', document.getElementById('photoFile').files[0]);
+            fd.append('title', document.getElementById('photoTitle').value);
+            fd.append('description', document.getElementById('photoDesc').value);
+            fd.append('uploadedBy', CURRENT_USER?.username || 'admin');
+            await Api.uploadPhoto(fd);
+            modal.style.display = 'none';
+            this.renderAdminPhotos();
+            renderPhotos();
+        };
+    },
+
+    async renderAdminPhotos() {
+        const grid = document.getElementById('adminPhotosGrid');
+        if (!grid) return;
+        const photos = await Api.getPhotos();
+        grid.innerHTML = photos.length === 0 ? '<p style="color:var(--text-muted);">No hay fotos</p>' :
+            photos.map(p => `
+                <div class="photo-card admin-photo-card">
+                    <div class="photo-img"><img src="/uploads/${p.filename}" alt="${p.title || ''}" loading="lazy"></div>
+                    <div class="photo-info">
+                        ${p.title ? `<div class="photo-title">${p.title}</div>` : ''}
+                        <div class="photo-date">${p.date || ''}</div>
+                    </div>
+                    <button class="btn-icon danger" onclick="Admin.deletePhoto(${p.id})" title="Eliminar"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+    },
+
+    async deletePhoto(id) {
+        if (!confirm('¿Eliminar esta foto?')) return;
+        await Api.deletePhoto(id);
+        this.renderAdminPhotos();
+        renderPhotos();
+    },
+
+    // CRÓNICA ADMIN
+    renderCronicaForm() {
+        const sel = document.getElementById('cronicaPlayerSelect');
+        if (!sel) return;
+        const opts = PLAYERS.map(p => `<option value="${p.id}">${p.number} - ${p.nickname || p.name}</option>`).join('');
+        sel.innerHTML = '<option value="">Seleccionar jugador...</option>' + opts;
+        sel.onchange = () => this.loadCronicaHistory();
+    },
+
+    async loadCronicaHistory() {
+        const sel = document.getElementById('cronicaPlayerSelect');
+        const form = document.getElementById('cronicaForm');
+        const hist = document.getElementById('cronicaHistory');
+        const playerId = sel.value;
+        if (!playerId) { form.innerHTML = ''; hist.innerHTML = ''; return; }
+
+        const catLabels = { technique: 'Técnica', tactics: 'Táctica', physical: 'Física', mental: 'Mental', attitude: 'Actitud' };
+        const renderStars = (val) => '★'.repeat(val) + '☆'.repeat(5 - val);
+
+        form.innerHTML = `
+            <div class="cronica-eval-form">
+                <h3>Evaluación de ${PLAYERS.find(p => p.id == playerId)?.nickname || PLAYERS.find(p => p.id == playerId)?.name}</h3>
+                ${Object.entries(catLabels).map(([key, label]) => `
+                    <div class="cronica-row">
+                        <label>${label}</label>
+                        <div class="cronica-stars" data-cat="${key}">
+                            ${[1,2,3,4,5].map(n => `<span class="star-input" data-val="${n}" onclick="Admin.setStar('${key}',${n})">☆</span>`).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+                <div class="cronica-row">
+                    <label>Observaciones</label>
+                    <textarea id="cronicaComment" rows="3" placeholder="Escribe tus observaciones..."></textarea>
+                </div>
+                <div class="cronica-row">
+                    <label>Evaluador</label>
+                    <input type="text" id="cronicaEvaluator" placeholder="Nombre del evaluador" value="${CURRENT_USER?.username || ''}">
+                </div>
+                <button class="btn-primary" onclick="Admin.saveEvaluation(${playerId})"><i class="fas fa-save"></i> Guardar Evaluación</button>
+            </div>
+        `;
+        this._cronicaScores = { technique: 0, tactics: 0, physical: 0, mental: 0, attitude: 0 };
+
+        const evals = await Api.getPlayerEvaluations(playerId);
+        hist.innerHTML = evals.length === 0 ? '' : `<h3>Historial</h3>` + evals.map(ev => {
+            const avg = ((ev.technique + ev.tactics + ev.physical + ev.mental + ev.attitude) / 5).toFixed(1);
+            return `
+            <div class="eval-card">
+                <div class="eval-header">
+                    <span class="eval-date">${ev.date}</span>
+                    <span class="eval-evaluator">${ev.evaluator || 'Staff'}</span>
+                    <span class="eval-avg">Media: <strong>${avg}</strong>/5</span>
+                    <button class="btn-icon danger" onclick="Admin.deleteEvaluation(${ev.id})" title="Eliminar"><i class="fas fa-trash"></i></button>
+                </div>
+                <div class="eval-scores">
+                    ${Object.entries(catLabels).map(([cat, label]) => `
+                        <div class="eval-cat"><span class="eval-cat-label">${label}</span> <span class="eval-stars">${renderStars(ev[cat])}</span></div>
+                    `).join('')}
+                </div>
+                ${ev.comment ? `<div class="eval-comment"><i class="fas fa-comment-dots"></i> ${ev.comment}</div>` : ''}
+            </div>`;
+        }).join('');
+    },
+
+    setStar(cat, val) {
+        if (!this._cronicaScores) this._cronicaScores = {};
+        this._cronicaScores[cat] = val;
+        const stars = document.querySelectorAll(`.cronica-stars[data-cat="${cat}"] .star-input`);
+        stars.forEach((s, i) => { s.textContent = i < val ? '★' : '☆'; s.classList.toggle('active', i < val); });
+    },
+
+    async saveEvaluation(playerId) {
+        const scores = this._cronicaScores || {};
+        if (Object.values(scores).every(v => v === 0)) { alert('Pon al menos una puntuación'); return; }
+        const comment = document.getElementById('cronicaComment')?.value || '';
+        const evaluator = document.getElementById('cronicaEvaluator')?.value || '';
+        await Api.addEvaluation({ playerId: parseInt(playerId), ...scores, comment, evaluator });
+        this.loadCronicaHistory();
+    },
+
+    async deleteEvaluation(id) {
+        if (!confirm('¿Eliminar esta evaluación?')) return;
+        await Api.deleteEvaluation(id);
+        this.loadCronicaHistory();
     }
 };

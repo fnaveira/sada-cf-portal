@@ -14,7 +14,7 @@
         <div class="login-container">
             <div class="login-header">
                 <i class="fas fa-futbol"></i>
-                <h1>Sada CF</h1>
+                <h1>SFCAV</h1>
                 <p>Portal Interno</p>
             </div>
             <form id="loginForm" class="login-form">
@@ -44,16 +44,14 @@
         <nav class="navbar">
             <div class="nav-brand">
                 <i class="fas fa-futbol"></i>
-                <span>Sada CF</span>
+                <span>SFCAV</span>
             </div>
             <ul class="nav-links">
                 <li><a href="#convocatoria" class="nav-link active" data-section="convocatoria"><i class="fas fa-clipboard-list"></i> Convocatoria</a></li>
                 <li><a href="#jugadores" class="nav-link" data-section="jugadores"><i class="fas fa-users"></i> Jugadores</a></li>
                 <li><a href="#noticias" class="nav-link" data-section="noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
-                <li><a href="#estadisticas" class="nav-link" data-section="estadisticas"><i class="fas fa-chart-bar"></i> Estadísticas</a></li>
-                <li><a href="#partidos" class="nav-link" data-section="partidos"><i class="fas fa-calendar-alt"></i> Partidos</a></li>
-                <li><a href="#resultados" class="nav-link" data-section="resultados"><i class="fas fa-trophy"></i> Resultados</a></li>
-                <li><a href="#club" class="nav-link" data-section="club"><i class="fas fa-landmark"></i> Club</a></li>
+                <li><a href="#fotos" class="nav-link" data-section="fotos"><i class="fas fa-camera"></i> Fotos</a></li>
+                <li><a href="#cronica" class="nav-link" data-section="cronica"><i class="fas fa-clipboard-check"></i> Crónica</a></li>
                 <li id="adminNavLink" style="display:none;"><a href="#admin" class="nav-link" data-section="admin"><i class="fas fa-cog"></i> Admin</a></li>
             </ul>
             <div class="nav-user">
@@ -142,10 +140,27 @@
                 <div class="club-grid" id="clubInfo"></div>
             </section>
 
+            <!-- FOTOS -->
+            <section id="fotos" class="section" style="display:none;">
+                <div class="section-header">
+                    <h1><i class="fas fa-camera"></i> Fotos del Equipo</h1>
+                </div>
+                <div class="photos-grid" id="photosGrid"></div>
+            </section>
+
+            <!-- CRÓNICA (jugador ve su evaluación) -->
+            <section id="cronica" class="section" style="display:none;">
+                <div class="section-header">
+                    <h1><i class="fas fa-clipboard-check"></i> Mi Crónica</h1>
+                </div>
+                <div id="playerEvaluations"></div>
+            </section>
+
             <!-- ADMIN PANEL -->
             <section id="admin" class="section">
                 <div class="section-header">
                     <h1><i class="fas fa-cog"></i> Panel de Administración</h1>
+                    <button class="btn-secondary" onclick="Admin.exitAdmin()" title="Salir de admin"><i class="fas fa-sign-out-alt"></i> Salir de Admin</button>
                 </div>
 
                 <div class="admin-tabs">
@@ -156,12 +171,21 @@
                     <button class="admin-tab" data-tab="adminUsers"><i class="fas fa-user-shield"></i> Usuarios</button>
                     <button class="admin-tab" data-tab="adminAppearance"><i class="fas fa-palette"></i> Apariencia</button>
                     <button class="admin-tab" data-tab="adminNews"><i class="fas fa-newspaper"></i> Noticias</button>
+                    <button class="admin-tab" data-tab="adminPhotos"><i class="fas fa-camera"></i> Fotos</button>
+                    <button class="admin-tab" data-tab="adminCronica"><i class="fas fa-clipboard-check"></i> Crónica</button>
                 </div>
 
                 <!-- Players Admin -->
                 <div id="adminPlayers" class="admin-panel active">
                     <div class="admin-toolbar">
                         <button class="btn-primary" id="addPlayerBtn"><i class="fas fa-plus"></i> Nuevo Jugador</button>
+                        <div class="position-filters">
+                            <button class="pos-filter active" data-filter="todos" onclick="Admin.filterPlayers('todos')">Todos</button>
+                            <button class="pos-filter" data-filter="portero" onclick="Admin.filterPlayers('portero')"><i class="fas fa-hands-gloves"></i> Porteros</button>
+                            <button class="pos-filter" data-filter="defensa" onclick="Admin.filterPlayers('defensa')"><i class="fas fa-shield-halved"></i> Defensas</button>
+                            <button class="pos-filter" data-filter="centrocampista" onclick="Admin.filterPlayers('centrocampista')"><i class="fas fa-arrows-left-right"></i> Centrocampistas</button>
+                            <button class="pos-filter" data-filter="delantero" onclick="Admin.filterPlayers('delantero')"><i class="fas fa-bullseye"></i> Delanteros</button>
+                        </div>
                     </div>
                     <div class="admin-table-container">
                         <table class="admin-table" id="adminPlayersTable">
@@ -315,6 +339,25 @@
                             <tbody id="adminNewsBody"></tbody>
                         </table>
                     </div>
+                </div>
+
+                <!-- Photos Admin -->
+                <div id="adminPhotos" class="admin-panel" style="display:none;">
+                    <div class="admin-toolbar">
+                        <button class="btn-primary" id="addPhotoBtn"><i class="fas fa-upload"></i> Subir Foto</button>
+                    </div>
+                    <div class="photos-grid" id="adminPhotosGrid"></div>
+                </div>
+
+                <!-- Crónica Admin -->
+                <div id="adminCronica" class="admin-panel" style="display:none;">
+                    <div class="admin-toolbar">
+                        <select id="cronicaPlayerSelect" class="cronica-select">
+                            <option value="">Seleccionar jugador...</option>
+                        </select>
+                    </div>
+                    <div class="cronica-form" id="cronicaForm"></div>
+                    <div id="cronicaHistory"></div>
                 </div>
             </section>
         </main>

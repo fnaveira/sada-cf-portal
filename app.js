@@ -73,6 +73,8 @@ function showMainApp() {
     renderCalendar();
     renderResults();
     renderClubInfo();
+    renderPhotos();
+    renderPlayerEvaluations();
     initFilters();
     Admin.init();
     Admin.renderAdminPlayers();
@@ -569,6 +571,63 @@ function renderClubInfo() {
             `).join('')}
         </div>
     `;
+}
+
+// PHOTOS
+async function renderPhotos() {
+    const container = document.getElementById('photosGrid');
+    if (!container) return;
+    const photos = await Api.getPhotos();
+    if (photos.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No hay fotos aún</p>';
+        return;
+    }
+    container.innerHTML = photos.map(p => `
+        <div class="photo-card">
+            <div class="photo-img"><img src="/uploads/${p.filename}" alt="${p.title || ''}" loading="lazy"></div>
+            ${p.title ? `<div class="photo-title">${p.title}</div>` : ''}
+            ${p.description ? `<div class="photo-desc">${p.description}</div>` : ''}
+            <div class="photo-date">${p.date || ''}</div>
+        </div>
+    `).join('');
+}
+
+// CRÓNICA (player view)
+async function renderPlayerEvaluations() {
+    const container = document.getElementById('playerEvaluations');
+    if (!container || !CURRENT_USER || !CURRENT_USER.playerName) return;
+    const player = PLAYERS.find(p => p.name === CURRENT_USER.playerName || p.nickname === CURRENT_USER.playerName);
+    if (!player) { container.innerHTML = '<p>No se encontró tu perfil de jugador</p>'; return; }
+
+    const evals = await Api.getPlayerEvaluations(player.id);
+    if (evals.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">Aún no tienes evaluaciones</p>';
+        return;
+    }
+
+    const catLabels = { technique: 'Técnica', tactics: 'Táctica', physical: 'Física', mental: 'Mental', attitude: 'Actitud' };
+    const renderStars = (val) => '★'.repeat(val) + '☆'.repeat(5 - val);
+
+    container.innerHTML = evals.map(ev => {
+        const avg = ((ev.technique + ev.tactics + ev.physical + ev.mental + ev.attitude) / 5).toFixed(1);
+        return `
+        <div class="eval-card">
+            <div class="eval-header">
+                <span class="eval-date">${ev.date}</span>
+                <span class="eval-evaluator">Evaluado por: ${ev.evaluator || 'Staff'}</span>
+                <span class="eval-avg">Media: <strong>${avg}</strong>/5</strong></span>
+            </div>
+            <div class="eval-scores">
+                ${Object.keys(catLabels).map(cat => `
+                    <div class="eval-cat">
+                        <span class="eval-cat-label">${catLabels[cat]}</span>
+                        <span class="eval-stars">${renderStars(ev[cat])}</span>
+                    </div>
+                `).join('')}
+            </div>
+            ${ev.comment ? `<div class="eval-comment"><i class="fas fa-comment-dots"></i> ${ev.comment}</div>` : ''}
+        </div>`;
+    }).join('');
 }
 
 document.addEventListener("DOMContentLoaded", initApp);

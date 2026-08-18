@@ -2,12 +2,27 @@ const express = require('express');
 const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
 const crypto = require('crypto');
+const multer = require('multer');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname)));
+
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
+app.use('/uploads', express.static(uploadsDir));
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadsDir),
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, Date.now() + '-' + crypto.randomBytes(4).toString('hex') + ext);
+    }
+});
+const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
 // --- DATABASE ---
 const db = new DatabaseSync(path.join(__dirname, 'sada.db'));
@@ -97,6 +112,26 @@ function initDB() {
       type TEXT DEFAULT 'jugador',
       playerName TEXT
     );
+    CREATE TABLE IF NOT EXISTS photos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT,
+      description TEXT,
+      filename TEXT NOT NULL,
+      uploadedBy TEXT,
+      date TEXT DEFAULT (date('now'))
+    );
+    CREATE TABLE IF NOT EXISTS evaluations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      playerId INTEGER NOT NULL,
+      technique INTEGER DEFAULT 0,
+      tactics INTEGER DEFAULT 0,
+      physical INTEGER DEFAULT 0,
+      mental INTEGER DEFAULT 0,
+      attitude INTEGER DEFAULT 0,
+      comment TEXT,
+      evaluator TEXT,
+      date TEXT DEFAULT (date('now'))
+    );
   `);
 }
 
@@ -113,14 +148,14 @@ function seedData() {
     [3,"David Mourelo Mouzo","Mourelo",5,"defensa,centrocampista,delantero",37,"no_disponible"],
     [4,"Alfonso Martínez Váquez","Alfonso",20,"delantero,defensa",39,"disponible"],
     [5,"Carlos M. Álvarez Labora","Charlie",21,"delantero,defensa",56,"no_disponible"],
-    [6,"Diego Fernández Cabana","Cabaña",12,"centrocampista,defensa",46,"disponible"],
+    [6,"Diego Fernández Cabana","Cabana",12,"centrocampista,defensa",46,"disponible"],
     [7,"Miguel Amor Haz","Miguel",6,"defensa,centrocampista,delantero",46,"disponible"],
-    [8,"Iván Fernández Álvarez","Iván",2,"portero,defensa,centrocampista,delantero",46,"no_disponible"],
+    [8,"Iván Fernández Álvarez","Pirulo",2,"portero,defensa,centrocampista,delantero",46,"no_disponible"],
     [9,"Gonzalo Ferro Rozas","Ferro",22,"delantero,centrocampista",46,"lesionado"],
     [10,"Miguel Boo Fernández","Boo",23,"delantero,defensa",41,"disponible"],
     [11,"Santiago Seijo Cancelo","Santi",13,"centrocampista,defensa",46,"no_disponible"],
     [12,"Sergio Seijo Cancelo","Sergio",14,"centrocampista,defensa",38,"no_disponible"],
-    [13,"Bernardo Gómez Cagiao","Berni",7,"defensa,centrocampista",40,"disponible"],
+    [13,"Bernardo Gómez Cagiao","Bernardo",7,"defensa,centrocampista",40,"disponible"],
     [14,"Jose Luis Mallo López","Pepe",24,"delantero,defensa",42,"no_disponible"],
     [15,"Antonio Seoane Barros","Toni",15,"centrocampista,defensa",39,"disponible"],
     [16,"César Freire Lesta","César",8,"defensa,centrocampista,delantero",46,"disponible"],
@@ -129,12 +164,13 @@ function seedData() {
     [19,"Pablo Graña Pita","Graña",17,"centrocampista,defensa",42,"disponible"],
     [20,"Javier Vizoso Guerra","Vizoso",18,"centrocampista",55,"lesionado"],
     [21,"Francisco Lata Cortes","Lata",10,"defensa,centrocampista",41,"no_disponible"],
-    [22,"Manuel Cortes","Manolo",3,"portero",50,"disponible"]
+    [22,"Manuel Cortes","Manolo",3,"portero",50,"disponible"],
+    [23,"Julio",null,25,"centrocampista",46,"disponible"]
   ];
   for (const p of players) insertPlayer.run(...p);
 
   const insertConv = db.prepare('INSERT INTO convocatoria (playerId) VALUES (?)');
-  for (const id of [2,4,6,7,10,15,16,19,20,22]) insertConv.run(id);
+  for (const id of [2,4,6,7,10,15,16,19,20,22,23]) insertConv.run(id);
 
     db.prepare('INSERT INTO formation (id, name, positions) VALUES (1, ?, ?)').run(
     '4-2-3-1',
@@ -382,6 +418,57 @@ app.put('/api/users/:id', (req, res) => {
 
 app.delete('/api/users/:id', (req, res) => {
   db.prepare('DELETE FROM users WHERE id = ?').run(req.params.id);
+  res.json({ ok: true });
+});
+
+// --- PHOTOS ---
+app.get('/api/photos', (req, res) => {
+  const photos = db.prepare('SELECT * FROM photos ORDER BY date DESC, id DESC').all();
+  res.json(photos);
+});
+
+app.post('/api/photos', upload.single('photo'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No se envió archivo' });
+  const { title, description, uploadedBy } = req.body;
+  const info = db.prepare('INSERT INTO photos (title, description, filename, uploadedBy, date) VALUES (?, ?, ?, ?, date("now"))').run(title || null, description || null, req.file.filename, uploadedBy || null);
+  res.json({ id: info.lastInsertRowid, filename: req.file.filename });
+});
+
+app.delete('/api/photos/:id', (req, res) => {
+  const photo = db.prepare('SELECT filename FROM photos WHERE id = ?').get(req.params.id);
+  if (photo) {
+    const filePath = path.join(uploadsDir, photo.filename);
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  }
+  db.prepare('DELETE FROM photos WHERE id = ?').run(req.params.id);
+  res.json({ ok: true });
+});
+
+// --- EVALUATIONS ---
+app.get('/api/evaluations', (req, res) => {
+  const { playerId } = req.query;
+  let evals;
+  if (playerId) {
+    evals = db.prepare('SELECT * FROM evaluations WHERE playerId = ? ORDER BY date DESC, id DESC').all(playerId);
+  } else {
+    evals = db.prepare('SELECT * FROM evaluations ORDER BY date DESC, id DESC').all();
+  }
+  res.json(evals);
+});
+
+app.get('/api/evaluations/player/:id', (req, res) => {
+  const evals = db.prepare('SELECT * FROM evaluations WHERE playerId = ? ORDER BY date DESC, id DESC').all(req.params.id);
+  res.json(evals);
+});
+
+app.post('/api/evaluations', (req, res) => {
+  const { playerId, technique, tactics, physical, mental, attitude, comment, evaluator } = req.body;
+  const info = db.prepare('INSERT INTO evaluations (playerId, technique, tactics, physical, mental, attitude, comment, evaluator, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, date("now"))').run(playerId, technique || 0, tactics || 0, physical || 0, mental || 0, attitude || 0, comment || null, evaluator || null);
+  res.json({ id: info.lastInsertRowid });
+});
+
+app.delete('/api/evaluations/:id', (req, res) => {
+  db.prepare('DELETE FROM evaluations WHERE id = ?').run(req.params.id);
   res.json({ ok: true });
 });
 

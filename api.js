@@ -61,6 +61,22 @@ const Api = {
 
   async saveAppearance(data) { return this.put('/api/appearance', data); },
 
+  async getPhotos() { return this.get('/api/photos'); },
+  async uploadPhoto(formData) {
+    const res = await fetch(API_BASE + '/api/photos', { method: 'POST', body: formData });
+    if (!res.ok) throw new Error('Upload failed');
+    return res.json();
+  },
+  async deletePhoto(id) { return this.del(`/api/photos/${id}`); },
+
+  async getEvaluations(playerId) {
+    const url = playerId ? `/api/evaluations?playerId=${playerId}` : '/api/evaluations';
+    return this.get(url);
+  },
+  async getPlayerEvaluations(playerId) { return this.get(`/api/evaluations/player/${playerId}`); },
+  async addEvaluation(data) { return this.post('/api/evaluations', data); },
+  async deleteEvaluation(id) { return this.del(`/api/evaluations/${id}`); },
+
   async login(username, password) { return this.post('/api/auth/login', { username, password }); },
   async getUsers() { return this.get('/api/users'); },
   async addUser(data) { return this.post('/api/users', data); },
