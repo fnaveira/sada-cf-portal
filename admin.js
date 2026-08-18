@@ -282,8 +282,21 @@ const Admin = {
             };
             await Api.savePlayer(id, data);
             Object.assign(player, data);
+            if (data.status !== 'disponible') {
+                const inFormation = FORMATION.positions.findIndex(p => p.playerId === player.id);
+                if (inFormation !== -1) {
+                    FORMATION.positions.splice(inFormation, 1);
+                    await Api.saveFormation(FORMATION.name, FORMATION.positions);
+                }
+                const inConv = CONVOCATORIA.indexOf(player.id);
+                if (inConv !== -1) {
+                    CONVOCATORIA.splice(inConv, 1);
+                    await Api.saveConvocatoria(CONVOCATORIA);
+                }
+            }
             modal.style.display = 'none';
             this.renderAdminPlayers();
+            this.renderAdminConvocatoria();
             renderPlayers();
             renderConvocatoria();
         };
@@ -686,6 +699,10 @@ const Admin = {
             if (inConv !== -1) CONVOCATORIA.splice(inConv, 1);
         } else {
             const player = PLAYERS.find(p => p.id === playerId);
+            if (player && player.status !== 'disponible') {
+                alert('No se puede añadir un jugador ' + (player.status === 'lesionado' ? 'lesionado' : 'no disponible') + ' a titulares');
+                return;
+            }
             const autoPos = this.autoPositionPlayer(player, FORMATION.positions.length);
             FORMATION.positions.push({ playerId, x: autoPos.x, y: autoPos.y });
             if (inConv === -1) CONVOCATORIA.push(playerId);
