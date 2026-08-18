@@ -430,7 +430,7 @@ app.get('/api/photos', (req, res) => {
 app.post('/api/photos', upload.single('photo'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No se envió archivo' });
   const { title, description, uploadedBy } = req.body;
-  const info = db.prepare('INSERT INTO photos (title, description, filename, uploadedBy, date) VALUES (?, ?, ?, ?, date("now"))').run(title || null, description || null, req.file.filename, uploadedBy || null);
+  const info = db.prepare(`INSERT INTO photos (title, description, filename, uploadedBy, date) VALUES (?, ?, ?, ?, date('now'))`).run(title || null, description || null, req.file.filename, uploadedBy || null);
   res.json({ id: info.lastInsertRowid, filename: req.file.filename });
 });
 
@@ -463,7 +463,7 @@ app.get('/api/evaluations/player/:id', (req, res) => {
 
 app.post('/api/evaluations', (req, res) => {
   const { playerId, technique, tactics, physical, mental, attitude, comment, evaluator } = req.body;
-  const info = db.prepare('INSERT INTO evaluations (playerId, technique, tactics, physical, mental, attitude, comment, evaluator, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, date("now"))').run(playerId, technique || 0, tactics || 0, physical || 0, mental || 0, attitude || 0, comment || null, evaluator || null);
+  const info = db.prepare(`INSERT INTO evaluations (playerId, technique, tactics, physical, mental, attitude, comment, evaluator, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, date('now'))`).run(playerId, technique || 0, tactics || 0, physical || 0, mental || 0, attitude || 0, comment || null, evaluator || null);
   res.json({ id: info.lastInsertRowid });
 });
 
