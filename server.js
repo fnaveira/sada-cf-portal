@@ -160,7 +160,7 @@ function seedData() {
   [[1,"Fran Naveira","Entrenador"],[2,"Santi Seijo","Entrenador Auxiliar"]].forEach(s => insertStaff.run(...s));
 
   const insertBoard = db.prepare('INSERT INTO board (id, name, role) VALUES (?, ?, ?)');
-  [[1,"D. Diego Fernández Cabana","Presidente"],[2,"D. Carlos Méndez Vizoso","Vicepresidente"],[3,"D. Antonio Garea Blanco","Secretario"],[4,"D. Miguel Amor Rodríguez","Tesorero"],[5,"Dña. Laura Fernández Suárez","Vocal"]].forEach(b => insertBoard.run(...b));
+  [[1,"D. Diego Fernández Cabana","Presidente"],[2,"D. Carlos Méndez Vizoso","Vicepresidente"],[3,"D. Antonio Garea Blanco","Secretario"],[4,"D. Miguel Amor Rodríguez","Tesorero"]].forEach(b => insertBoard.run(...b));
 
   const insertNews = db.prepare('INSERT INTO news (id, title, summary, date, tag) VALUES (?, ?, ?, ?, ?)');
   [
