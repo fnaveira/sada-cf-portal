@@ -19,9 +19,11 @@ function initDB() {
     CREATE TABLE IF NOT EXISTS players (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
+      nickname TEXT,
       number INTEGER NOT NULL,
       position TEXT NOT NULL,
       age INTEGER,
+      status TEXT DEFAULT 'disponible',
       goals INTEGER DEFAULT 0,
       yellowCards INTEGER DEFAULT 0,
       redCards INTEGER DEFAULT 0
@@ -104,29 +106,41 @@ function seedNeeded() {
 }
 
 function seedData() {
-  const insertPlayer = db.prepare('INSERT INTO players (id, name, number, position, age, goals, yellowCards, redCards) VALUES (?, ?, ?, ?, ?, 0, 0, 0)');
+  const insertPlayer = db.prepare('INSERT INTO players (id, name, nickname, number, position, age, status, goals, yellowCards, redCards) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, 0)');
   const players = [
-    [1,"Carlos Caamaño",1,"portero",50],[2,"Alberto Roibas",2,"defensa",45],[3,"Francisco Lata",3,"defensa",41],
-    [4,"Carlos Álvarez",4,"defensa",56],[5,"Miguel Amor",5,"defensa",46],[6,"Miguel Garea",6,"defensa",46],
-    [7,"Carlos Robles",7,"defensa",42],[8,"Jose Mallo",8,"defensa",42],[9,"Yonattan Carro",14,"centrocampista",43],
-    [10,"César",15,"centrocampista",46],[11,"Diego Fernández",16,"centrocampista",46],[12,"Santiago Seijo",17,"centrocampista",46],
-    [13,"Óscar Barallobre",18,"centrocampista",49],[14,"Antonio Seoane",19,"centrocampista",39],[15,"Javier Vizoso",20,"centrocampista",55],
-    [16,"Enrique Gómez",21,"centrocampista",47],[17,"Alberto Durán",22,"centrocampista",42],[18,"Francisco Veiga",23,"centrocampista",51],
-    [19,"Juan Pol Moares",24,"centrocampista",45],[20,"Alfonso Martínez",25,"centrocampista",39],[21,"David Mourelo",26,"centrocampista",37],
-    [22,"Sergio Seijo",9,"delantero",38],[23,"Pablo Graña",10,"delantero",42],[24,"Miguel Boo Fernández",11,"delantero",41],
-    [25,"Miguel Meiras",27,"delantero",46],[26,"Iván Fernández",28,"delantero",46],[27,"Gonzalo Ferro",29,"delantero",46]
+    [1,"Carlos Caamaño","Caamaño",1,"portero",50,"disponible"],
+    [2,"Miguel Ángel Garea Parga","Garea",2,"defensa",46,"disponible"],
+    [3,"David Mourelo Mouzo","Mourelo",3,"defensa",37,"disponible"],
+    [4,"Alfonso Martínez Váquez","Alfonso",4,"delantero",39,"disponible"],
+    [5,"Carlos M. Álvarez Labora","Carlitos",5,"delantero",56,"disponible"],
+    [6,"Diego Fernández Cabana","Diego",6,"centrocampista",46,"disponible"],
+    [7,"Miguel Amor Haz","Amor",7,"defensa",46,"disponible"],
+    [8,"Iván Fernández Álvarez","Iván",9,"portero",46,"disponible"],
+    [9,"Gonzalo Ferro Rozas","Ferro",10,"delantero",46,"disponible"],
+    [10,"Miguel Boo Fernández","Boo",11,"delantero",41,"disponible"],
+    [11,"Santiago Seijo Cancelo","Santi",14,"centrocampista",46,"disponible"],
+    [12,"Sergio Seijo Cancelo","Sergio",15,"centrocampista",38,"disponible"],
+    [13,"Bernardo Gómez Cagiao","Berni",16,"defensa",40,"disponible"],
+    [14,"Jose Luis Mallo López","Mallo",19,"delantero",42,"disponible"],
+    [15,"Antonio Seoane Barros","Seoane",21,"centrocampista",39,"disponible"],
+    [16,"César Freire Lesta","César",23,"defensa",46,"disponible"],
+    [17,"Alberto Durán Alfonsín","Durán",24,"centrocampista",42,"disponible"],
+    [18,"Alberto Roibás Naveiro","Roibás",25,"defensa",45,"disponible"],
+    [19,"Pablo Graña Pita","Graña",26,"centrocampista",42,"disponible"],
+    [20,"Javier Vizoso Guerra","Vizoso",27,"centrocampista",55,"disponible"],
+    [21,"Francisco Lata Cortes","Lata",30,"defensa",41,"disponible"]
   ];
   for (const p of players) insertPlayer.run(...p);
 
   const insertConv = db.prepare('INSERT INTO convocatoria (playerId) VALUES (?)');
-  for (const id of [1,8,2,10,14,16,21,20,27,23,26,3,5,9,13,22,24]) insertConv.run(id);
+  for (const id of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]) insertConv.run(id);
 
     db.prepare('INSERT INTO formation (id, name, positions) VALUES (1, ?, ?)').run(
     '4-4-2',
     JSON.stringify([
-      {playerId:1,x:50,y:85},{playerId:8,x:20,y:65},{playerId:2,x:37,y:65},{playerId:10,x:63,y:65},
-      {playerId:14,x:80,y:65},{playerId:16,x:20,y:42},{playerId:21,x:37,y:42},{playerId:20,x:63,y:42},
-      {playerId:26,x:80,y:42},{playerId:27,x:38,y:22},{playerId:23,x:62,y:22}
+      {playerId:1,x:50,y:85},{playerId:3,x:20,y:65},{playerId:18,x:37,y:65},{playerId:7,x:63,y:65},
+      {playerId:21,x:80,y:65},{playerId:6,x:20,y:42},{playerId:11,x:37,y:42},{playerId:15,x:63,y:42},
+      {playerId:20,x:80,y:42},{playerId:10,x:38,y:22},{playerId:19,x:62,y:22}
     ])
   );
 
@@ -137,16 +151,16 @@ function seedData() {
     stadiumAddress: "Avda. de la Marina, s/n - 15160 Sada",
     stadiumCapacity: "2.000 espectadores",
     founded: "1975",
-    president: "D. José Antonio Fernández López"
+    president: "D. Diego Fernández Cabana"
   };
   const insertClub = db.prepare('INSERT INTO club_info (key, value) VALUES (?, ?)');
   for (const [k, v] of Object.entries(clubData)) insertClub.run(k, v);
 
   const insertStaff = db.prepare('INSERT INTO staff (id, name, role) VALUES (?, ?, ?)');
-  [[1,"Adrián Vilas","Entrenador"],[2,"Francisco J. Fernández Vega","Entrenador Auxiliar"],[3,"Jorge Amor Rodríguez","Preparador Físico"],[4,"Óscar Orro Suárez","Entrenador de Porteros"],[5,"Yeray Muñoz Pérez","Analista"]].forEach(s => insertStaff.run(...s));
+  [[1,"Fran Naveira","Entrenador"],[2,"Santi Seijo","Entrenador Auxiliar"],[3,"Jorge Amor Rodríguez","Preparador Físico"],[4,"Óscar Orro Suárez","Entrenador de Porteros"],[5,"Yeray Muñoz Pérez","Analista"],[6,"Francisco Naveira García","Director Técnico"]].forEach(s => insertStaff.run(...s));
 
   const insertBoard = db.prepare('INSERT INTO board (id, name, role) VALUES (?, ?, ?)');
-  [[1,"D. José Antonio Fernández López","Presidente"],[2,"D. Carlos Méndez Vizoso","Vicepresidente"],[3,"D. Antonio Garea Blanco","Secretario"],[4,"D. Miguel Amor Rodríguez","Tesorero"],[5,"Dña. Laura Fernández Suárez","Vocal"]].forEach(b => insertBoard.run(...b));
+  [[1,"D. Diego Fernández Cabana","Presidente"],[2,"D. Carlos Méndez Vizoso","Vicepresidente"],[3,"D. Antonio Garea Blanco","Secretario"],[4,"D. Miguel Amor Rodríguez","Tesorero"],[5,"Dña. Laura Fernández Suárez","Vocal"]].forEach(b => insertBoard.run(...b));
 
   const insertNews = db.prepare('INSERT INTO news (id, title, summary, date, tag) VALUES (?, ?, ?, ?, ?)');
   [
@@ -168,7 +182,7 @@ function seedData() {
   [[1,"Sada CF",14,10,2,2,28,10,32],[2,"CD Pilar",14,9,3,2,25,12,30],[3,"UD Ponte",14,8,2,4,22,15,26],[4,"CF Narón",14,7,4,3,20,14,25],[5,"SD Bergondo",14,7,2,5,19,16,23],[6,"CD Meira",14,6,3,5,18,17,21],[7,"UD Montaña",14,5,2,7,15,20,17],[8,"CD Oleiros",14,4,3,7,14,21,15],[9,"SD Culleredo",14,4,1,9,12,24,13],[10,"CF Cambre",14,3,2,9,10,26,11]].forEach(s => insertStanding.run(...s));
 
   const insertApp = db.prepare('INSERT INTO appearance (key, value) VALUES (?, ?)');
-  insertApp.run('primaryColor', '#c41e3a');
+  insertApp.run('primaryColor', '#1e40af');
   insertApp.run('brandName', 'Sada CF');
   insertApp.run('logoText', 'SADA');
 
@@ -216,15 +230,15 @@ app.get('/api/init', (req, res) => {
 
 // --- API: PLAYERS ---
 app.put('/api/players/:id', (req, res) => {
-  const { name, number, position, age, goals, yellowCards, redCards } = req.body;
-  const stmt = db.prepare('UPDATE players SET name=?, number=?, position=?, age=?, goals=?, yellowCards=?, redCards=? WHERE id=?');
-  stmt.run(name, number, position, age || null, goals || 0, yellowCards || 0, redCards || 0, req.params.id);
+  const { name, nickname, number, position, age, status, goals, yellowCards, redCards } = req.body;
+  const stmt = db.prepare('UPDATE players SET name=?, nickname=?, number=?, position=?, age=?, status=?, goals=?, yellowCards=?, redCards=? WHERE id=?');
+  stmt.run(name, nickname || null, number, position, age || null, status || 'disponible', goals || 0, yellowCards || 0, redCards || 0, req.params.id);
   res.json({ ok: true });
 });
 
 app.post('/api/players', (req, res) => {
-  const { name, number, position, age } = req.body;
-  const info = db.prepare('INSERT INTO players (name, number, position, age, goals, yellowCards, redCards) VALUES (?, ?, ?, ?, 0, 0, 0)').run(name, number, position, age || null);
+  const { name, nickname, number, position, age } = req.body;
+  const info = db.prepare('INSERT INTO players (name, nickname, number, position, age, status, goals, yellowCards, redCards) VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0)').run(name, nickname || null, number, position, age || null, 'disponible');
   res.json({ id: info.lastInsertRowid });
 });
 

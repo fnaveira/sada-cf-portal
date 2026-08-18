@@ -2,10 +2,12 @@ const Admin = {
     async renderAdminPlayers() {
         const tbody = document.getElementById('adminPlayersBody');
 
-        tbody.innerHTML = PLAYERS.map(p => `
+        tbody.innerHTML = PLAYERS.map(p => {
+            const statusIcon = p.status === 'lesionado' ? '🤕' : p.status === 'no_disponible' ? '🚫' : '✅';
+            return `
             <tr>
                 <td>${p.number}</td>
-                <td><strong>${p.name}</strong></td>
+                <td><strong>${p.nickname || p.name}</strong><br><small style="color:var(--text-muted)">${p.nickname ? p.name : ''}</small></td>
                 <td>${formatPosition(p.position)}</td>
                 <td>
                     <div class="stat-controls">
@@ -13,6 +15,9 @@ const Admin = {
                         <span class="stat-value">${p.age || '-'}</span>
                         <button class="stat-btn plus" onclick="Admin.changeAge(${p.id}, 1)">+</button>
                     </div>
+                </td>
+                <td>
+                    <button class="status-toggle" onclick="Admin.cycleStatus(${p.id})" title="Cambiar estado">${statusIcon}</button>
                 </td>
                 <td>
                     <div class="stat-controls">
@@ -39,8 +44,20 @@ const Admin = {
                     <button class="btn-icon" onclick="Admin.showEditPlayerModal(${p.id})"><i class="fas fa-edit"></i></button>
                     <button class="btn-icon danger" onclick="Admin.confirmDeletePlayer(${p.id})"><i class="fas fa-trash"></i></button>
                 </td>
-            </tr>
-        `).join('');
+            </tr>`;
+        }).join('');
+    },
+
+    async cycleStatus(id) {
+        const player = PLAYERS.find(p => p.id === id);
+        if (!player) return;
+        const order = ['disponible', 'no_disponible', 'lesionado'];
+        const current = order.indexOf(player.status || 'disponible');
+        player.status = order[(current + 1) % order.length];
+        await Api.savePlayer(id, { ...player, nickname: player.nickname || null });
+        this.renderAdminPlayers();
+        renderPlayers();
+        renderConvocatoria();
     },
 
     async changeStat(playerId, field, delta) {
@@ -76,7 +93,7 @@ const Admin = {
             <div class="mini-table">
                 ${scorers.map(p => `
                     <div class="mini-row">
-                        <span class="mini-name">${p.name}</span>
+                        <span class="mini-name">${p.nickname || p.name}</span>
                         <span class="mini-stat"><i class="fas fa-futbol"></i> ${p.goals}</span>
                     </div>
                 `).join('')}
@@ -89,7 +106,7 @@ const Admin = {
             <div class="mini-table">
                 ${cardsPlayers.map(p => `
                     <div class="mini-row">
-                        <span class="mini-name">${p.name}</span>
+                        <span class="mini-name">${p.nickname || p.name}</span>
                         <span class="mini-stat"><span class="card-dot yellow"></span> ${p.yellowCards || 0} <span class="card-dot red"></span> ${p.redCards || 0}</span>
                     </div>
                 `).join('')}
@@ -121,12 +138,22 @@ const Admin = {
             <form id="playerForm" class="modal-form">
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Nombre</label>
+                        <label>Nombre completo</label>
                         <input type="text" id="pName" required>
                     </div>
                     <div class="form-group">
+                        <label>Apodo</label>
+                        <input type="text" id="pNickname" placeholder="Nombre corto">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
                         <label>Nº Dorsal</label>
                         <input type="number" id="pNumber" min="1" max="99" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Edad</label>
+                        <input type="number" id="pAge" min="16" max="60">
                     </div>
                 </div>
                 <div class="form-row">
@@ -140,8 +167,12 @@ const Admin = {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Edad</label>
-                        <input type="number" id="pAge" min="16" max="60">
+                        <label>Estado</label>
+                        <select id="pStatus">
+                            <option value="disponible">Disponible</option>
+                            <option value="no_disponible">No disponible</option>
+                            <option value="lesionado">Lesionado</option>
+                        </select>
                     </div>
                 </div>
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Guardar</button>
@@ -153,9 +184,11 @@ const Admin = {
             e.preventDefault();
             const data = {
                 name: document.getElementById('pName').value,
+                nickname: document.getElementById('pNickname').value || null,
                 number: parseInt(document.getElementById('pNumber').value),
                 position: document.getElementById('pPosition').value,
-                age: document.getElementById('pAge').value ? parseInt(document.getElementById('pAge').value) : null
+                age: document.getElementById('pAge').value ? parseInt(document.getElementById('pAge').value) : null,
+                status: document.getElementById('pStatus').value
             };
             const result = await Api.addPlayer(data);
             PLAYERS.push({ id: result.id, ...data, goals: 0, yellowCards: 0, redCards: 0 });
@@ -176,12 +209,22 @@ const Admin = {
             <form id="editPlayerForm" class="modal-form">
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Nombre</label>
+                        <label>Nombre completo</label>
                         <input type="text" id="epName" value="${player.name}" required>
                     </div>
                     <div class="form-group">
+                        <label>Apodo</label>
+                        <input type="text" id="epNickname" value="${player.nickname || ''}" placeholder="Nombre corto">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
                         <label>Nº Dorsal</label>
                         <input type="number" id="epNumber" value="${player.number}" min="1" max="99" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Edad</label>
+                        <input type="number" id="epAge" value="${player.age || ''}" min="16" max="60">
                     </div>
                 </div>
                 <div class="form-row">
@@ -195,8 +238,12 @@ const Admin = {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Edad</label>
-                        <input type="number" id="epAge" value="${player.age || ''}" min="16" max="60">
+                        <label>Estado</label>
+                        <select id="epStatus">
+                            <option value="disponible" ${player.status === 'disponible' ? 'selected' : ''}>Disponible</option>
+                            <option value="no_disponible" ${player.status === 'no_disponible' ? 'selected' : ''}>No disponible</option>
+                            <option value="lesionado" ${player.status === 'lesionado' ? 'selected' : ''}>Lesionado</option>
+                        </select>
                     </div>
                 </div>
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Guardar</button>
@@ -208,9 +255,11 @@ const Admin = {
             e.preventDefault();
             const data = {
                 name: document.getElementById('epName').value,
+                nickname: document.getElementById('epNickname').value || null,
                 number: parseInt(document.getElementById('epNumber').value),
                 position: document.getElementById('epPosition').value,
                 age: document.getElementById('epAge').value ? parseInt(document.getElementById('epAge').value) : null,
+                status: document.getElementById('epStatus').value,
                 goals: player.goals || 0, yellowCards: player.yellowCards || 0, redCards: player.redCards || 0
             };
             await Api.savePlayer(id, data);
@@ -391,7 +440,7 @@ const Admin = {
         let current;
         try { current = await Api.get('/api/init').then(d => d.appearance); } catch(e) { current = {}; }
         const app = {
-            primaryColor: current.primaryColor || '#c41e3a',
+            primaryColor: current.primaryColor || '#1e40af',
             brandName: current.brandName || 'Sada CF',
             logoText: current.logoText || 'SADA',
             teamLogo: current.teamLogo || '⚽'
@@ -537,31 +586,36 @@ const Admin = {
         titularesCount.textContent = titularesPlayers.length;
         disponiblesCount.textContent = disponiblesPlayers.length;
 
-        titularesList.innerHTML = titularesPlayers.map(p => `
+        titularesList.innerHTML = titularesPlayers.map(p => {
+            const pName = p.nickname || p.name;
+            return `
             <div class="admin-player-row titular" data-id="${p.id}">
                 <div class="admin-player-num">${p.number}</div>
                 <div class="admin-player-info">
-                    <span class="admin-player-name">${p.name}</span>
+                    <span class="admin-player-name">${pName}</span>
                     <span class="admin-player-pos">${formatPosition(p.position)}</span>
                 </div>
                 <button class="btn-icon danger" onclick="Admin.toggleConvocatoria(${p.id})" title="Quitar de titulares">
                     <i class="fas fa-times"></i>
                 </button>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
 
-        disponiblesList.innerHTML = disponiblesPlayers.map(p => `
+        disponiblesList.innerHTML = disponiblesPlayers.map(p => {
+            const pName = p.nickname || p.name;
+            const statusIcon = p.status === 'lesionado' ? ' 🤕' : p.status === 'no_disponible' ? ' 🚫' : '';
+            return `
             <div class="admin-player-row" data-id="${p.id}">
                 <div class="admin-player-num">${p.number}</div>
                 <div class="admin-player-info">
-                    <span class="admin-player-name">${p.name}</span>
+                    <span class="admin-player-name">${pName}${statusIcon}</span>
                     <span class="admin-player-pos">${formatPosition(p.position)}</span>
                 </div>
                 <button class="btn-icon success" onclick="Admin.toggleConvocatoria(${p.id})" title="Añadir a titulares">
                     <i class="fas fa-plus"></i>
                 </button>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
 
         this.renderAdminPitch();
     },
@@ -646,7 +700,7 @@ const Admin = {
             el.style.top = pos.y + '%';
             el.innerHTML = `
                 <div class="pitch-player-number">${player.number}</div>
-                <div class="pitch-player-name">${player.name.split(' ')[0]}</div>
+                <div class="pitch-player-name">${player.nickname || player.name.split(' ')[0]}</div>
             `;
             el.draggable = true;
             el.dataset.idx = idx;

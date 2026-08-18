@@ -148,6 +148,8 @@ function renderConvocatoria() {
 
     const posLabels = { portero: 'GK', defensa: 'DEF', centrocampista: 'MED', delantero: 'DEL' };
 
+    const displayName = (p) => p.nickname || p.name.split(' ').pop();
+
     let html = `
         <div class="conv-matchday">
             <div class="conv-matchday-inner">
@@ -180,13 +182,15 @@ function renderConvocatoria() {
                 ${FORMATION.positions.map(pos => {
                     const player = PLAYERS.find(p => p.id === pos.playerId);
                     if (!player) return '';
+                    const pName = player.nickname || player.name.split(' ').pop();
+                    const statusClass = player.status !== 'disponible' ? ' player-unavailable' : '';
                     return `
-                        <div class="conv-player" style="left:${pos.x}%;top:${pos.y}%;">
+                        <div class="conv-player${statusClass}" style="left:${pos.x}%;top:${pos.y}%;">
                             <div class="conv-player-jersey">
                                 <span class="conv-player-num">${player.number}</span>
                             </div>
                             <div class="conv-player-label">
-                                <span class="conv-player-name">${player.name.split(' ').pop()}</span>
+                                <span class="conv-player-name">${pName}</span>
                                 <span class="conv-player-pos">${posLabels[player.position] || ''}</span>
                             </div>
                         </div>`;
@@ -206,15 +210,19 @@ function renderConvocatoria() {
                     </div>
                 </div>
                 <div class="conv-bench-list">
-                    ${suplentes.map(player => `
-                        <div class="conv-bench-item">
+                    ${suplentes.map(player => {
+                        const pName = player.nickname || player.name.split(' ').pop();
+                        const statusClass = player.status !== 'disponible' ? ' bench-unavailable' : '';
+                        const statusIcon = player.status === 'lesionado' ? ' 🤕' : player.status === 'no_disponible' ? ' ✖' : '';
+                        return `
+                        <div class="conv-bench-item${statusClass}">
                             <div class="conv-bench-number">${player.number}</div>
                             <div class="conv-bench-info">
-                                <span class="conv-bench-name">${player.name}</span>
+                                <span class="conv-bench-name">${pName}${statusIcon}</span>
                                 <span class="conv-bench-pos">${formatPosition(player.position)}</span>
                             </div>
-                        </div>
-                    `).join('')}
+                        </div>`;
+                    }).join('')}
                 </div>
             </div>
         `;
@@ -230,17 +238,21 @@ function renderPlayers(filter = "todos") {
         ? PLAYERS
         : PLAYERS.filter(p => p.position === filter);
 
-    container.innerHTML = filtered.map(player => `
-        <div class="player-card">
+    container.innerHTML = filtered.map(player => {
+        const statusClass = player.status === 'lesionado' ? 'lesionado' : player.status === 'no_disponible' ? 'no-disponible' : '';
+        const statusLabel = player.status === 'lesionado' ? 'Lesionado' : player.status === 'no_disponible' ? 'No disponible' : '';
+        return `
+        <div class="player-card ${statusClass}">
             <div class="player-avatar">${getInitials(player.name)}</div>
             <div class="player-details">
-                <h3>${player.name}</h3>
+                <h3>${player.nickname || player.name}</h3>
                 <span class="position">${formatPosition(player.position)}</span>
                 <p class="info">Edad: ${player.age || '-'}</p>
+                ${statusLabel ? `<span class="player-status-badge ${player.status}">${statusLabel}</span>` : ''}
             </div>
             <div class="player-number">#${player.number}</div>
-        </div>
-    `).join("");
+        </div>`;
+    }).join("");
 }
 
 // NEWS

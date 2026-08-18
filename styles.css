@@ -5,9 +5,9 @@
 }
 
 :root {
-    --primary: #c41e3a;
-    --primary-dark: #8b1528;
-    --primary-light: #e63956;
+    --primary: #1e40af;
+    --primary-dark: #1e3a8a;
+    --primary-light: #3b82f6;
     --accent: #ffffff;
     --bg: #f5f7fa;
     --card-bg: #ffffff;
@@ -525,6 +525,60 @@ body {
 .news-actions {
     display: flex;
     gap: 0.25rem;
+}
+
+/* PLAYER STATUS */
+.player-status-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-top: 0.2rem;
+}
+
+.player-status-badge.lesionado {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.player-status-badge.no_disponible {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.player-card.lesionado {
+    border-left-color: #ef4444;
+    opacity: 0.7;
+}
+
+.player-card.no-disponible {
+    border-left-color: #f59e0b;
+    opacity: 0.7;
+}
+
+.status-toggle {
+    background: none;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 0.3rem 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.status-toggle:hover {
+    border-color: var(--primary);
+    transform: scale(1.15);
+}
+
+.player-unavailable .conv-player-jersey {
+    opacity: 0.4;
+}
+
+.bench-unavailable {
+    opacity: 0.5;
+    border-style: dashed;
 }
 
 /* CALENDAR */
