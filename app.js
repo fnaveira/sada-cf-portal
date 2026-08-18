@@ -595,10 +595,57 @@ async function renderPhotos() {
     `).join('');
 }
 
-// CRÓNICA (player view)
+// CRÓNICA (player view + admin view)
 async function renderPlayerEvaluations() {
     const container = document.getElementById('playerEvaluations');
-    if (!container || !CURRENT_USER || !CURRENT_USER.playerName) return;
+    if (!container || !CURRENT_USER) return;
+
+    const catLabels = { technique: 'Técnica', tactics: 'Táctica', physical: 'Física', mental: 'Mental', attitude: 'Actitud' };
+    const renderStars = (val) => '★'.repeat(val) + '☆'.repeat(5 - val);
+
+    if (CURRENT_USER.type === 'admin') {
+        const allEvals = await Api.getEvaluations();
+        if (allEvals.length === 0) {
+            container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No hay evaluaciones aún</p>';
+            return;
+        }
+        const grouped = {};
+        allEvals.forEach(ev => {
+            if (!grouped[ev.playerId]) grouped[ev.playerId] = [];
+            grouped[ev.playerId].push(ev);
+        });
+        container.innerHTML = Object.entries(grouped).map(([playerId, evals]) => {
+            const player = PLAYERS.find(p => p.id == playerId);
+            const pName = player ? (player.nickname || player.name) : `Jugador #${playerId}`;
+            return `
+            <div class="eval-player-section">
+                <h3 class="eval-player-title"><i class="fas fa-user"></i> ${pName}</h3>
+                ${evals.map(ev => {
+                    const avg = ((ev.technique + ev.tactics + ev.physical + ev.mental + ev.attitude) / 5).toFixed(1);
+                    return `
+                    <div class="eval-card">
+                        <div class="eval-header">
+                            <span class="eval-date">${ev.date}</span>
+                            <span class="eval-evaluator">Evaluado por: ${ev.evaluator || 'Staff'}</span>
+                            <span class="eval-avg">Media: <strong>${avg}</strong>/5</span>
+                        </div>
+                        <div class="eval-scores">
+                            ${Object.keys(catLabels).map(cat => `
+                                <div class="eval-cat">
+                                    <span class="eval-cat-label">${catLabels[cat]}</span>
+                                    <span class="eval-stars">${renderStars(ev[cat])}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${ev.comment ? `<div class="eval-comment"><i class="fas fa-comment-dots"></i> ${ev.comment}</div>` : ''}
+                    </div>`;
+                }).join('')}
+            </div>`;
+        }).join('');
+        return;
+    }
+
+    if (!CURRENT_USER.playerName) return;
     const player = PLAYERS.find(p => p.name === CURRENT_USER.playerName || p.nickname === CURRENT_USER.playerName);
     if (!player) { container.innerHTML = '<p>No se encontró tu perfil de jugador</p>'; return; }
 
@@ -608,9 +655,6 @@ async function renderPlayerEvaluations() {
         return;
     }
 
-    const catLabels = { technique: 'Técnica', tactics: 'Táctica', physical: 'Física', mental: 'Mental', attitude: 'Actitud' };
-    const renderStars = (val) => '★'.repeat(val) + '☆'.repeat(5 - val);
-
     container.innerHTML = evals.map(ev => {
         const avg = ((ev.technique + ev.tactics + ev.physical + ev.mental + ev.attitude) / 5).toFixed(1);
         return `
@@ -618,7 +662,7 @@ async function renderPlayerEvaluations() {
             <div class="eval-header">
                 <span class="eval-date">${ev.date}</span>
                 <span class="eval-evaluator">Evaluado por: ${ev.evaluator || 'Staff'}</span>
-                <span class="eval-avg">Media: <strong>${avg}</strong>/5</strong></span>
+                <span class="eval-avg">Media: <strong>${avg}</strong>/5</span>
             </div>
             <div class="eval-scores">
                 ${Object.keys(catLabels).map(cat => `

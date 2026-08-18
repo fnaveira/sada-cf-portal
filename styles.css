@@ -2147,6 +2147,17 @@ body {
 
 .eval-comment i { margin-right: 0.5rem; }
 
+.eval-player-section { margin-bottom: 2rem; }
+.eval-player-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary, #16a34a);
+    color: var(--text-primary, #1f2937);
+}
+.eval-player-title i { margin-right: 0.5rem; color: var(--primary, #16a34a); }
+
 /* CRÓNICA FORM (admin) */
 .cronica-select {
     padding: 0.5rem 1rem;
