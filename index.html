@@ -50,6 +50,7 @@
                 <li><a href="#convocatoria" class="nav-link active" data-section="convocatoria"><i class="fas fa-clipboard-list"></i> Convocatoria</a></li>
                 <li><a href="#jugadores" class="nav-link" data-section="jugadores"><i class="fas fa-users"></i> Jugadores</a></li>
                 <li><a href="#noticias" class="nav-link" data-section="noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
+                <li><a href="#estadisticas" class="nav-link" data-section="estadisticas"><i class="fas fa-chart-bar"></i> Estadísticas</a></li>
                 <li><a href="#partidos" class="nav-link" data-section="partidos"><i class="fas fa-calendar-alt"></i> Partidos</a></li>
                 <li><a href="#resultados" class="nav-link" data-section="resultados"><i class="fas fa-trophy"></i> Resultados</a></li>
                 <li><a href="#club" class="nav-link" data-section="club"><i class="fas fa-landmark"></i> Club</a></li>
@@ -94,6 +95,18 @@
                     <h1><i class="fas fa-newspaper"></i> Noticias</h1>
                 </div>
                 <div class="news-grid" id="newsGrid"></div>
+            </section>
+
+            <!-- ESTADÍSTICAS -->
+            <section id="estadisticas" class="section">
+                <div class="section-header">
+                    <h1><i class="fas fa-chart-bar"></i> Estadísticas</h1>
+                </div>
+                <div class="stats-cards" id="publicStatsCards"></div>
+                <h3 class="subsection-title">Máximos Goleadores</h3>
+                <div id="publicTopScorers"></div>
+                <h3 class="subsection-title" style="margin-top:2rem;">Tarjetas</h3>
+                <div id="publicTopCards"></div>
             </section>
 
             <!-- PARTIDOS -->
@@ -235,8 +248,16 @@
                                 <div class="admin-conv-player-list" id="adminTitularesList"></div>
                             </div>
                             <div class="admin-conv-section">
-                                <h3 class="admin-conv-col-title"><i class="fas fa-users"></i> Disponibles (<span id="disponiblesCount">0</span>)</h3>
+                                <h3 class="admin-conv-col-title"><i class="fas fa-users"></i> Suplentes (<span id="disponiblesCount">0</span>)</h3>
                                 <div class="admin-conv-player-list" id="adminDisponiblesList"></div>
+                            </div>
+                            <div class="admin-conv-section">
+                                <h3 class="admin-conv-col-title"><i class="fas fa-user-clock"></i> No convocados (<span id="noConvocadosCount">0</span>)</h3>
+                                <div class="admin-conv-player-list" id="adminNoConvocadosList"></div>
+                            </div>
+                            <div class="admin-conv-section">
+                                <h3 class="admin-conv-col-title"><i class="fas fa-band-aid"></i> Lesionados (<span id="lesionadosCount">0</span>)</h3>
+                                <div class="admin-conv-player-list" id="adminLesionadosList"></div>
                             </div>
                         </div>
                     </div>

@@ -128,7 +128,8 @@ function seedData() {
     [18,"Alberto Roibás Naveiro","Roibás",25,"defensa",45,"disponible"],
     [19,"Pablo Graña Pita","Graña",26,"centrocampista",42,"disponible"],
     [20,"Javier Vizoso Guerra","Vizoso",27,"centrocampista",55,"disponible"],
-    [21,"Francisco Lata Cortes","Lata",30,"defensa",41,"disponible"]
+    [21,"Francisco Lata Cortes","Lata",30,"defensa",41,"disponible"],
+    [22,"Manuel Cortes","Manolo",13,"portero",50,"disponible"]
   ];
   for (const p of players) insertPlayer.run(...p);
 
@@ -165,11 +166,9 @@ function seedData() {
   const insertNews = db.prepare('INSERT INTO news (id, title, summary, date, tag) VALUES (?, ?, ?, ?, ?)');
   [
     [1,"Victoria importante en la jornada anterior","El equipo se impuso 3-1 en un gran partido que mostró la mejor versión del equipo. Los goles fueron obra de Sergio Seijo, Pablo Graña y Miguel Boo.","2026-07-25","Crónica"],
-    [2,"Debut de David Mourelo","David Mourelo, con 37 años el jugador más joven del plantel, debutó con el primer equipo en el último partido. Mostró gran seguridad en el mediocampo.","2026-07-22","Fichaje"],
-    [3,"Entrenamiento especial de estrategia","El cuerpo técnico ha preparado una sesión especial enfocada en jugadas a balón parado antes del próximo compromiso liguero.","2026-07-20","Entrenamiento"],
-    [4,"Yonattan Carro, baja temporal","Yonattan Carro sufre una distensión muscular que le tendrá entre 2 y 3 semanas de baja. El equipo le desea una pronta recuperación.","2026-07-18","Bajas"],
-    [5,"Sada CF se impone en la Copa Regional","El equipo superó en la tanda de penaltis al rival tras un empate sin goles en el tiempo reglamentario. Carlos Caamaño fue protagonista con dos paradas decisivas.","2026-07-15","Copa"],
-    [6,"Temporada 2026/27 - Objetivo: ascenso","La directiva del club ha confirmado que el objetivo de la temporada será el ascenso de categoría. Se ha reforzado la plantilla con varios fichajes estratégicos.","2026-07-10","Club"]
+    [2,"Debut de David Mourelo","David Mourelo debutó con el primer equipo en el último partido. Mostró gran seguridad en el mediocampo.","2026-07-22","Fichaje"],
+    [3,"Yonattan Carro, baja temporal","Yonattan Carro sufre una distensión muscular que le tendrá entre 2 y 3 semanas de baja. El equipo le desea una pronta recuperación.","2026-07-18","Bajas"],
+    [4,"Temporada 2026/27 - Objetivo: ascenso","La directiva del club ha confirmado que el objetivo de la temporada será el ascenso de categoría. Se ha reforzado la plantilla con varios fichajes estratégicos.","2026-07-10","Club"]
   ].forEach(n => insertNews.run(...n));
 
   const insertMatch = db.prepare('INSERT INTO matches (id, rival, date, time, venue, home) VALUES (?, ?, ?, ?, ?, ?)');
