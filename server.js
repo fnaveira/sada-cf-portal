@@ -108,7 +108,7 @@ function seedNeeded() {
 function seedData() {
   const insertPlayer = db.prepare('INSERT INTO players (id, name, nickname, number, position, age, status, goals, yellowCards, redCards) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, 0)');
   const players = [
-    [1,"Carlos Caamaño","Caamaño",1,"portero",50,"disponible"],
+    [1,"Carlos Caamaño","Caamaño",1,"portero",50,"no_disponible"],
     [2,"Miguel Ángel Garea Parga","Garea",2,"defensa,centrocampista",46,"disponible"],
     [3,"David Mourelo Mouzo","Mourelo",3,"defensa,centrocampista,delantero",37,"no_disponible"],
     [4,"Alfonso Martínez Váquez","Alfonso",4,"delantero,defensa",39,"disponible"],
@@ -116,26 +116,27 @@ function seedData() {
     [6,"Diego Fernández Cabana","Diego",6,"centrocampista,defensa",46,"disponible"],
     [7,"Miguel Amor Haz","Amor",7,"defensa,centrocampista,delantero",46,"disponible"],
     [8,"Iván Fernández Álvarez","Iván",9,"portero,defensa,centrocampista,delantero",46,"disponible"],
-    [9,"Gonzalo Ferro Rozas","Ferro",10,"delantero,centrocampista",46,"disponible"],
+    [9,"Gonzalo Ferro Rozas","Ferro",10,"delantero,centrocampista",46,"lesionado"],
     [10,"Miguel Boo Fernández","Boo",11,"delantero,defensa",41,"disponible"],
     [11,"Santiago Seijo Cancelo","Santi",14,"centrocampista,defensa",46,"no_disponible"],
     [12,"Sergio Seijo Cancelo","Sergio",15,"centrocampista,defensa",38,"disponible"],
     [13,"Bernardo Gómez Cagiao","Berni",16,"defensa,centrocampista",40,"disponible"],
-    [14,"Jose Luis Mallo López","Mallo",19,"delantero,defensa",42,"disponible"],
+    [14,"Jose Luis Mallo López","Mallo",19,"delantero,defensa",42,"no_disponible"],
     [15,"Antonio Seoane Barros","Seoane",21,"centrocampista,defensa",39,"disponible"],
     [16,"César Freire Lesta","César",23,"defensa,centrocampista,delantero",46,"disponible"],
-    [17,"Alberto Durán Alfonsín","Durán",24,"centrocampista",42,"disponible"],
+    [17,"Alberto Durán Alfonsín","Durán",24,"centrocampista",42,"no_disponible"],
     [18,"Alberto Roibás Naveiro","Roibás",25,"defensa,centrocampista",45,"disponible"],
     [19,"Pablo Graña Pita","Graña",26,"centrocampista,defensa",42,"disponible"],
     [20,"Javier Vizoso Guerra","Vizoso",27,"centrocampista",55,"lesionado"],
     [21,"Francisco Lata Cortes","Lata",30,"defensa,centrocampista",41,"disponible"],
     [22,"Manuel Cortes","Manolo",13,"portero",50,"disponible"],
-    [23,"Arturo",null,28,"centrocampista",25,"disponible"]
+    [23,"Arturo",null,28,"centrocampista",25,"disponible"],
+    [24,"Charli",null,29,"defensa",50,"disponible"]
   ];
   for (const p of players) insertPlayer.run(...p);
 
   const insertConv = db.prepare('INSERT INTO convocatoria (playerId) VALUES (?)');
-  for (const id of [2,4,6,7,10,14,15,16,19,20,22,23]) insertConv.run(id);
+  for (const id of [2,4,6,7,10,15,16,19,20,22,23,24]) insertConv.run(id);
 
     db.prepare('INSERT INTO formation (id, name, positions) VALUES (1, ?, ?)').run(
     '4-2-3-1',
