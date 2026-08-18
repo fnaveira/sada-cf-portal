@@ -69,6 +69,7 @@ function showMainApp() {
     renderConvocatoria();
     renderPlayers();
     renderNews();
+    renderPublicStats();
     renderCalendar();
     renderResults();
     renderClubInfo();
@@ -300,6 +301,42 @@ function renderNews() {
             </div>
         </div>
     `).join("");
+}
+
+// STATS (public)
+function renderPublicStats() {
+    const totalGoals = PLAYERS.reduce((s, p) => s + (p.goals || 0), 0);
+    const totalYellows = PLAYERS.reduce((s, p) => s + (p.yellowCards || 0), 0);
+    const totalReds = PLAYERS.reduce((s, p) => s + (p.redCards || 0), 0);
+
+    const cards = document.getElementById('publicStatsCards');
+    if (cards) cards.innerHTML = `
+        <div class="stat-card"><i class="fas fa-futbol"></i><div class="stat-value">${totalGoals}</div><div class="stat-label">Goles Totales</div></div>
+        <div class="stat-card yellow"><i class="fas fa-square"></i><div class="stat-value">${totalYellows}</div><div class="stat-label">Tarjetas Amarillas</div></div>
+        <div class="stat-card red"><i class="fas fa-square"></i><div class="stat-value">${totalReds}</div><div class="stat-label">Tarjetas Rojas</div></div>
+        <div class="stat-card"><i class="fas fa-users"></i><div class="stat-value">${PLAYERS.length}</div><div class="stat-label">Jugadores</div></div>
+    `;
+
+    const scorers = PLAYERS.filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals).slice(0, 5);
+    const scorersEl = document.getElementById('publicTopScorers');
+    if (scorersEl) scorersEl.innerHTML = scorers.length > 0 ? `
+        <div class="mini-table">${scorers.map(p => `
+            <div class="mini-row">
+                <span class="mini-name">${p.nickname || p.name}</span>
+                <span class="mini-stat"><i class="fas fa-futbol"></i> ${p.goals}</span>
+            </div>`).join('')}
+        </div>` : '<p style="color:var(--text-muted);">Sin goles registrados</p>';
+
+    const cardsPlayers = PLAYERS.filter(p => (p.yellowCards || 0) + (p.redCards || 0) > 0)
+        .sort((a, b) => (b.yellowCards + b.redCards) - (a.yellowCards + a.redCards)).slice(0, 5);
+    const cardsEl = document.getElementById('publicTopCards');
+    if (cardsEl) cardsEl.innerHTML = cardsPlayers.length > 0 ? `
+        <div class="mini-table">${cardsPlayers.map(p => `
+            <div class="mini-row">
+                <span class="mini-name">${p.nickname || p.name}</span>
+                <span class="mini-stat"><span class="card-dot yellow"></span> ${p.yellowCards || 0} <span class="card-dot red"></span> ${p.redCards || 0}</span>
+            </div>`).join('')}
+        </div>` : '<p style="color:var(--text-muted);">Sin tarjetas registradas</p>';
 }
 
 // CALENDAR

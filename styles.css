@@ -581,6 +581,11 @@ body {
     border-style: dashed;
 }
 
+.admin-player-row.lesionado {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.06);
+}
+
 /* CALENDAR */
 .calendar-grid {
     display: flex;

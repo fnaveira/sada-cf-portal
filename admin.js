@@ -574,50 +574,90 @@ const Admin = {
         const titulares = FORMATION.positions.map(p => p.playerId);
         const titularesList = document.getElementById('adminTitularesList');
         const disponiblesList = document.getElementById('adminDisponiblesList');
+        const noConvocadosList = document.getElementById('adminNoConvocadosList');
+        const lesionadosList = document.getElementById('adminLesionadosList');
         const titularesCount = document.getElementById('titularesCount');
         const disponiblesCount = document.getElementById('disponiblesCount');
+        const noConvocadosCount = document.getElementById('noConvocadosCount');
+        const lesionadosCount = document.getElementById('lesionadosCount');
 
         const positionOrder = { portero: 0, defensa: 1, centrocampista: 2, delantero: 3 };
-        const sorted = [...PLAYERS].sort((a, b) => positionOrder[a.position] - positionOrder[b.position]);
+        const sortFn = (a, b) => positionOrder[a.position] - positionOrder[b.position];
 
-        const titularesPlayers = sorted.filter(p => titulares.includes(p.id));
-        const disponiblesPlayers = sorted.filter(p => !titulares.includes(p.id));
+        const lesionados = PLAYERS.filter(p => p.status === 'lesionado').sort(sortFn);
+        const noDisponibles = PLAYERS.filter(p => p.status === 'no_disponible').sort(sortFn);
+        const titularesPlayers = PLAYERS.filter(p => titulares.includes(p.id)).sort(sortFn);
+        const convocados = PLAYERS.filter(p => CONVOCATORIA.includes(p.id) && !titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
+        const noConvocados = PLAYERS.filter(p => !CONVOCATORIA.includes(p.id) && p.status === 'disponible').sort(sortFn);
 
         titularesCount.textContent = titularesPlayers.length;
-        disponiblesCount.textContent = disponiblesPlayers.length;
+        disponiblesCount.textContent = convocados.length;
+        noConvocadosCount.textContent = noConvocados.length;
+        lesionadosCount.textContent = lesionados.length;
 
-        titularesList.innerHTML = titularesPlayers.map(p => {
-            const pName = p.nickname || p.name;
-            return `
-            <div class="admin-player-row titular" data-id="${p.id}">
-                <div class="admin-player-num">${p.number}</div>
-                <div class="admin-player-info">
-                    <span class="admin-player-name">${pName}</span>
-                    <span class="admin-player-pos">${formatPosition(p.position)}</span>
-                </div>
-                <button class="btn-icon danger" onclick="Admin.toggleConvocatoria(${p.id})" title="Quitar de titulares">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>`;
-        }).join('');
-
-        disponiblesList.innerHTML = disponiblesPlayers.map(p => {
+        const renderRow = (p, btnClass, btnIcon, btnTitle, onclick) => {
             const pName = p.nickname || p.name;
             const statusIcon = p.status === 'lesionado' ? ' 🤕' : p.status === 'no_disponible' ? ' 🚫' : '';
             return `
-            <div class="admin-player-row" data-id="${p.id}">
+            <div class="admin-player-row${p.status === 'lesionado' ? ' lesionado' : ''}" data-id="${p.id}">
                 <div class="admin-player-num">${p.number}</div>
                 <div class="admin-player-info">
                     <span class="admin-player-name">${pName}${statusIcon}</span>
                     <span class="admin-player-pos">${formatPosition(p.position)}</span>
                 </div>
-                <button class="btn-icon success" onclick="Admin.toggleConvocatoria(${p.id})" title="Añadir a titulares">
-                    <i class="fas fa-plus"></i>
+                <button class="btn-icon ${btnClass}" onclick="${onclick}" title="${btnTitle}">
+                    <i class="fas fa-${btnIcon}"></i>
                 </button>
             </div>`;
-        }).join('');
+        };
+
+        titularesList.innerHTML = titularesPlayers.map(p =>
+            renderRow(p, 'danger', 'times', 'Quitar de titulares', `Admin.toggleConvocatoria(${p.id})`)
+        ).join('');
+
+        disponiblesList.innerHTML = convocados.map(p =>
+            renderRow(p, 'danger', 'times', 'Quitar de convocatoria', `Admin.removeConvocado(${p.id})`)
+        ).join('') + lesionados.map(p =>
+            renderRow(p, 'success', 'plus', 'Añadir a suplentes', `Admin.addFromLesion(${p.id})`)
+        ).join('');
+
+        noConvocadosList.innerHTML = noConvocados.map(p =>
+            renderRow(p, 'success', 'plus', 'Añadir a convocatoria', `Admin.toggleConvocatoria(${p.id})`)
+        ).join('') + noDisponibles.map(p =>
+            renderRow(p, 'success', 'plus', 'Añadir a convocatoria', `Admin.toggleConvocatoria(${p.id})`)
+        ).join('');
+
+        lesionadosList.innerHTML = lesionados.length > 0 ? lesionados.map(p =>
+            renderRow(p, '', 'check', 'Marcar disponible', `Admin.markAvailable(${p.id})`)
+        ).join('') : '<p style="color:var(--text-muted);padding:0.5rem;font-size:0.85rem;">No hay lesionados</p>';
 
         this.renderAdminPitch();
+    },
+
+    async removeConvocado(playerId) {
+        const inConv = CONVOCATORIA.indexOf(playerId);
+        if (inConv !== -1) CONVOCATORIA.splice(inConv, 1);
+        await Api.saveConvocatoria(CONVOCATORIA);
+        this.renderAdminConvocatoria();
+        renderConvocatoria();
+    },
+
+    async addFromLesion(playerId) {
+        const player = PLAYERS.find(p => p.id === playerId);
+        if (player) player.status = 'disponible';
+        await Api.savePlayer(playerId, { ...player, nickname: player.nickname || null });
+        if (!CONVOCATORIA.includes(playerId)) CONVOCATORIA.push(playerId);
+        await Api.saveConvocatoria(CONVOCATORIA);
+        this.renderAdminConvocatoria();
+        renderConvocatoria();
+    },
+
+    async markAvailable(playerId) {
+        const player = PLAYERS.find(p => p.id === playerId);
+        if (player) player.status = 'disponible';
+        await Api.savePlayer(playerId, { ...player, nickname: player.nickname || null });
+        this.renderAdminConvocatoria();
+        renderPlayers();
     },
 
     async toggleConvocatoria(playerId) {
