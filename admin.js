@@ -19,41 +19,41 @@ const Admin = {
             const statusIcon = p.status === 'lesionado' ? '🤕' : p.status === 'no_disponible' ? '🚫' : '✅';
             return `
             <tr>
-                <td>${p.number}</td>
-                <td><strong>${p.nickname || p.name}</strong><br><small style="color:var(--text-muted)">${p.nickname ? p.name : ''}</small></td>
-                <td>${formatPosition(p.position)}</td>
-                <td>
+                <td data-label="#">${p.number}</td>
+                <td data-label="Nombre"><strong>${p.nickname || p.name}</strong><br><small style="color:var(--text-muted)">${p.nickname ? p.name : ''}</small></td>
+                <td data-label="Posición">${formatPosition(p.position)}</td>
+                <td data-label="Edad">
                     <div class="stat-controls">
                         <button class="stat-btn minus" onclick="Admin.changeAge(${p.id}, -1)">-</button>
                         <span class="stat-value">${p.age || '-'}</span>
                         <button class="stat-btn plus" onclick="Admin.changeAge(${p.id}, 1)">+</button>
                     </div>
                 </td>
-                <td>
+                <td data-label="Estado">
                     <button class="status-toggle" onclick="Admin.cycleStatus(${p.id})" title="Cambiar estado">${statusIcon}</button>
                 </td>
-                <td>
+                <td data-label="Goles">
                     <div class="stat-controls">
                         <button class="stat-btn minus" onclick="Admin.changeStat(${p.id},'goals',-1)">-</button>
                         <span class="stat-value">${p.goals || 0}</span>
                         <button class="stat-btn plus" onclick="Admin.changeStat(${p.id},'goals',1)">+</button>
                     </div>
                 </td>
-                <td>
+                <td data-label="Amarillas">
                     <div class="stat-controls yellow">
                         <button class="stat-btn minus" onclick="Admin.changeStat(${p.id},'yellowCards',-1)">-</button>
                         <span class="stat-value">${p.yellowCards || 0}</span>
                         <button class="stat-btn plus" onclick="Admin.changeStat(${p.id},'yellowCards',1)">+</button>
                     </div>
                 </td>
-                <td>
+                <td data-label="Rojas">
                     <div class="stat-controls red">
                         <button class="stat-btn minus" onclick="Admin.changeStat(${p.id},'redCards',-1)">-</button>
                         <span class="stat-value">${p.redCards || 0}</span>
                         <button class="stat-btn plus" onclick="Admin.changeStat(${p.id},'redCards',1)">+</button>
                     </div>
                 </td>
-                <td>
+                <td data-label="Acciones">
                     <button class="btn-icon" onclick="Admin.showEditPlayerModal(${p.id})"><i class="fas fa-edit"></i></button>
                     <button class="btn-icon danger" onclick="Admin.confirmDeletePlayer(${p.id})"><i class="fas fa-trash"></i></button>
                 </td>
@@ -133,10 +133,10 @@ const Admin = {
 
         tbody.innerHTML = USERS.map(u => `
             <tr>
-                <td><strong>${u.username}</strong></td>
-                <td><span class="user-type-badge ${u.type}">${u.type === 'admin' ? 'Administrador' : 'Jugador'}</span></td>
-                <td>${u.playerName || '-'}</td>
-                <td>
+                <td data-label="Usuario"><strong>${u.username}</strong></td>
+                <td data-label="Tipo"><span class="user-type-badge ${u.type}">${u.type === 'admin' ? 'Administrador' : 'Jugador'}</span></td>
+                <td data-label="Jugador">${u.playerName || '-'}</td>
+                <td data-label="Acciones">
                     <button class="btn-icon" onclick="Admin.showEditUserModal(${u.id})"><i class="fas fa-edit"></i></button>
                     <button class="btn-icon danger" onclick="Admin.confirmDeleteUser(${u.id})"><i class="fas fa-trash"></i></button>
                 </td>
@@ -698,6 +698,10 @@ const Admin = {
             FORMATION.positions.splice(inFormation, 1);
             if (inConv !== -1) CONVOCATORIA.splice(inConv, 1);
         } else {
+            if (FORMATION.positions.length >= 11) {
+                alert('Ya hay 11 titulares. Quitá uno antes de agregar otro.');
+                return;
+            }
             const player = PLAYERS.find(p => p.id === playerId);
             if (player && player.status !== 'disponible') {
                 alert('No se puede añadir un jugador ' + (player.status === 'lesionado' ? 'lesionado' : 'no disponible') + ' a titulares');
@@ -893,9 +897,9 @@ const Admin = {
                     <tbody id="staffBody">
                         ${STAFF.map(s => `
                             <tr>
-                                <td><strong>${s.name}</strong></td>
-                                <td>${s.role}</td>
-                                <td>
+                                <td data-label="Nombre"><strong>${s.name}</strong></td>
+                                <td data-label="Cargo">${s.role}</td>
+                                <td data-label="Acciones">
                                     <button class="btn-icon" onclick="Admin.showEditStaffModal(${s.id})"><i class="fas fa-edit"></i></button>
                                     <button class="btn-icon danger" onclick="Admin.doDeleteStaff(${s.id})"><i class="fas fa-trash"></i></button>
                                 </td>
@@ -915,9 +919,9 @@ const Admin = {
                     <tbody id="boardBody">
                         ${BOARD.map(b => `
                             <tr>
-                                <td><strong>${b.name}</strong></td>
-                                <td>${b.role}</td>
-                                <td>
+                                <td data-label="Nombre"><strong>${b.name}</strong></td>
+                                <td data-label="Cargo">${b.role}</td>
+                                <td data-label="Acciones">
                                     <button class="btn-icon" onclick="Admin.showEditBoardModal(${b.id})"><i class="fas fa-edit"></i></button>
                                     <button class="btn-icon danger" onclick="Admin.doDeleteBoard(${b.id})"><i class="fas fa-trash"></i></button>
                                 </td>
@@ -1051,10 +1055,10 @@ const Admin = {
         const tbody = document.getElementById('adminNewsBody');
         tbody.innerHTML = NEWS.map(n => `
             <tr>
-                <td><strong>${n.title}</strong></td>
-                <td>${n.date}</td>
-                <td><span class="news-tag">${n.tag || '-'}</span></td>
-                <td>
+                <td data-label="Título"><strong>${n.title}</strong></td>
+                <td data-label="Fecha">${n.date}</td>
+                <td data-label="Etiqueta"><span class="news-tag">${n.tag || '-'}</span></td>
+                <td data-label="Acciones">
                     <button class="btn-icon" onclick="Admin.showEditNewsModal(${n.id})"><i class="fas fa-edit"></i></button>
                     <button class="btn-icon danger" onclick="Admin.confirmDeleteNews(${n.id})"><i class="fas fa-trash"></i></button>
                 </td>
@@ -1346,9 +1350,21 @@ const Admin = {
         const catLabels = { technique: 'Técnica', tactics: 'Táctica', physical: 'Física', mental: 'Mental', attitude: 'Actitud' };
         const renderStars = (val) => '★'.repeat(val) + '☆'.repeat(5 - val);
 
+        const matchOpts = MATCHES.map(m => {
+            const label = m.home ? `vs ${m.rival}` : `${m.rival} (F)`;
+            return `<option value="${m.id}">${m.date} - ${label}</option>`;
+        }).join('');
+
         form.innerHTML = `
             <div class="cronica-eval-form">
                 <h3>Evaluación de ${PLAYERS.find(p => p.id == playerId)?.nickname || PLAYERS.find(p => p.id == playerId)?.name}</h3>
+                <div class="cronica-row">
+                    <label>Partido</label>
+                    <select id="cronicaMatchSelect" style="flex:1;padding:0.5rem;border:1px solid var(--border, #e5e7eb);border-radius:8px;font-size:0.85rem;">
+                        <option value="">Sin partido específico</option>
+                        ${matchOpts}
+                    </select>
+                </div>
                 ${Object.entries(catLabels).map(([key, label]) => `
                     <div class="cronica-row">
                         <label>${label}</label>
@@ -1373,10 +1389,12 @@ const Admin = {
         const evals = await Api.getPlayerEvaluations(playerId);
         hist.innerHTML = evals.length === 0 ? '' : `<h3>Historial</h3>` + evals.map(ev => {
             const avg = ((ev.technique + ev.tactics + ev.physical + ev.mental + ev.attitude) / 5).toFixed(1);
+            const matchInfo = ev.matchRival ? (ev.matchHome ? `vs ${ev.matchRival}` : `${ev.matchRival} (F)`) : '';
             return `
             <div class="eval-card">
                 <div class="eval-header">
                     <span class="eval-date">${ev.date}</span>
+                    ${matchInfo ? `<span class="eval-evaluator" style="color:var(--primary);font-weight:600;"><i class="fas fa-futbol"></i> ${matchInfo}</span>` : ''}
                     <span class="eval-evaluator">${ev.evaluator || 'Staff'}</span>
                     <span class="eval-avg">Media: <strong>${avg}</strong>/5</span>
                     <button class="btn-icon danger" onclick="Admin.deleteEvaluation(${ev.id})" title="Eliminar"><i class="fas fa-trash"></i></button>
@@ -1403,7 +1421,8 @@ const Admin = {
         if (Object.values(scores).every(v => v === 0)) { alert('Pon al menos una puntuación'); return; }
         const comment = document.getElementById('cronicaComment')?.value || '';
         const evaluator = document.getElementById('cronicaEvaluator')?.value || '';
-        await Api.addEvaluation({ playerId: parseInt(playerId), ...scores, comment, evaluator });
+        const matchId = document.getElementById('cronicaMatchSelect')?.value || null;
+        await Api.addEvaluation({ playerId: parseInt(playerId), matchId: matchId ? parseInt(matchId) : null, ...scores, comment, evaluator });
         this.loadCronicaHistory();
     },
 

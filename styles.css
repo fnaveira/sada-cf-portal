@@ -1498,6 +1498,89 @@ body {
     .club-grid, .staff-grid, .board-grid {
         grid-template-columns: 1fr;
     }
+
+    .admin-table thead {
+        display: none;
+    }
+
+    .admin-table,
+    .admin-table tbody,
+    .admin-table tr,
+    .admin-table td {
+        display: block;
+    }
+
+    .admin-table tr {
+        background: var(--card-bg, #fff);
+        border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .admin-table td {
+        border: none;
+        padding: 0.25rem 0;
+        font-size: 0.85rem;
+    }
+
+    .admin-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--primary, #1e40af);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: block;
+        margin-bottom: 0.15rem;
+    }
+
+    .admin-table td:last-child {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--border, #e5e7eb);
+    }
+
+    .admin-table td:last-child::before {
+        display: none;
+    }
+
+    .admin-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 0.5rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-tab {
+        white-space: nowrap;
+        flex-shrink: 0;
+        font-size: 0.8rem;
+        padding: 0.6rem 0.9rem;
+    }
+
+    .admin-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .position-filters {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pos-filter {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .admin-conv-player-list {
+        max-height: 200px;
+    }
 }
 
 /* CONVOCATORIA - MATCHDAY HEADER */

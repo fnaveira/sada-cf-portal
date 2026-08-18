@@ -622,10 +622,12 @@ async function renderPlayerEvaluations() {
                 <h3 class="eval-player-title"><i class="fas fa-user"></i> ${pName}</h3>
                 ${evals.map(ev => {
                     const avg = ((ev.technique + ev.tactics + ev.physical + ev.mental + ev.attitude) / 5).toFixed(1);
+                    const matchInfo = ev.matchRival ? (ev.matchHome ? `vs ${ev.matchRival}` : `${ev.matchRival} (F)`) : '';
                     return `
                     <div class="eval-card">
                         <div class="eval-header">
                             <span class="eval-date">${ev.date}</span>
+                            ${matchInfo ? `<span class="eval-evaluator" style="color:var(--primary);font-weight:600;"><i class="fas fa-futbol"></i> ${matchInfo}</span>` : ''}
                             <span class="eval-evaluator">Evaluado por: ${ev.evaluator || 'Staff'}</span>
                             <span class="eval-avg">Media: <strong>${avg}</strong>/5</span>
                         </div>

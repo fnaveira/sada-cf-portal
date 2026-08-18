@@ -123,6 +123,7 @@ function initDB() {
     CREATE TABLE IF NOT EXISTS evaluations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       playerId INTEGER NOT NULL,
+      matchId INTEGER,
       technique INTEGER DEFAULT 0,
       tactics INTEGER DEFAULT 0,
       physical INTEGER DEFAULT 0,
@@ -233,6 +234,7 @@ function seedData() {
 }
 
 initDB();
+try { db.exec('ALTER TABLE evaluations ADD COLUMN matchId INTEGER'); } catch(e) {}
 if (seedNeeded()) seedData();
 
 // --- HELPERS ---
@@ -449,21 +451,21 @@ app.get('/api/evaluations', (req, res) => {
   const { playerId } = req.query;
   let evals;
   if (playerId) {
-    evals = db.prepare('SELECT * FROM evaluations WHERE playerId = ? ORDER BY date DESC, id DESC').all(playerId);
+    evals = db.prepare(`SELECT e.*, m.rival as matchRival, m.date as matchDate, m.home as matchHome FROM evaluations e LEFT JOIN matches m ON e.matchId = m.id WHERE e.playerId = ? ORDER BY e.date DESC, e.id DESC`).all(playerId);
   } else {
-    evals = db.prepare('SELECT * FROM evaluations ORDER BY date DESC, id DESC').all();
+    evals = db.prepare(`SELECT e.*, m.rival as matchRival, m.date as matchDate, m.home as matchHome FROM evaluations e LEFT JOIN matches m ON e.matchId = m.id ORDER BY e.date DESC, e.id DESC`).all();
   }
   res.json(evals);
 });
 
 app.get('/api/evaluations/player/:id', (req, res) => {
-  const evals = db.prepare('SELECT * FROM evaluations WHERE playerId = ? ORDER BY date DESC, id DESC').all(req.params.id);
+  const evals = db.prepare(`SELECT e.*, m.rival as matchRival, m.date as matchDate, m.home as matchHome FROM evaluations e LEFT JOIN matches m ON e.matchId = m.id WHERE e.playerId = ? ORDER BY e.date DESC, e.id DESC`).all(req.params.id);
   res.json(evals);
 });
 
 app.post('/api/evaluations', (req, res) => {
-  const { playerId, technique, tactics, physical, mental, attitude, comment, evaluator } = req.body;
-  const info = db.prepare(`INSERT INTO evaluations (playerId, technique, tactics, physical, mental, attitude, comment, evaluator, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, date('now'))`).run(playerId, technique || 0, tactics || 0, physical || 0, mental || 0, attitude || 0, comment || null, evaluator || null);
+  const { playerId, matchId, technique, tactics, physical, mental, attitude, comment, evaluator } = req.body;
+  const info = db.prepare(`INSERT INTO evaluations (playerId, matchId, technique, tactics, physical, mental, attitude, comment, evaluator, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, date('now'))`).run(playerId, matchId || null, technique || 0, tactics || 0, physical || 0, mental || 0, attitude || 0, comment || null, evaluator || null);
   res.json({ id: info.lastInsertRowid });
 });
 
