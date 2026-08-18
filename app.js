@@ -2,12 +2,14 @@ let PLAYERS = [], CONVOCATORIA = [], FORMATION = { name: '4-4-2', positions: [] 
 let CLUB_INFO = {}, STAFF = [], BOARD = [], NEWS = [], MATCHES = [], RESULTS = [], STANDINGS = [];
 let USERS = [];
 let APPEARANCE = {};
+let CURRENT_USER = null;
 
 async function initApp() {
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
     if (Auth.isLoggedIn()) {
+        CURRENT_USER = Auth.getSession();
         await loadAllData();
         showMainApp();
     } else {
@@ -90,6 +92,7 @@ async function handleLogin(e) {
     const session = await Auth.login(username, password);
 
     if (session) {
+        CURRENT_USER = session;
         document.getElementById('loginError').style.display = 'none';
         await loadAllData();
         showMainApp();
