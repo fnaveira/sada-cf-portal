@@ -1,0 +1,6 @@
+node_modules/
+sada.db
+sada.db-shm
+sada.db-wal
+.env
+.DS_Store

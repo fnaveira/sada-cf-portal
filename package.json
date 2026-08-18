@@ -1,0 +1,13 @@
+{
+  "name": "sada-cf-portal",
+  "version": "1.0.0",
+  "description": "Portal interno Sada CF",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --experimental-sqlite server.js",
+    "dev": "node --watch --experimental-sqlite server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
