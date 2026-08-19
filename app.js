@@ -143,6 +143,10 @@ function initNavigation() {
 }
 
 // CONVOCATORIA
+function isSuspended(player) {
+    return (player.yellowCards >= 5) || (player.redCards >= 1);
+}
+
 function renderConvocatoria() {
     const container = document.getElementById("convocatoriaList");
     const titulares = FORMATION.positions.map(p => p.playerId);
@@ -191,10 +195,13 @@ function renderConvocatoria() {
                     if (!player) return '';
                     const pName = player.nickname || player.name.split(' ').pop();
                     const statusClass = player.status !== 'disponible' ? ' player-unavailable' : '';
+                    const suspended = isSuspended(player);
+                    const suspendedBadge = suspended ? '<span class="conv-suspended-badge" title="Sancionado"><i class="fas fa-ban"></i></span>' : '';
                     return `
                         <div class="conv-player${statusClass}" style="left:${pos.x}%;top:${pos.y}%;">
                             <div class="conv-player-jersey">
                                 <span class="conv-player-num">${player.number}</span>
+                                ${suspendedBadge}
                             </div>
                             <div class="conv-player-label">
                                 <span class="conv-player-name">${pName}</span>
@@ -220,7 +227,8 @@ function renderConvocatoria() {
                     ${suplentes.map(player => {
                         const pName = player.nickname || player.name.split(' ').pop();
                         const statusClass = player.status !== 'disponible' ? ' bench-unavailable' : '';
-                        const statusIcon = player.status === 'lesionado' ? ' 🤕' : player.status === 'no_disponible' ? ' ✖' : '';
+                        const suspended = isSuspended(player);
+                        const statusIcon = suspended ? ' 🚫' : player.status === 'lesionado' ? ' 🤕' : player.status === 'no_disponible' ? ' ✖' : '';
                         return `
                         <div class="conv-bench-item${statusClass}">
                             <div class="conv-bench-number">${player.number}</div>
@@ -228,6 +236,7 @@ function renderConvocatoria() {
                                 <span class="conv-bench-name">${pName}${statusIcon}</span>
                                 <span class="conv-bench-pos">${formatPosition(player.position)}</span>
                             </div>
+                            ${suspended ? '<span class="conv-suspended-text" title="Sancionado - suspendido 1 partido"><i class="fas fa-exclamation-triangle"></i> Sancionado</span>' : ''}
                         </div>`;
                     }).join('')}
                 </div>

@@ -1899,6 +1899,33 @@ body {
     color: var(--text-secondary, #6b7280);
 }
 
+/* SUSPENDED */
+.conv-suspended-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #dc2626;
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.5rem;
+    z-index: 3;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+.conv-player-jersey { position: relative; }
+.conv-suspended-text {
+    display: block;
+    font-size: 0.65rem;
+    color: #dc2626;
+    font-weight: 700;
+    margin-top: 2px;
+}
+.conv-suspended-text i { margin-right: 2px; }
+
 /* ADMIN PITCH (kept for admin panel) */
 .admin-pitch {
     max-width: 350px;
