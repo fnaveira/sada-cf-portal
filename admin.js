@@ -663,7 +663,7 @@ const Admin = {
         noConvocadosCount.textContent = noConvocados.length;
         lesionadosCount.textContent = lesionados.length;
 
-        const renderRow = (p, btnClass, btnIcon, btnTitle, onclick) => {
+        const renderRow = (p, buttons) => {
             const pName = p.nickname || p.name;
             const statusIcon = p.status === 'lesionado' ? ' 🤕' : p.status === 'no_disponible' ? ' 🚫' : '';
             return `
@@ -673,24 +673,34 @@ const Admin = {
                     <span class="admin-player-name">${pName}${statusIcon}</span>
                     <span class="admin-player-pos">${formatPosition(p.position)}</span>
                 </div>
-                <button class="btn-icon ${btnClass}" onclick="${onclick}" title="${btnTitle}">
-                    <i class="fas fa-${btnIcon}"></i>
-                </button>
+                <div class="admin-player-actions">${buttons}</div>
             </div>`;
         };
 
+        const btn = (icon, cls, title, onclick) =>
+            `<button class="btn-icon ${cls}" onclick="${onclick}" title="${title}"><i class="fas fa-${icon}"></i></button>`;
+
+        const canPromote = titularesPlayers.length < 11;
+
         titularesList.innerHTML = titularesPlayers.map(p =>
-            renderRow(p, 'danger', 'times', 'Quitar de titulares', `Admin.toggleConvocatoria(${p.id})`)
+            renderRow(p,
+                btn('arrow-down', 'warning', 'Bajar a suplente', `Admin.demoteToSuplente(${p.id})`) +
+                btn('times', 'danger', 'Quitar de convocatoria', `Admin.removeConvocado(${p.id})`)
+            )
         ).join('');
 
-        disponiblesList.innerHTML = convocados.map(p => {
-            const canPromote = titularesPlayers.length < 11;
-            return renderRow(p, 'danger', 'times', 'Quitar de convocatoria', `Admin.removeConvocado(${p.id})`)
-                + (canPromote ? `<button class="btn-icon success" onclick="Admin.promoteToTitular(${p.id})" title="Promover a titular"><i class="fas fa-arrow-up"></i></button>` : '');
-        }).join('');
+        disponiblesList.innerHTML = convocados.map(p =>
+            renderRow(p,
+                (canPromote ? btn('arrow-up', 'success', 'Promover a titular', `Admin.promoteToTitular(${p.id})`) : '') +
+                btn('arrow-down', 'danger', 'Quitar de convocatoria', `Admin.removeConvocado(${p.id})`)
+            )
+        ).join('');
 
         noConvocadosList.innerHTML = noConvocados.map(p =>
-            renderRow(p, 'success', 'plus', 'Añadir a convocatoria', `Admin.toggleConvocatoria(${p.id})`)
+            renderRow(p,
+                btn('arrow-up', 'success', 'Añadir como titular', `Admin.addToTitulares(${p.id})`) +
+                btn('plus', 'primary', 'Añadir como suplente', `Admin.addToSuplentes(${p.id})`)
+            )
         ).join('');
 
         lesionadosList.innerHTML = lesionados.length > 0 ? lesionados.map(p => {
@@ -788,6 +798,48 @@ const Admin = {
         if (!CONVOCATORIA.includes(playerId)) CONVOCATORIA.push(playerId);
         await Api.saveConvocatoria(CONVOCATORIA);
         await Api.saveFormation(FORMATION.name, FORMATION.positions);
+        this.renderAdminConvocatoria();
+        renderConvocatoria();
+    },
+
+    async demoteToSuplente(playerId) {
+        const fi = FORMATION.positions.findIndex(p => p.playerId === playerId);
+        if (fi === -1) return;
+        FORMATION.positions.splice(fi, 1);
+        if (!CONVOCATORIA.includes(playerId)) CONVOCATORIA.push(playerId);
+        await Api.saveFormation(FORMATION.name, FORMATION.positions);
+        await Api.saveConvocatoria(CONVOCATORIA);
+        this.renderAdminConvocatoria();
+        renderConvocatoria();
+    },
+
+    async addToTitulares(playerId) {
+        const player = PLAYERS.find(p => p.id === playerId);
+        if (!player || player.status !== 'disponible') {
+            alert('Solo se pueden añadir jugadores disponibles como titulares');
+            return;
+        }
+        if (FORMATION.positions.length >= 11) {
+            alert('Ya hay 11 titulares');
+            return;
+        }
+        const autoPos = this.autoPositionPlayer(player, FORMATION.positions.length);
+        FORMATION.positions.push({ playerId, x: autoPos.x, y: autoPos.y });
+        if (!CONVOCATORIA.includes(playerId)) CONVOCATORIA.push(playerId);
+        await Api.saveFormation(FORMATION.name, FORMATION.positions);
+        await Api.saveConvocatoria(CONVOCATORIA);
+        this.renderAdminConvocatoria();
+        renderConvocatoria();
+    },
+
+    async addToSuplentes(playerId) {
+        const player = PLAYERS.find(p => p.id === playerId);
+        if (!player || player.status !== 'disponible') {
+            alert('Solo se pueden añadir jugadores disponibles como suplentes');
+            return;
+        }
+        if (!CONVOCATORIA.includes(playerId)) CONVOCATORIA.push(playerId);
+        await Api.saveConvocatoria(CONVOCATORIA);
         this.renderAdminConvocatoria();
         renderConvocatoria();
     },

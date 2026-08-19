@@ -345,6 +345,20 @@ body {
     color: #dc2626;
 }
 
+.btn-icon.warning {
+    color: #d97706;
+}
+
+.btn-icon.primary {
+    color: #2563eb;
+}
+
+.admin-player-actions {
+    display: flex;
+    gap: 0.2rem;
+    flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
     .admin-conv-layout {
         grid-template-columns: 1fr;
