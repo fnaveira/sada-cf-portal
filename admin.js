@@ -268,6 +268,20 @@ const Admin = {
                         <input type="date" id="epRecoveryDate" value="${player.recoveryDate || ''}">
                     </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Goles</label>
+                        <input type="number" id="epGoals" value="${player.goals || 0}" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Tarjetas Amarillas</label>
+                        <input type="number" id="epYellowCards" value="${player.yellowCards || 0}" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Tarjetas Rojas</label>
+                        <input type="number" id="epRedCards" value="${player.redCards || 0}" min="0">
+                    </div>
+                </div>
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Guardar</button>
             </form>
         `;
@@ -284,7 +298,9 @@ const Admin = {
                 position: checked.join(','),
                 age: document.getElementById('epAge').value ? parseInt(document.getElementById('epAge').value) : null,
                 status: document.getElementById('epStatus').value,
-                goals: player.goals || 0, yellowCards: player.yellowCards || 0, redCards: player.redCards || 0,
+                goals: parseInt(document.getElementById('epGoals').value) || 0,
+                yellowCards: parseInt(document.getElementById('epYellowCards').value) || 0,
+                redCards: parseInt(document.getElementById('epRedCards').value) || 0,
                 recoveryDate: document.getElementById('epRecoveryDate').value || null
             };
             await Api.savePlayer(id, data);
@@ -304,6 +320,7 @@ const Admin = {
             modal.style.display = 'none';
             this.renderAdminPlayers();
             this.renderAdminConvocatoria();
+            this.renderStats();
             renderPlayers();
             renderConvocatoria();
         };
