@@ -642,9 +642,21 @@ const Admin = {
         const lesionados = PLAYERS.filter(p => p.status === 'lesionado').sort(sortFn);
         const lesionadosIds = lesionados.map(p => p.id);
         const noDisponibles = PLAYERS.filter(p => p.status === 'no_disponible' && !CONVOCATORIA.includes(p.id)).sort(sortFn);
-        const titularesPlayers = PLAYERS.filter(p => titulares.includes(p.id)).sort(sortFn);
+        const titularesPlayers = PLAYERS.filter(p => titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
         const convocados = PLAYERS.filter(p => CONVOCATORIA.includes(p.id) && !titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
         const noConvocados = PLAYERS.filter(p => !CONVOCATORIA.includes(p.id) && p.status === 'disponible' && !lesionadosIds.includes(p.id)).sort(sortFn);
+
+        let changed = false;
+        lesionadosIds.forEach(lid => {
+            const fi = FORMATION.positions.findIndex(p => p.playerId === lid);
+            if (fi !== -1) { FORMATION.positions.splice(fi, 1); changed = true; }
+            const ci = CONVOCATORIA.indexOf(lid);
+            if (ci !== -1) { CONVOCATORIA.splice(ci, 1); changed = true; }
+        });
+        if (changed) {
+            Api.saveConvocatoria(CONVOCATORIA);
+            Api.saveFormation(FORMATION.name, FORMATION.positions);
+        }
 
         titularesCount.textContent = titularesPlayers.length;
         disponiblesCount.textContent = convocados.length;
@@ -678,8 +690,6 @@ const Admin = {
         }).join('');
 
         noConvocadosList.innerHTML = noConvocados.map(p =>
-            renderRow(p, 'success', 'plus', 'Añadir a convocatoria', `Admin.toggleConvocatoria(${p.id})`)
-        ).join('') + noDisponibles.map(p =>
             renderRow(p, 'success', 'plus', 'Añadir a convocatoria', `Admin.toggleConvocatoria(${p.id})`)
         ).join('');
 
@@ -729,6 +739,11 @@ const Admin = {
     },
 
     async toggleConvocatoria(playerId) {
+        const player = PLAYERS.find(p => p.id === playerId);
+        if (player && player.status === 'lesionado') {
+            alert('No se puede añadir un jugador lesionado a la convocatoria');
+            return;
+        }
         const inFormation = FORMATION.positions.findIndex(p => p.playerId === playerId);
         const inConv = CONVOCATORIA.indexOf(playerId);
 
@@ -750,6 +765,27 @@ const Admin = {
             if (inConv === -1) CONVOCATORIA.push(playerId);
         }
 
+        await Api.saveConvocatoria(CONVOCATORIA);
+        await Api.saveFormation(FORMATION.name, FORMATION.positions);
+        this.renderAdminConvocatoria();
+        renderConvocatoria();
+    },
+
+    async promoteToTitular(playerId) {
+        const player = PLAYERS.find(p => p.id === playerId);
+        if (!player || player.status !== 'disponible') {
+            alert('Solo se pueden promover jugadores disponibles');
+            return;
+        }
+        if (FORMATION.positions.length >= 11) {
+            alert('Ya hay 11 titulares');
+            return;
+        }
+        const inFormation = FORMATION.positions.findIndex(p => p.playerId === playerId);
+        if (inFormation !== -1) return;
+        const autoPos = this.autoPositionPlayer(player, FORMATION.positions.length);
+        FORMATION.positions.push({ playerId, x: autoPos.x, y: autoPos.y });
+        if (!CONVOCATORIA.includes(playerId)) CONVOCATORIA.push(playerId);
         await Api.saveConvocatoria(CONVOCATORIA);
         await Api.saveFormation(FORMATION.name, FORMATION.positions);
         this.renderAdminConvocatoria();
