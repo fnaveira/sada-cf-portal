@@ -272,8 +272,18 @@ app.get('/api/init', (req, res) => {
 // --- API: PLAYERS ---
 app.put('/api/players/:id', (req, res) => {
   const { name, nickname, number, position, age, status, goals, yellowCards, redCards } = req.body;
+  const newStatus = status || 'disponible';
   const stmt = db.prepare('UPDATE players SET name=?, nickname=?, number=?, position=?, age=?, status=?, goals=?, yellowCards=?, redCards=? WHERE id=?');
-  stmt.run(name, nickname || null, number, position, age || null, status || 'disponible', goals || 0, yellowCards || 0, redCards || 0, req.params.id);
+  stmt.run(name, nickname || null, number, position, age || null, newStatus, goals || 0, yellowCards || 0, redCards || 0, req.params.id);
+  const pid = parseInt(req.params.id);
+  if (newStatus !== 'disponible') {
+    const fRow = db.prepare('SELECT positions FROM formation WHERE id = 1').get();
+    if (fRow) {
+      const positions = JSON.parse(fRow.positions).filter(p => p.playerId !== pid);
+      db.prepare('UPDATE formation SET positions = ? WHERE id = 1').run(JSON.stringify(positions));
+    }
+    db.prepare('DELETE FROM convocatoria WHERE playerId = ?').run(pid);
+  }
   res.json({ ok: true });
 });
 
