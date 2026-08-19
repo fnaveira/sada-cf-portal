@@ -161,7 +161,7 @@ function renderConvocatoria() {
         <div class="conv-matchday">
             <div class="conv-matchday-inner">
                 <div class="conv-matchday-team">
-                    <div class="conv-matchday-crest">${APPEARANCE.teamLogo || '⚽'}</div>
+                    <div class="conv-matchday-crest"><img src="${APPEARANCE.teamLogo || '/assets/logo.jpeg'}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;"></div>
                     <span>${APPEARANCE.brandName || 'Sada CF'}</span>
                 </div>
                 <div class="conv-matchday-vs">

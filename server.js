@@ -224,6 +224,7 @@ function seedData() {
   insertApp.run('primaryColor', '#1e40af');
   insertApp.run('brandName', 'Sada F.C. A Nosa Viña (Veteranos)');
   insertApp.run('logoText', 'SADA');
+  insertApp.run('teamLogo', '/assets/logo.jpeg');
 
   // Default admin user
   const salt = crypto.randomBytes(16).toString('hex');
