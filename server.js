@@ -136,6 +136,12 @@ function initDB() {
   `);
 }
 
+function migrateDB() {
+  try { db.prepare('SELECT matchId FROM evaluations LIMIT 1').get(); } catch(e) {
+    db.prepare('ALTER TABLE evaluations ADD COLUMN matchId INTEGER').run();
+  }
+}
+
 function seedNeeded() {
   const row = db.prepare('SELECT COUNT(*) as c FROM players').get();
   return row.c === 0;
@@ -236,7 +242,7 @@ function seedData() {
 }
 
 initDB();
-try { db.exec('ALTER TABLE evaluations ADD COLUMN matchId INTEGER'); } catch(e) {}
+migrateDB();
 if (seedNeeded()) seedData();
 
 // --- HELPERS ---

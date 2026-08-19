@@ -647,9 +647,11 @@ const Admin = {
             renderRow(p, 'danger', 'times', 'Quitar de titulares', `Admin.toggleConvocatoria(${p.id})`)
         ).join('');
 
-        disponiblesList.innerHTML = convocados.map(p =>
-            renderRow(p, 'danger', 'times', 'Quitar de convocatoria', `Admin.removeConvocado(${p.id})`)
-        ).join('');
+        disponiblesList.innerHTML = convocados.map(p => {
+            const canPromote = titularesPlayers.length < 11;
+            return renderRow(p, 'danger', 'times', 'Quitar de convocatoria', `Admin.removeConvocado(${p.id})`)
+                + (canPromote ? `<button class="btn-icon success" onclick="Admin.promoteToTitular(${p.id})" title="Promover a titular"><i class="fas fa-arrow-up"></i></button>` : '');
+        }).join('');
 
         noConvocadosList.innerHTML = noConvocados.map(p =>
             renderRow(p, 'success', 'plus', 'Añadir a convocatoria', `Admin.toggleConvocatoria(${p.id})`)
