@@ -148,31 +148,31 @@ function seedNeeded() {
 }
 
 function seedData() {
-  const insertPlayer = db.prepare('INSERT INTO players (id, name, nickname, number, position, age, status, goals, yellowCards, redCards) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, 0)');
+  const insertPlayer = db.prepare('INSERT INTO players (id, name, nickname, number, position, age, status, goals, yellowCards, redCards) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0)');
   const players = [
-    [1,"Carlos Caamaño","Caamaño",1,"portero",50,"no_disponible"],
-    [2,"Miguel Ángel Garea Parga","Garea",4,"defensa,centrocampista",46,"disponible"],
-    [3,"David Mourelo Mouzo","Mourelo",5,"defensa,centrocampista,delantero",37,"no_disponible"],
-    [4,"Alfonso Martínez Váquez","Alfonso",20,"delantero,defensa",39,"disponible"],
-    [5,"Carlos M. Álvarez Labora","Charlie",21,"delantero,defensa",56,"no_disponible"],
-    [6,"Diego Fernández Cabana","Cabana",12,"centrocampista,defensa",46,"disponible"],
-    [7,"Miguel Amor Haz","Miguel",6,"defensa,centrocampista,delantero",46,"disponible"],
-    [8,"Iván Fernández Álvarez","Pirulo",2,"portero,defensa,centrocampista,delantero",46,"no_disponible"],
-    [9,"Gonzalo Ferro Rozas","Ferro",22,"delantero,centrocampista",46,"lesionado"],
-    [10,"Miguel Boo Fernández","Boo",23,"delantero,defensa",41,"disponible"],
-    [11,"Santiago Seijo Cancelo","Santi",13,"centrocampista,defensa",46,"no_disponible"],
-    [12,"Sergio Seijo Cancelo","Sergio",14,"centrocampista,defensa",38,"no_disponible"],
-    [13,"Bernardo Gómez Cagiao","Bernardo",7,"defensa,centrocampista",40,"disponible"],
-    [14,"Jose Luis Mallo López","Pepe",24,"delantero,defensa",42,"disponible"],
-    [15,"Antonio Seoane Barros","Toni",15,"centrocampista,defensa",39,"disponible"],
-    [16,"César Freire Lesta","César",8,"defensa,centrocampista,delantero",46,"disponible"],
-    [17,"Alberto Durán Alfonsín","Durán",16,"centrocampista",42,"no_disponible"],
-    [18,"Alberto Roibás Naveiro","Roibás",9,"defensa,centrocampista",45,"no_disponible"],
-    [19,"Pablo Graña Pita","Graña",17,"centrocampista,defensa",42,"disponible"],
-    [20,"Javier Vizoso Guerra","Vizoso",18,"centrocampista",55,"lesionado"],
-    [21,"Francisco Lata Cortes","Lata",10,"defensa,centrocampista",41,"no_disponible"],
-    [22,"Manuel Cortes","Manolo",3,"portero",50,"disponible"],
-    [23,"Julio",null,25,"centrocampista",46,"disponible"]
+    [1,"Carlos Caamaño","Caamaño",1,"portero",50,"no_disponible",0],
+    [2,"Miguel Ángel Garea Parga","Garea",4,"defensa,centrocampista",46,"disponible",0],
+    [3,"David Mourelo Mouzo","Mourelo",5,"defensa,centrocampista,delantero",37,"no_disponible",0],
+    [4,"Alfonso Martínez Váquez","Alfonso",20,"delantero,defensa",39,"disponible",1],
+    [5,"Carlos M. Álvarez Labora","Charlie",21,"delantero,defensa",56,"no_disponible",0],
+    [6,"Diego Fernández Cabana","Cabana",12,"centrocampista,defensa",46,"disponible",0],
+    [7,"Miguel Amor Haz","Miguel",6,"defensa,centrocampista,delantero",46,"disponible",0],
+    [8,"Iván Fernández Álvarez","Pirulo",2,"portero,defensa,centrocampista,delantero",46,"no_disponible",0],
+    [9,"Gonzalo Ferro Rozas","Ferro",22,"delantero,centrocampista",46,"lesionado",0],
+    [10,"Miguel Boo Fernández","Boo",23,"delantero,defensa",41,"disponible",0],
+    [11,"Santiago Seijo Cancelo","Santi",13,"centrocampista,defensa",46,"no_disponible",0],
+    [12,"Sergio Seijo Cancelo","Sergio",14,"centrocampista,defensa",38,"no_disponible",0],
+    [13,"Bernardo Gómez Cagiao","Bernardo",7,"defensa,centrocampista",40,"disponible",0],
+    [14,"Jose Luis Mallo López","Pepe",24,"delantero,defensa",42,"disponible",0],
+    [15,"Antonio Seoane Barros","Toni",15,"centrocampista,defensa",39,"disponible",0],
+    [16,"César Freire Lesta","César",8,"defensa,centrocampista,delantero",46,"disponible",0],
+    [17,"Alberto Durán Alfonsín","Durán",16,"centrocampista",42,"no_disponible",0],
+    [18,"Alberto Roibás Naveiro","Roibás",9,"defensa,centrocampista",45,"no_disponible",0],
+    [19,"Pablo Graña Pita","Graña",17,"centrocampista,defensa",42,"disponible",0],
+    [20,"Javier Vizoso Guerra","Vizoso",18,"centrocampista",55,"lesionado",0],
+    [21,"Francisco Lata Cortes","Lata",10,"defensa,centrocampista",41,"no_disponible",0],
+    [22,"Manuel Cortes","Manolo",3,"portero",50,"disponible",0],
+    [23,"Julio",null,25,"centrocampista",46,"disponible",0]
   ];
   for (const p of players) insertPlayer.run(...p);
 
