@@ -157,7 +157,7 @@ function seedData() {
     [11,"Santiago Seijo Cancelo","Santi",13,"centrocampista,defensa",46,"no_disponible"],
     [12,"Sergio Seijo Cancelo","Sergio",14,"centrocampista,defensa",38,"no_disponible"],
     [13,"Bernardo Gómez Cagiao","Bernardo",7,"defensa,centrocampista",40,"disponible"],
-    [14,"Jose Luis Mallo López","Pepe",24,"delantero,defensa",42,"no_disponible"],
+    [14,"Jose Luis Mallo López","Pepe",24,"delantero,defensa",42,"disponible"],
     [15,"Antonio Seoane Barros","Toni",15,"centrocampista,defensa",39,"disponible"],
     [16,"César Freire Lesta","César",8,"defensa,centrocampista,delantero",46,"disponible"],
     [17,"Alberto Durán Alfonsín","Durán",16,"centrocampista",42,"no_disponible"],
@@ -171,7 +171,7 @@ function seedData() {
   for (const p of players) insertPlayer.run(...p);
 
   const insertConv = db.prepare('INSERT INTO convocatoria (playerId) VALUES (?)');
-  for (const id of [2,4,6,7,10,15,16,19,20,22,23]) insertConv.run(id);
+  for (const id of [2,4,6,7,10,14,15,16,19,22,23]) insertConv.run(id);
 
     db.prepare('INSERT INTO formation (id, name, positions) VALUES (1, ?, ?)').run(
     '4-2-3-1',
@@ -179,7 +179,7 @@ function seedData() {
       {playerId:22,x:50,y:85},
       {playerId:4,x:20,y:65},{playerId:2,x:37,y:65},{playerId:10,x:63,y:65},{playerId:7,x:80,y:65},
       {playerId:15,x:32,y:48},{playerId:16,x:68,y:48},
-      {playerId:14,x:18,y:35},{playerId:6,x:50,y:32},{playerId:20,x:82,y:35},
+      {playerId:14,x:18,y:35},{playerId:6,x:50,y:32},{playerId:23,x:82,y:35},
       {playerId:19,x:50,y:18}
     ])
   );
