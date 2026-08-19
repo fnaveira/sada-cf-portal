@@ -206,6 +206,7 @@ function renderConvocatoria() {
                             <div class="conv-player-label">
                                 <span class="conv-player-name">${pName}</span>
                                 <span class="conv-player-pos">${posLabels[getPrimaryPosition(player.position)] || ''}</span>
+                                ${player.status === 'lesionado' && player.recoveryDate ? `<span class="conv-recovery">Vuelve: ${player.recoveryDate}</span>` : ''}
                             </div>
                         </div>`;
                 }).join('')}
@@ -235,6 +236,7 @@ function renderConvocatoria() {
                             <div class="conv-bench-info">
                                 <span class="conv-bench-name">${pName}${statusIcon}</span>
                                 <span class="conv-bench-pos">${formatPosition(player.position)}</span>
+                                ${player.status === 'lesionado' && player.recoveryDate ? `<span class="conv-recovery">Vuelve: ${player.recoveryDate}</span>` : ''}
                             </div>
                             ${suspended ? '<span class="conv-suspended-text" title="Sancionado - suspendido 1 partido"><i class="fas fa-exclamation-triangle"></i> Sancionado</span>' : ''}
                         </div>`;
@@ -257,6 +259,7 @@ function renderPlayers(filter = "todos") {
     container.innerHTML = filtered.map(player => {
         const statusClass = player.status === 'lesionado' ? 'lesionado' : player.status === 'no_disponible' ? 'no-disponible' : '';
         const statusLabel = player.status === 'lesionado' ? 'Lesionado' : player.status === 'no_disponible' ? 'No disponible' : '';
+        const recoveryLabel = player.status === 'lesionado' && player.recoveryDate ? `<span class="player-recovery"><i class="fas fa-calendar-check"></i> Vuelve: ${player.recoveryDate}</span>` : '';
         return `
         <div class="player-card ${statusClass}">
             <div class="player-avatar">${getInitials(player.name)}</div>
@@ -265,6 +268,7 @@ function renderPlayers(filter = "todos") {
                 <span class="position">${formatPosition(player.position)}</span>
                 <p class="info">Edad: ${player.age || '-'}</p>
                 ${statusLabel ? `<span class="player-status-badge ${player.status}">${statusLabel}</span>` : ''}
+                ${recoveryLabel}
             </div>
             <div class="player-number">#${player.number}</div>
         </div>`;

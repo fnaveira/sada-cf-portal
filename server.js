@@ -41,7 +41,8 @@ function initDB() {
       status TEXT DEFAULT 'disponible',
       goals INTEGER DEFAULT 0,
       yellowCards INTEGER DEFAULT 0,
-      redCards INTEGER DEFAULT 0
+      redCards INTEGER DEFAULT 0,
+      recoveryDate TEXT
     );
     CREATE TABLE IF NOT EXISTS convocatoria (
       playerId INTEGER PRIMARY KEY
@@ -139,6 +140,9 @@ function initDB() {
 function migrateDB() {
   try { db.prepare('SELECT matchId FROM evaluations LIMIT 1').get(); } catch(e) {
     db.prepare('ALTER TABLE evaluations ADD COLUMN matchId INTEGER').run();
+  }
+  try { db.prepare('SELECT recoveryDate FROM players LIMIT 1').get(); } catch(e) {
+    db.prepare('ALTER TABLE players ADD COLUMN recoveryDate TEXT').run();
   }
 }
 
@@ -277,10 +281,10 @@ app.get('/api/init', (req, res) => {
 
 // --- API: PLAYERS ---
 app.put('/api/players/:id', (req, res) => {
-  const { name, nickname, number, position, age, status, goals, yellowCards, redCards } = req.body;
+  const { name, nickname, number, position, age, status, goals, yellowCards, redCards, recoveryDate } = req.body;
   const newStatus = status || 'disponible';
-  const stmt = db.prepare('UPDATE players SET name=?, nickname=?, number=?, position=?, age=?, status=?, goals=?, yellowCards=?, redCards=? WHERE id=?');
-  stmt.run(name, nickname || null, number, position, age || null, newStatus, goals || 0, yellowCards || 0, redCards || 0, req.params.id);
+  const stmt = db.prepare('UPDATE players SET name=?, nickname=?, number=?, position=?, age=?, status=?, goals=?, yellowCards=?, redCards=?, recoveryDate=? WHERE id=?');
+  stmt.run(name, nickname || null, number, position, age || null, newStatus, goals || 0, yellowCards || 0, redCards || 0, recoveryDate || null, req.params.id);
   const pid = parseInt(req.params.id);
   if (newStatus !== 'disponible') {
     const fRow = db.prepare('SELECT positions FROM formation WHERE id = 1').get();

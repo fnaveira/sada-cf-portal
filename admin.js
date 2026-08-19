@@ -262,6 +262,12 @@ const Admin = {
                         </select>
                     </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fecha de recuperación</label>
+                        <input type="date" id="epRecoveryDate" value="${player.recoveryDate || ''}">
+                    </div>
+                </div>
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Guardar</button>
             </form>
         `;
@@ -278,7 +284,8 @@ const Admin = {
                 position: checked.join(','),
                 age: document.getElementById('epAge').value ? parseInt(document.getElementById('epAge').value) : null,
                 status: document.getElementById('epStatus').value,
-                goals: player.goals || 0, yellowCards: player.yellowCards || 0, redCards: player.redCards || 0
+                goals: player.goals || 0, yellowCards: player.yellowCards || 0, redCards: player.redCards || 0,
+                recoveryDate: document.getElementById('epRecoveryDate').value || null
             };
             await Api.savePlayer(id, data);
             Object.assign(player, data);
@@ -659,9 +666,21 @@ const Admin = {
             renderRow(p, 'success', 'plus', 'Añadir a convocatoria', `Admin.toggleConvocatoria(${p.id})`)
         ).join('');
 
-        lesionadosList.innerHTML = lesionados.length > 0 ? lesionados.map(p =>
-            renderRow(p, '', 'check', 'Marcar disponible', `Admin.markAvailable(${p.id})`)
-        ).join('') : '<p style="color:var(--text-muted);padding:0.5rem;font-size:0.85rem;">No hay lesionados</p>';
+        lesionadosList.innerHTML = lesionados.length > 0 ? lesionados.map(p => {
+            const pName = p.nickname || p.name;
+            const recoveryInfo = p.recoveryDate ? `<span style="font-size:0.7rem;color:var(--text-muted);margin-left:0.3rem;"><i class="fas fa-calendar-check"></i> ${p.recoveryDate}</span>` : '';
+            return `
+            <div class="admin-player-row lesionado" data-id="${p.id}">
+                <div class="admin-player-num">${p.number}</div>
+                <div class="admin-player-info">
+                    <span class="admin-player-name">${pName} 🤕${recoveryInfo}</span>
+                    <span class="admin-player-pos">${formatPosition(p.position)}</span>
+                </div>
+                <button class="btn-icon" onclick="Admin.markAvailable(${p.id})" title="Marcar disponible">
+                    <i class="fas fa-check"></i>
+                </button>
+            </div>`;
+        }).join('') : '<p style="color:var(--text-muted);padding:0.5rem;font-size:0.85rem;">No hay lesionados</p>';
 
         this.renderAdminPitch();
     },
