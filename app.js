@@ -150,7 +150,7 @@ function renderConvocatoria() {
     const suplentes = convocados.filter(p => !titulares.includes(p.id) && p.status === 'disponible');
 
     const positionOrder = { portero: 0, defensa: 1, centrocampista: 2, delantero: 3 };
-    const sortByPos = (a, b) => positionOrder[getPrimaryPosition(a.position)] - positionOrder[getPrimaryPosition(b.position)];
+    const sortByPos = (a, b) => (positionOrder[getPrimaryPosition(a.position)] ?? 99) - (positionOrder[getPrimaryPosition(b.position)] ?? 99) || a.number - b.number;
     convocados.sort(sortByPos);
 
     const posLabels = { portero: 'GK', defensa: 'DEF', centrocampista: 'MED', delantero: 'DEL' };
@@ -586,7 +586,7 @@ async function renderPhotos() {
         return;
     }
     container.innerHTML = photos.map(p => `
-        <div class="photo-card">
+        <div class="photo-card" onclick="openLightbox('/uploads/${p.filename}', '${(p.title || '').replace(/'/g, "\\'")}')" style="cursor:pointer;">
             <div class="photo-img"><img src="/uploads/${p.filename}" alt="${p.title || ''}" loading="lazy"></div>
             ${p.title ? `<div class="photo-title">${p.title}</div>` : ''}
             ${p.description ? `<div class="photo-desc">${p.description}</div>` : ''}
@@ -677,6 +677,22 @@ async function renderPlayerEvaluations() {
             ${ev.comment ? `<div class="eval-comment"><i class="fas fa-comment-dots"></i> ${ev.comment}</div>` : ''}
         </div>`;
     }).join('');
+}
+
+// LIGHTBOX
+function openLightbox(src, caption) {
+    const lb = document.getElementById('photoLightbox');
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightboxCaption').textContent = caption || '';
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+    if (e.target === document.getElementById('photoLightbox') || e.target.classList.contains('lightbox-close')) {
+        document.getElementById('photoLightbox').classList.remove('active');
+        document.body.style.overflow = '';
+    }
 }
 
 document.addEventListener("DOMContentLoaded", initApp);
