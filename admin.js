@@ -659,10 +659,11 @@ const Admin = {
         const noConvocados = PLAYERS.filter(p => !CONVOCATORIA.includes(p.id) && (p.status === 'disponible' || p.status === 'no_disponible') && !lesionadosIds.includes(p.id)).sort(sortFn);
 
         let changed = false;
-        lesionadosIds.forEach(lid => {
-            const fi = FORMATION.positions.findIndex(p => p.playerId === lid);
+        const nonDisponiblesIds = PLAYERS.filter(p => p.status !== 'disponible').map(p => p.id);
+        nonDisponiblesIds.forEach(nid => {
+            const fi = FORMATION.positions.findIndex(p => p.playerId === nid);
             if (fi !== -1) { FORMATION.positions.splice(fi, 1); changed = true; }
-            const ci = CONVOCATORIA.indexOf(lid);
+            const ci = CONVOCATORIA.indexOf(nid);
             if (ci !== -1) { CONVOCATORIA.splice(ci, 1); changed = true; }
         });
         if (changed) {
