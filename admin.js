@@ -68,7 +68,20 @@ const Admin = {
         const current = order.indexOf(player.status || 'disponible');
         player.status = order[(current + 1) % order.length];
         await Api.savePlayer(id, { ...player, nickname: player.nickname || null });
+        if (player.status !== 'disponible') {
+            const inFormation = FORMATION.positions.findIndex(p => p.playerId === id);
+            if (inFormation !== -1) {
+                FORMATION.positions.splice(inFormation, 1);
+                await Api.saveFormation(FORMATION.name, FORMATION.positions);
+            }
+            const inConv = CONVOCATORIA.indexOf(id);
+            if (inConv !== -1) {
+                CONVOCATORIA.splice(inConv, 1);
+                await Api.saveConvocatoria(CONVOCATORIA);
+            }
+        }
         this.renderAdminPlayers();
+        this.renderAdminConvocatoria();
         renderPlayers();
         renderConvocatoria();
     },
@@ -641,10 +654,9 @@ const Admin = {
 
         const lesionados = PLAYERS.filter(p => p.status === 'lesionado').sort(sortFn);
         const lesionadosIds = lesionados.map(p => p.id);
-        const noDisponibles = PLAYERS.filter(p => p.status === 'no_disponible' && !CONVOCATORIA.includes(p.id)).sort(sortFn);
         const titularesPlayers = PLAYERS.filter(p => titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
         const convocados = PLAYERS.filter(p => CONVOCATORIA.includes(p.id) && !titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
-        const noConvocados = PLAYERS.filter(p => !CONVOCATORIA.includes(p.id) && p.status === 'disponible' && !lesionadosIds.includes(p.id)).sort(sortFn);
+        const noConvocados = PLAYERS.filter(p => !CONVOCATORIA.includes(p.id) && (p.status === 'disponible' || p.status === 'no_disponible') && !lesionadosIds.includes(p.id)).sort(sortFn);
 
         let changed = false;
         lesionadosIds.forEach(lid => {
@@ -698,7 +710,8 @@ const Admin = {
 
         noConvocadosList.innerHTML = noConvocados.map(p =>
             renderRow(p,
-                btn('arrow-up', 'success', 'Añadir como titular', `Admin.addToTitulares(${p.id})`) +
+                p.status === 'no_disponible' ? '' :
+                (canPromote ? btn('arrow-up', 'success', 'Añadir como titular', `Admin.addToTitulares(${p.id})`) : '') +
                 btn('plus', 'primary', 'Añadir como suplente', `Admin.addToSuplentes(${p.id})`)
             )
         ).join('');
