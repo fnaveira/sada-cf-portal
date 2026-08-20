@@ -784,7 +784,7 @@ const Admin = {
                 alert('No se puede añadir un jugador ' + (player.status === 'lesionado' ? 'lesionado' : 'no disponible') + ' a titulares');
                 return;
             }
-            const autoPos = this.autoPositionPlayer(player, FORMATION.positions.length);
+            const autoPos = this.findVacantSlot(player);
             FORMATION.positions.push({ playerId, x: autoPos.x, y: autoPos.y });
             if (inConv === -1) CONVOCATORIA.push(playerId);
         }
@@ -807,7 +807,7 @@ const Admin = {
         }
         const inFormation = FORMATION.positions.findIndex(p => p.playerId === playerId);
         if (inFormation !== -1) return;
-        const autoPos = this.autoPositionPlayer(player, FORMATION.positions.length);
+        const autoPos = this.findVacantSlot(player);
         FORMATION.positions.push({ playerId, x: autoPos.x, y: autoPos.y });
         if (!CONVOCATORIA.includes(playerId)) CONVOCATORIA.push(playerId);
         await Api.saveConvocatoria(CONVOCATORIA);
@@ -837,7 +837,7 @@ const Admin = {
             alert('Ya hay 11 titulares');
             return;
         }
-        const autoPos = this.autoPositionPlayer(player, FORMATION.positions.length);
+        const autoPos = this.findVacantSlot(player);
         FORMATION.positions.push({ playerId, x: autoPos.x, y: autoPos.y });
         if (!CONVOCATORIA.includes(playerId)) CONVOCATORIA.push(playerId);
         await Api.saveFormation(FORMATION.name, FORMATION.positions);
@@ -902,6 +902,60 @@ const Admin = {
         const positions = slot[getPrimaryPosition(player.position)] || slot.centrocampista;
         const pos = positions[index % positions.length];
         return { x: pos.x, y: pos.y };
+    },
+
+    findVacantSlot(player) {
+        const formations = {
+            '4-4-2': {
+                portero: [{x:50,y:85}],
+                defensa: [{x:20,y:65},{x:37,y:65},{x:63,y:65},{x:80,y:65}],
+                centrocampista: [{x:20,y:42},{x:37,y:42},{x:63,y:42},{x:80,y:42}],
+                delantero: [{x:38,y:22},{x:62,y:22}]
+            },
+            '4-3-3': {
+                portero: [{x:50,y:85}],
+                defensa: [{x:20,y:65},{x:37,y:65},{x:63,y:65},{x:80,y:65}],
+                centrocampista: [{x:30,y:45},{x:50,y:48},{x:70,y:45}],
+                delantero: [{x:20,y:22},{x:50,y:18},{x:80,y:22}]
+            },
+            '3-5-2': {
+                portero: [{x:50,y:85}],
+                defensa: [{x:30,y:65},{x:50,y:65},{x:70,y:65}],
+                centrocampista: [{x:12,y:48},{x:33,y:42},{x:50,y:45},{x:67,y:42},{x:88,y:48}],
+                delantero: [{x:38,y:22},{x:62,y:22}]
+            },
+            '4-2-3-1': {
+                portero: [{x:50,y:85}],
+                defensa: [{x:20,y:65},{x:37,y:65},{x:63,y:65},{x:80,y:65}],
+                centrocampista: [{x:37,y:52},{x:63,y:52},{x:20,y:35},{x:50,y:35},{x:80,y:35}],
+                delantero: [{x:50,y:18}]
+            },
+            '5-3-2': {
+                portero: [{x:50,y:85}],
+                defensa: [{x:12,y:48},{x:30,y:65},{x:50,y:65},{x:70,y:65},{x:88,y:48}],
+                centrocampista: [{x:32,y:42},{x:50,y:42},{x:68,y:42}],
+                delantero: [{x:38,y:22},{x:62,y:22}]
+            },
+            '4-1-4-1': {
+                portero: [{x:50,y:85}],
+                defensa: [{x:20,y:65},{x:37,y:65},{x:63,y:65},{x:80,y:65}],
+                centrocampista: [{x:50,y:55},{x:20,y:38},{x:37,y:38},{x:63,y:38},{x:80,y:38}],
+                delantero: [{x:50,y:18}]
+            },
+        };
+
+        const slot = formations[FORMATION.name] || formations['4-4-2'];
+        const allSlots = [...(slot.portero||[]),...(slot.defensa||[]),...(slot.centrocampista||[]),...(slot.delantero||[])];
+        const occupied = new Set(FORMATION.positions.map(p => `${p.x},${p.y}`));
+        const playerPos = getPrimaryPosition(player.position);
+        const posSlots = slot[playerPos] || slot.centrocampista;
+        for (const s of posSlots) {
+            if (!occupied.has(`${s.x},${s.y}`)) return s;
+        }
+        for (const s of allSlots) {
+            if (!occupied.has(`${s.x},${s.y}`)) return s;
+        }
+        return { x: 50, y: 50 };
     },
 
     renderAdminPitch() {
