@@ -151,6 +151,23 @@ function isSuspended(player) {
 
 function renderConvocatoria() {
     const container = document.getElementById("convocatoriaList");
+
+    const changed = { flag: false };
+    CONVOCATORIA = CONVOCATORIA.filter(id => {
+        const p = PLAYERS.find(pl => pl.id === id);
+        if (p && p.status !== 'disponible') { changed.flag = true; return false; }
+        return true;
+    });
+    FORMATION.positions = FORMATION.positions.filter(pos => {
+        const p = PLAYERS.find(pl => pl.id === pos.playerId);
+        if (p && p.status !== 'disponible') { changed.flag = true; return false; }
+        return true;
+    });
+    if (changed.flag) {
+        Api.saveConvocatoria(CONVOCATORIA);
+        Api.saveFormation(FORMATION.name, FORMATION.positions);
+    }
+
     const titulares = FORMATION.positions.map(p => p.playerId);
     const convocados = CONVOCATORIA.map(id => PLAYERS.find(p => p.id === id)).filter(Boolean);
     const suplentes = convocados.filter(p => !titulares.includes(p.id) && p.status === 'disponible');
