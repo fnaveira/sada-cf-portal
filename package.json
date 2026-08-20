@@ -4,10 +4,12 @@
   "description": "Portal interno Sada CF",
   "main": "server.js",
   "scripts": {
-    "start": "node --experimental-sqlite server.js",
-    "dev": "node --watch --experimental-sqlite server.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
   },
   "dependencies": {
+    "@libsql/client": "^0.17.4",
+    "dotenv": "^17.4.2",
     "express": "^4.21.0",
     "multer": "^2.2.0"
   }
