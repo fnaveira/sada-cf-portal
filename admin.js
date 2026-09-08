@@ -802,7 +802,6 @@ const Admin = {
         this.renderAdminConvocatoria();
         renderConvocatoria();
     },
-    },
 
     async markAvailable(playerId) {
         const player = PLAYERS.find(p => p.id === playerId);
