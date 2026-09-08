@@ -290,9 +290,10 @@ function renderConvocatoria() {
 // PLAYERS
 function renderPlayers(filter = "todos") {
     const container = document.getElementById("playersGrid");
+    const active = PLAYERS.filter(p => p.status !== 'baja');
     const filtered = filter === "todos"
-        ? PLAYERS
-        : PLAYERS.filter(p => p.position && p.position.includes(filter));
+        ? active
+        : active.filter(p => p.position && p.position.includes(filter));
 
     container.innerHTML = filtered.map(player => {
         const statusClass = player.status === 'lesionado' ? 'lesionado' : player.status === 'no_disponible' ? 'no-disponible' : '';
