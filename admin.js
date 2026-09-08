@@ -16,7 +16,7 @@ const Admin = {
         });
 
         tbody.innerHTML = filtered.map(p => {
-            const statusIcon = p.status === 'lesionado' ? '🤕' : p.status === 'no_disponible' ? '🚫' : '✅';
+            const statusIcon = p.status === 'lesionado' ? '🤕' : p.status === 'no_disponible' ? '🚫' : p.status === 'baja' ? '❌' : '✅';
             const photoHtml = p.photo
                 ? `<img src="${p.photo}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer;" onclick="Admin.uploadPhoto(${p.id})" title="Cambiar foto">`
                 : `<div onclick="Admin.uploadPhoto(${p.id})" style="width:36px;height:36px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.8rem;color:var(--primary);" title="Subir foto"><i class="fas fa-camera"></i></div>`;
@@ -68,7 +68,7 @@ const Admin = {
     async cycleStatus(id) {
         const player = PLAYERS.find(p => p.id === id);
         if (!player) return;
-        const order = ['disponible', 'no_disponible', 'lesionado'];
+        const order = ['disponible', 'no_disponible', 'lesionado', 'baja'];
         const current = order.indexOf(player.status || 'disponible');
         player.status = order[(current + 1) % order.length];
         await Api.savePlayer(id, { ...player, nickname: player.nickname || null });
@@ -292,6 +292,7 @@ const Admin = {
                             <option value="disponible" ${player.status === 'disponible' ? 'selected' : ''}>Disponible</option>
                             <option value="no_disponible" ${player.status === 'no_disponible' ? 'selected' : ''}>No disponible</option>
                             <option value="lesionado" ${player.status === 'lesionado' ? 'selected' : ''}>Lesionado</option>
+                            <option value="baja" ${player.status === 'baja' ? 'selected' : ''}>Baja</option>
                         </select>
                     </div>
                 </div>
@@ -676,7 +677,7 @@ const Admin = {
         const lesionadosIds = lesionados.map(p => p.id);
         const titularesPlayers = PLAYERS.filter(p => titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
         const convocados = PLAYERS.filter(p => CONVOCATORIA.includes(p.id) && !titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
-        const noConvocados = PLAYERS.filter(p => !CONVOCATORIA.includes(p.id) && (p.status === 'disponible' || p.status === 'no_disponible') && !lesionadosIds.includes(p.id)).sort(sortFn);
+        const noConvocados = PLAYERS.filter(p => !CONVOCATORIA.includes(p.id) && (p.status === 'disponible' || p.status === 'no_disponible') && p.status !== 'baja' && !lesionadosIds.includes(p.id)).sort(sortFn);
 
         let changed = false;
         const nonDisponiblesIds = PLAYERS.filter(p => p.status !== 'disponible').map(p => p.id);

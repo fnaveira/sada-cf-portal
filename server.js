@@ -138,44 +138,56 @@ async function initDB() {
 
 async function seedNeeded() {
   const row = (await db.execute('SELECT COUNT(*) as c FROM players')).rows[0];
-  return row.c === 0;
+  if (row.c === 0) return true;
+  const check = (await db.execute('SELECT number FROM players WHERE id=1')).rows[0];
+  if (check && check.number === 1) {
+    await db.execute('DELETE FROM players');
+    await db.execute('DELETE FROM convocatoria');
+    await db.execute('DELETE FROM formation');
+    await db.execute('DELETE FROM board');
+    await db.execute('DELETE FROM staff');
+    await db.execute('DELETE FROM club_info');
+    return true;
+  }
+  return false;
 }
 
 async function seedData() {
   const s = [];
   const P = (sql, args) => s.push({ sql, args });
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [1,"Carlos Caamaño","Caamaño",1,"portero",50,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [2,"Miguel Ángel Garea Parga","Garea",4,"defensa,centrocampista",46,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [3,"David Mourelo Mouzo","Mourelo",5,"defensa,centrocampista,delantero",37,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [4,"Alfonso Martínez Váquez","Alfonso",20,"delantero,defensa",39,"disponible",1]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [5,"Carlos M. Álvarez Labora","Charlie",21,"delantero,defensa",56,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [6,"Diego Fernández Cabana","Cabana",12,"centrocampista,defensa",46,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [7,"Miguel Amor Haz","Miguel",6,"defensa,centrocampista,delantero",46,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [8,"Iván Fernández Álvarez","Pirulo",2,"portero,defensa,centrocampista,delantero",46,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [9,"Gonzalo Ferro Rozas","Ferro",22,"delantero,centrocampista",46,"lesionado",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [10,"Miguel Boo Fernández","Boo",23,"delantero,defensa",41,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [11,"Santiago Seijo Cancelo","Santi",13,"centrocampista,defensa",46,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [12,"Sergio Seijo Cancelo","Sergio",14,"centrocampista,defensa",38,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [13,"Bernardo Gómez Cagiao","Bernardo",7,"defensa,centrocampista",40,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [14,"Jose Luis Mallo López","Pepe",24,"delantero,defensa",42,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [15,"Antonio Seoane Barros","Toni",15,"centrocampista,defensa",39,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [16,"César Freire Lesta","César",8,"defensa,centrocampista,delantero",46,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [17,"Alberto Durán Alfonsín","Durán",16,"centrocampista",42,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [18,"Alberto Roibás Naveiro","Roibás",9,"defensa,centrocampista",45,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [19,"Pablo Graña Pita","Graña",17,"centrocampista,defensa",42,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [20,"Javier Vizoso Guerra","Vizoso",18,"centrocampista",55,"lesionado",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [21,"Francisco Lata Cortes","Lata",10,"defensa,centrocampista",41,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [22,"Manuel Cortes","Manolo",3,"portero",50,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [23,"Julio",null,25,"centrocampista",46,"disponible",0]);
-  for (const id of [2,4,6,7,10,14,15,16,19,22,23]) P('INSERT INTO convocatoria (playerId) VALUES (?)', [id]);
-  P('INSERT INTO formation (id,name,positions) VALUES (1,?,?)', ['4-2-3-1',JSON.stringify([{playerId:22,x:50,y:85},{playerId:4,x:20,y:65},{playerId:2,x:37,y:65},{playerId:10,x:63,y:65},{playerId:7,x:80,y:65},{playerId:15,x:32,y:48},{playerId:16,x:68,y:48},{playerId:14,x:18,y:35},{playerId:6,x:50,y:32},{playerId:23,x:82,y:35},{playerId:19,x:50,y:18}])]);
-  for (const [k,v] of Object.entries({federationName:"Sada F.C. A Nosa Viña (Veteranos)",federationAddress:"Calle del Deporte, 15 - 15160 Sada, A Coruña, Galicia",stadium:"Campo Municipal de Sada",stadiumAddress:"Avda. de la Marina, s/n - 15160 Sada",stadiumCapacity:"2.000 espectadores",founded:"1975",president:"D. Diego Fernández Cabana"})) P('INSERT INTO club_info (key,value) VALUES (?,?)', [k,v]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [1,"Carlos Caamaño Cambon","Caamaño",33,"portero",49,"disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [2,"Miguel Ángel Garea Parga","Garea",1,"defensa,centrocampista",46,"disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [3,"David Mourelo Mouzo","Mourelo",10,"defensa,centrocampista,delantero",36,"no_disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [4,"Alfonso Martínez Váquez","Alfonso",24,"delantero,defensa",39,"disponible",1]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [5,"Carlos M. Álvarez Labora","Charlie",39,"delantero,defensa",56,"no_disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [6,"Diego Fernández Cabana","Cabana",20,"centrocampista,defensa",46,"disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [7,"Miguel Amor Haz","Miguel",2,"defensa,centrocampista,delantero",46,"disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [8,"Iván Fernández Álvarez","Pirulo",14,"portero,defensa,centrocampista,delantero",46,"no_disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [9,"Gonzalo Ferro Rozas","Ferro",32,"delantero,centrocampista",46,"lesionado",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [10,"Miguel Boo Fernández","Boo",31,"delantero,defensa",41,"disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [11,"Santiago Seijo Cancelo","Santi",28,"centrocampista,defensa",46,"no_disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [12,"Sergio Seijo Cancelo","Sergio",28,"centrocampista,defensa",38,"no_disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [13,"Bernardo Gómez Cagiao","Bernardo",45,"defensa,centrocampista",47,"disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [14,"Jose Luis Mallo López","Pepe",1,"delantero,defensa",41,"disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [15,"Antonio Seoane Barros","Toni",33,"centrocampista,defensa",39,"disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [16,"César Freire Lesta","César",10,"defensa,centrocampista,delantero",46,"disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [17,"Alberto Durán Alfonsín","Durán",34,"centrocampista",42,"no_disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [18,"Alberto Roibás Naveiro","Roibás",26,"defensa,centrocampista",45,"no_disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [19,"Pablo Graña Pita","Graña",8,"centrocampista,defensa",42,"disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [20,"Javier Vizoso Guerra","Vizoso",7,"centrocampista",54,"lesionado",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [21,"Francisco Lata Cortes","Lata",37,"defensa,centrocampista",41,"no_disponible",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [22,"Manuel Cortes","Manolo",3,"portero",50,"baja",0]);
+  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [23,"Julio Teixeira Fernández","Julio",7,"centrocampista",45,"disponible",0]);
+  for (const id of [1,2,4,6,7,10,14,15,16,19,23]) P('INSERT INTO convocatoria (playerId) VALUES (?)', [id]);
+  P('INSERT INTO formation (id,name,positions) VALUES (1,?,?)', ['4-2-3-1',JSON.stringify([{playerId:1,x:50,y:85},{playerId:4,x:20,y:65},{playerId:2,x:37,y:65},{playerId:10,x:63,y:65},{playerId:7,x:80,y:65},{playerId:15,x:32,y:48},{playerId:16,x:68,y:48},{playerId:14,x:18,y:35},{playerId:6,x:50,y:32},{playerId:23,x:82,y:35},{playerId:19,x:50,y:18}])]);
+  for (const [k,v] of Object.entries({federationName:"Sada F.C. A Nosa Viña (Veteranos)",federationAddress:"Reboredo, 20 Ouces - 15165 Bergondo, A Coruña",stadium:"Campo Municipal de Sada",stadiumAddress:"Avda. de la Marina, s/n - 15160 Sada",stadiumCapacity:"2.000 espectadores",founded:"1975",president:"D. Diego Fernández Cabana",cif:"G70501242",phone1:"663495926",phone2:"659833245",email:"diegofernandezcabana@gmail.com"})) P('INSERT INTO club_info (key,value) VALUES (?,?)', [k,v]);
   P('INSERT INTO staff (id,name,role) VALUES (?,?,?)', [1,"Fran Naveira","Entrenador"]);
   P('INSERT INTO staff (id,name,role) VALUES (?,?,?)', [2,"Santi Seijo","Entrenador Auxiliar"]);
-  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [1,"D. Diego Fernández Cabana","Presidente"]);
-  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [2,"D. Carlos Méndez Vizoso","Vicepresidente"]);
-  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [3,"D. Antonio Garea Blanco","Secretario"]);
-  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [4,"D. Miguel Amor Rodríguez","Tesorero"]);
+  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [1,"Diego Fernández Cabana","Presidente"]);
+  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [2,"Iván Fernández Álvarez","Secretario"]);
+  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [3,"Santiago Seijo Cancelo","Vicesecretario"]);
+  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [4,"Alberto Roibás Naveiro","Tesorero"]);
+  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [5,"Gonzalo Ferro Rozas","Vocal"]);
   P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [1,"Derrota para aprender de los errores","Hemos perdido nuestro primer partido amistoso contra un rival de menor categoria por demeritos propios, tres fallos en defensa condenaron al equipo a ir a remolque todo el partido, mejorando sustanciablemente en la segunda parte con la entrada de los revulsivos. Derrota para aprender.","2026-07-25","Crónica"]);
   P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [2,"Debut de Julio","Julio debuta en el amistoso contra el SPM con gran rendimiento.","2026-07-22","Fichaje"]);
   P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [3,"Vizoso, baja temporal","Vizoso recae de un problema en el tendon de aquiles que le tendrá entre 2 y 3 semanas de baja. El equipo le desea una pronta recuperación.","2026-07-18","Bajas"]);
