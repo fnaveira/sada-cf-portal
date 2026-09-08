@@ -143,20 +143,10 @@ async function seedNeeded() {
   const row = (await db.execute('SELECT COUNT(*) as c FROM players')).rows[0];
   if (row.c === 0) return true;
   const check = (await db.execute('SELECT number FROM players WHERE id=1')).rows[0];
-  if (check && Number(check.number) === 1) {
-    await db.execute('DELETE FROM players');
-    await db.execute('DELETE FROM convocatoria');
-    await db.execute('DELETE FROM formation');
-    await db.execute('DELETE FROM board');
-    await db.execute('DELETE FROM staff');
-    await db.execute('DELETE FROM club_info');
-    await db.execute('DELETE FROM news');
-    await db.execute('DELETE FROM matches');
-    await db.execute('DELETE FROM results');
-    await db.execute('DELETE FROM standings');
-    await db.execute('DELETE FROM appearance');
-    await db.execute('DELETE FROM users');
-    await db.execute('DELETE FROM evaluations');
+  const num = check ? Number(check.number) : 0;
+  if (num !== 33) {
+    const tables = ['players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
+    for (const t of tables) await db.execute({ sql: `DELETE FROM ${t}`, args: [] });
     return true;
   }
   return false;
