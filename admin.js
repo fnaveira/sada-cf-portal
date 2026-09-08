@@ -664,10 +664,12 @@ const Admin = {
         const titularesList = document.getElementById('adminTitularesList');
         const disponiblesList = document.getElementById('adminDisponiblesList');
         const noConvocadosList = document.getElementById('adminNoConvocadosList');
+        const preconvocadosList = document.getElementById('adminPreconvocadosList');
         const lesionadosList = document.getElementById('adminLesionadosList');
         const titularesCount = document.getElementById('titularesCount');
         const disponiblesCount = document.getElementById('disponiblesCount');
         const noConvocadosCount = document.getElementById('noConvocadosCount');
+        const preconvocadosCount = document.getElementById('preconvocadosCount');
         const lesionadosCount = document.getElementById('lesionadosCount');
 
         const positionOrder = { portero: 0, defensa: 1, centrocampista: 2, delantero: 3 };
@@ -678,6 +680,7 @@ const Admin = {
         const titularesPlayers = PLAYERS.filter(p => titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
         const convocados = PLAYERS.filter(p => CONVOCATORIA.includes(p.id) && !titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
         const noConvocados = PLAYERS.filter(p => !CONVOCATORIA.includes(p.id) && (p.status === 'disponible' || p.status === 'no_disponible') && p.status !== 'baja' && !lesionadosIds.includes(p.id)).sort(sortFn);
+        const preconvocados = PLAYERS.filter(p => p.status === 'disponible' && !CONVOCATORIA.includes(p.id) && !lesionadosIds.includes(p.id)).sort(sortFn);
 
         let changed = false;
         const nonDisponiblesIds = PLAYERS.filter(p => p.status !== 'disponible').map(p => p.id);
@@ -695,6 +698,7 @@ const Admin = {
         titularesCount.textContent = titularesPlayers.length;
         disponiblesCount.textContent = convocados.length;
         noConvocadosCount.textContent = noConvocados.length;
+        preconvocadosCount.textContent = preconvocados.length;
         lesionadosCount.textContent = lesionados.length;
 
         const renderRow = (p, buttons) => {
@@ -739,6 +743,22 @@ const Admin = {
             )
         ).join('');
 
+        preconvocadosList.innerHTML = preconvocados.length > 0 ? preconvocados.map(p => {
+            const pName = p.nickname || p.name;
+            const photoHtml = p.photo ? `<img src="${p.photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">` : `<div class="admin-player-num">${p.number}</div>`;
+            return `
+            <div class="admin-player-row" data-id="${p.id}">
+                ${photoHtml}
+                <div class="admin-player-info">
+                    <span class="admin-player-name">${pName}</span>
+                    <span class="admin-player-pos">${formatPosition(p.position)}</span>
+                </div>
+                <button class="btn-icon btn-success" onclick="Admin.addPreconvocado(${p.id})" title="Añadir a convocatoria">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>`;
+        }).join('') : '<p style="color:var(--text-muted);padding:0.5rem;font-size:0.85rem;">Todos convocados</p>';
+
         lesionadosList.innerHTML = lesionados.length > 0 ? lesionados.map(p => {
             const pName = p.nickname || p.name;
             const recoveryInfo = p.recoveryDate ? `<span style="font-size:0.7rem;color:var(--text-muted);margin-left:0.3rem;"><i class="fas fa-calendar-check"></i> ${p.recoveryDate}</span>` : '';
@@ -774,6 +794,14 @@ const Admin = {
         await Api.saveConvocatoria(CONVOCATORIA);
         this.renderAdminConvocatoria();
         renderConvocatoria();
+    },
+
+    async addPreconvocado(playerId) {
+        if (!CONVOCATORIA.includes(playerId)) CONVOCATORIA.push(playerId);
+        await Api.saveConvocatoria(CONVOCATORIA);
+        this.renderAdminConvocatoria();
+        renderConvocatoria();
+    },
     },
 
     async markAvailable(playerId) {
