@@ -257,32 +257,33 @@ function renderConvocatoria() {
         `;
     }
 
-    html += `
-        <div class="conv-bench-section">
-            <div class="conv-bench-header">
-                <div class="conv-bench-icon"><i class="fas fa-clipboard-list"></i></div>
-                <div>
-                    <h3>${isAdmin ? 'Convocados' : 'Lista de convocados'}</h3>
-                    <span class="conv-bench-count">${convocados.length} jugadores</span>
+    if (!isAdmin) {
+        html += `
+            <div class="conv-bench-section">
+                <div class="conv-bench-header">
+                    <div class="conv-bench-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div>
+                        <h3>Lista de convocados</h3>
+                        <span class="conv-bench-count">${convocados.length} jugadores</span>
+                    </div>
                 </div>
-            </div>
-            <div class="conv-bench-list">
-                ${convocados.map(player => {
-                    const pName = player.nickname || player.name.split(' ').pop();
-                    const suspended = isSuspended(player);
-                    const statusIcon = suspended ? ' 🚫' : player.status === 'lesionado' ? ' 🤕' : player.status === 'no_disponible' ? ' ✖' : '';
-                    return `
-                    <div class="conv-bench-item">
-                        ${player.photo ? `<img src="${player.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : `<div class="conv-bench-number">${player.number}</div>`}
-                        <div class="conv-bench-info">
-                            <span class="conv-bench-name">${pName}${statusIcon}</span>
-                            <span class="conv-bench-pos">${formatPosition(player.position)}</span>
-                        </div>
-                    </div>`;
-                }).join('')}
-            </div>
-        </div>
-    `;
+                <div class="conv-bench-list">
+                    ${convocados.map(player => {
+                        const pName = player.nickname || player.name.split(' ').pop();
+                        const suspended = isSuspended(player);
+                        const statusIcon = suspended ? ' 🚫' : player.status === 'lesionado' ? ' 🤕' : player.status === 'no_disponible' ? ' ✖' : '';
+                        return `
+                        <div class="conv-bench-item">
+                            ${player.photo ? `<img src="${player.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : `<div class="conv-bench-number">${player.number}</div>`}
+                            <div class="conv-bench-info">
+                                <span class="conv-bench-name">${pName}${statusIcon}</span>
+                                <span class="conv-bench-pos">${formatPosition(player.position)}</span>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>`;
+    }
 
     container.innerHTML = html;
 }
