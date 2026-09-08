@@ -705,7 +705,9 @@ const Admin = {
         const renderRow = (p, buttons) => {
             const pName = p.nickname || p.name;
             const statusIcon = p.status === 'lesionado' ? ' 🤕' : p.status === 'no_disponible' ? ' 🚫' : p.status === 'baja' ? ' ❌' : '';
-            const photoHtml = p.photo ? `<img src="${p.photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">` : `<div class="admin-player-num">${p.number}</div>`;
+            const photoHtml = p.photo
+                ? `<div style="position:relative;width:32px;height:32px;flex-shrink:0;"><img src="${p.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"><span style="position:absolute;bottom:-2px;right:-4px;background:var(--primary);color:#fff;font-size:0.6rem;font-weight:700;padding:1px 4px;border-radius:8px;border:1.5px solid #fff;">${p.number}</span></div>`
+                : `<div class="admin-player-num">${p.number}</div>`;
             return `
             <div class="admin-player-row${p.status === 'lesionado' ? ' lesionado' : ''}" data-id="${p.id}">
                 ${photoHtml}
