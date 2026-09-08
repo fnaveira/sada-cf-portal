@@ -150,6 +150,13 @@ async function seedNeeded() {
     await db.execute('DELETE FROM board');
     await db.execute('DELETE FROM staff');
     await db.execute('DELETE FROM club_info');
+    await db.execute('DELETE FROM news');
+    await db.execute('DELETE FROM matches');
+    await db.execute('DELETE FROM results');
+    await db.execute('DELETE FROM standings');
+    await db.execute('DELETE FROM appearance');
+    await db.execute('DELETE FROM users');
+    await db.execute('DELETE FROM evaluations');
     return true;
   }
   return false;
