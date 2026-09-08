@@ -663,13 +663,13 @@ const Admin = {
         const titulares = FORMATION.positions.map(p => p.playerId);
         const titularesList = document.getElementById('adminTitularesList');
         const disponiblesList = document.getElementById('adminDisponiblesList');
-        const noConvocadosList = document.getElementById('adminNoConvocadosList');
         const preconvocadosList = document.getElementById('adminPreconvocadosList');
+        const noDisponiblesList = document.getElementById('adminNoDisponiblesList');
         const lesionadosList = document.getElementById('adminLesionadosList');
         const titularesCount = document.getElementById('titularesCount');
         const disponiblesCount = document.getElementById('disponiblesCount');
-        const noConvocadosCount = document.getElementById('noConvocadosCount');
         const preconvocadosCount = document.getElementById('preconvocadosCount');
+        const noDisponiblesCount = document.getElementById('noDisponiblesCount');
         const lesionadosCount = document.getElementById('lesionadosCount');
 
         const positionOrder = { portero: 0, defensa: 1, centrocampista: 2, delantero: 3 };
@@ -677,10 +677,11 @@ const Admin = {
 
         const lesionados = PLAYERS.filter(p => p.status === 'lesionado').sort(sortFn);
         const lesionadosIds = lesionados.map(p => p.id);
+        const noDisponibles = PLAYERS.filter(p => p.status === 'no_disponible' || p.status === 'baja').sort(sortFn);
+        const noDisponiblesIds = noDisponibles.map(p => p.id);
         const titularesPlayers = PLAYERS.filter(p => titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
-        const convocados = PLAYERS.filter(p => CONVOCATORIA.includes(p.id) && !titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
-        const noConvocados = PLAYERS.filter(p => !CONVOCATORIA.includes(p.id) && (p.status === 'disponible' || p.status === 'no_disponible') && p.status !== 'baja' && !lesionadosIds.includes(p.id)).sort(sortFn);
-        const preconvocados = PLAYERS.filter(p => p.status === 'disponible' && !CONVOCATORIA.includes(p.id) && !lesionadosIds.includes(p.id)).sort(sortFn);
+        const suplentes = PLAYERS.filter(p => CONVOCATORIA.includes(p.id) && !titulares.includes(p.id) && p.status === 'disponible').sort(sortFn);
+        const preconvocados = PLAYERS.filter(p => p.status === 'disponible' && !CONVOCATORIA.includes(p.id)).sort(sortFn);
 
         let changed = false;
         const nonDisponiblesIds = PLAYERS.filter(p => p.status !== 'disponible').map(p => p.id);
@@ -696,14 +697,14 @@ const Admin = {
         }
 
         titularesCount.textContent = titularesPlayers.length;
-        disponiblesCount.textContent = convocados.length;
-        noConvocadosCount.textContent = noConvocados.length;
+        disponiblesCount.textContent = suplentes.length;
         preconvocadosCount.textContent = preconvocados.length;
+        noDisponiblesCount.textContent = noDisponibles.length;
         lesionadosCount.textContent = lesionados.length;
 
         const renderRow = (p, buttons) => {
             const pName = p.nickname || p.name;
-            const statusIcon = p.status === 'lesionado' ? ' 🤕' : p.status === 'no_disponible' ? ' 🚫' : '';
+            const statusIcon = p.status === 'lesionado' ? ' 🤕' : p.status === 'no_disponible' ? ' 🚫' : p.status === 'baja' ? ' ❌' : '';
             const photoHtml = p.photo ? `<img src="${p.photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">` : `<div class="admin-player-num">${p.number}</div>`;
             return `
             <div class="admin-player-row${p.status === 'lesionado' ? ' lesionado' : ''}" data-id="${p.id}">
@@ -721,27 +722,18 @@ const Admin = {
 
         const canPromote = titularesPlayers.length < 11;
 
-        titularesList.innerHTML = titularesPlayers.map(p =>
+        titularesList.innerHTML = titularesPlayers.length > 0 ? titularesPlayers.map(p =>
             renderRow(p,
-                btn('arrow-down', 'warning', 'Bajar a suplente', `Admin.demoteToSuplente(${p.id})`) +
-                btn('times', 'danger', 'Quitar de convocatoria', `Admin.removeConvocado(${p.id})`)
+                btn('arrow-down', 'warning', 'Bajar a preconvocado', `Admin.demoteToPreconvocado(${p.id})`)
             )
-        ).join('');
+        ).join('') : '<p style="color:var(--text-muted);padding:0.5rem;font-size:0.85rem;">Sin titulares</p>';
 
-        disponiblesList.innerHTML = convocados.map(p =>
+        disponiblesList.innerHTML = suplentes.length > 0 ? suplentes.map(p =>
             renderRow(p,
                 (canPromote ? btn('arrow-up', 'success', 'Promover a titular', `Admin.promoteToTitular(${p.id})`) : '') +
-                btn('arrow-down', 'danger', 'Quitar de convocatoria', `Admin.removeConvocado(${p.id})`)
+                btn('arrow-down', 'warning', 'Bajar a preconvocado', `Admin.demoteToPreconvocado(${p.id})`)
             )
-        ).join('');
-
-        noConvocadosList.innerHTML = noConvocados.map(p =>
-            renderRow(p,
-                p.status === 'no_disponible' ? '' :
-                (canPromote ? btn('arrow-up', 'success', 'Añadir como titular', `Admin.addToTitulares(${p.id})`) : '') +
-                btn('plus', 'primary', 'Añadir como suplente', `Admin.addToSuplentes(${p.id})`)
-            )
-        ).join('');
+        ).join('') : '<p style="color:var(--text-muted);padding:0.5rem;font-size:0.85rem;">Sin suplentes</p>';
 
         preconvocadosList.innerHTML = preconvocados.length > 0 ? preconvocados.map(p => {
             const pName = p.nickname || p.name;
@@ -753,11 +745,28 @@ const Admin = {
                     <span class="admin-player-name">${pName}</span>
                     <span class="admin-player-pos">${formatPosition(p.position)}</span>
                 </div>
-                <button class="btn-icon btn-success" onclick="Admin.addPreconvocado(${p.id})" title="Añadir a convocatoria">
-                    <i class="fas fa-plus"></i>
-                </button>
+                <div class="admin-player-actions">
+                    ${canPromote ? btn('arrow-up', 'success', 'Promover a titular', `Admin.promoteToTitular(${p.id})`) : ''}
+                    ${btn('plus', 'primary', 'Añadir como suplente', `Admin.addToSuplentes(${p.id})`)}
+                </div>
             </div>`;
         }).join('') : '<p style="color:var(--text-muted);padding:0.5rem;font-size:0.85rem;">Todos convocados</p>';
+
+        noDisponiblesList.innerHTML = noDisponibles.length > 0 ? noDisponibles.map(p => {
+            const pName = p.nickname || p.name;
+            const statusLabel = p.status === 'baja' ? '❌ Baja' : '🚫 No disponible';
+            return `
+            <div class="admin-player-row" data-id="${p.id}">
+                <div class="admin-player-num">${p.number}</div>
+                <div class="admin-player-info">
+                    <span class="admin-player-name">${pName} ${statusLabel}</span>
+                    <span class="admin-player-pos">${formatPosition(p.position)}</span>
+                </div>
+                <div class="admin-player-actions">
+                    ${btn('check', 'success', 'Marcar disponible', `Admin.markAvailable(${p.id})`)}
+                </div>
+            </div>`;
+        }).join('') : '<p style="color:var(--text-muted);padding:0.5rem;font-size:0.85rem;">Todos disponibles</p>';
 
         lesionadosList.innerHTML = lesionados.length > 0 ? lesionados.map(p => {
             const pName = p.nickname || p.name;
@@ -799,6 +808,17 @@ const Admin = {
     async addPreconvocado(playerId) {
         if (!CONVOCATORIA.includes(playerId)) CONVOCATORIA.push(playerId);
         await Api.saveConvocatoria(CONVOCATORIA);
+        this.renderAdminConvocatoria();
+        renderConvocatoria();
+    },
+
+    async demoteToPreconvocado(playerId) {
+        const inConv = CONVOCATORIA.indexOf(playerId);
+        if (inConv !== -1) CONVOCATORIA.splice(inConv, 1);
+        const fi = FORMATION.positions.findIndex(p => p.playerId === playerId);
+        if (fi !== -1) FORMATION.positions.splice(fi, 1);
+        await Api.saveConvocatoria(CONVOCATORIA);
+        await Api.saveFormation(FORMATION.name, FORMATION.positions);
         this.renderAdminConvocatoria();
         renderConvocatoria();
     },
