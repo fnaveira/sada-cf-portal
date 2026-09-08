@@ -146,6 +146,9 @@ async function seedNeeded() {
   const check = (await db.execute('SELECT number FROM players WHERE id=1')).rows[0];
   const num = check ? Number(check.number) : 0;
   if (num !== 33) {
+    const photoRows = (await db.execute('SELECT id, photo FROM players WHERE photo IS NOT NULL AND photo != ""')).rows;
+    globalThis._savedPhotos = {};
+    for (const r of photoRows) globalThis._savedPhotos[Number(r.id)] = r.photo;
     const tables = ['players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
     for (const t of tables) {
       try { await db.execute('DELETE FROM ' + t); } catch(e) {}
@@ -228,6 +231,12 @@ async function seedData() {
   const hash2 = crypto.pbkdf2Sync('1234', salt2, 10000, 64, 'sha512').toString('hex');
   P('INSERT INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', ['usuario',hash2,salt2,'jugador',null]);
   await db.batch(s);
+  if (globalThis._savedPhotos) {
+    for (const [id, photo] of Object.entries(globalThis._savedPhotos)) {
+      await db.execute({ sql: 'UPDATE players SET photo=? WHERE id=?', args: [photo, Number(id)] });
+    }
+    delete globalThis._savedPhotos;
+  }
 }
 
 // --- API: INIT (load all data) ---
