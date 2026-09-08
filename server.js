@@ -79,7 +79,10 @@ async function initDB() {
     date TEXT,
     time TEXT,
     venue TEXT,
-    home INTEGER
+    home INTEGER,
+    competition TEXT DEFAULT 'Liga',
+    round TEXT,
+    result TEXT
   )`);
   await db.execute(`CREATE TABLE IF NOT EXISTS results (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -193,7 +196,24 @@ async function seedData() {
   P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [3,"Vizoso, baja temporal","Vizoso recae de un problema en el tendon de aquiles que le tendrá entre 2 y 3 semanas de baja. El equipo le desea una pronta recuperación.","2026-07-18","Bajas"]);
   P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [4,"Temporada 2026/27 - Objetivo: ascenso","La directiva del club ha confirmado que el objetivo de la temporada será el ascenso de categoría. Se ha reforzado la plantilla con varios fichajes estratégicos.","2026-07-10","Club"]);
   P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [5,"Amistoso vs Carnoedo","Este domingo 23 de agosto a las 10:00 jugamos un amistoso en el Campo del Carnoedo. ¡Todos a animar!","2026-08-23","Partido"]);
-  for (const m of [[1,"CD Rival","2026-08-02","18:00","Campo Municipal",1],[2,"UD Puente","2026-08-09","12:00","Campo de La Puente",0],[3,"SD Montaña","2026-08-16","18:00","Campo Municipal",1],[4,"CF Río","2026-08-23","17:30","Estadio del Río",0],[5,"Atlético Norte","2026-08-30","18:00","Campo Municipal",1],[6,"CD Valles","2026-09-06","12:00","Campo de Los Valles",0],[7,"UD Solana","2026-09-13","18:00","Campo Municipal",1],[8,"CD Olivo","2026-09-20","17:00","Campo del Olivo",0]]) P('INSERT INTO matches (id,rival,date,time,venue,home) VALUES (?,?,?,?,?,?)', m);
+  for (const m of [
+    [1,"C.D. Larín","2026-09-05","19:00","Meicende Grande (Arteixo)",0,"Copa","Treintadosavos","1-4"],
+    [2,"Narón Silver Catering","2026-09-13","10:00","O Cabaixo",0,"Liga","J1",null],
+    [3,"Sporting Cambre As Travesas","2026-09-19",null,"As Marías",1,"Liga","J2",null],
+    [4,"Portazgo S.D.","2026-09-26",null,"A Lavandeira (Culleredo)",0,"Liga","J3",null],
+    [5,"Liceo de Monelos S.D.","2026-10-03",null,"As Marías",1,"Liga","J4",null],
+    [6,"Xuventude Dorneda","2026-10-10",null,"A Marola",0,"Liga","J5",null],
+    [7,"Cedeira S.D.","2026-10-17",null,"As Marías",1,"Liga","J6",null],
+    [8,"Betanzos Norte","2026-10-24",null,"O Carregal (Betanzos)",0,"Liga","J7",null],
+    [9,"Atlético Perillo","2026-10-31",null,"O Redondo (Monterrei)",0,"Copa","Dieciseisavos",null],
+    [10,"C.D. Sigras","2026-11-07",null,"As Marías",1,"Liga","J8",null],
+    [11,"Campanal de Loureda F.C.","2026-11-15","11:00","Campo de Freián",0,"Liga","J9",null],
+    [12,"U.D. Narahío","2026-11-21",null,"As Marías",1,"Liga","J10",null],
+    [13,"Sporting Burgo","2026-11-28",null,"A Lavandeira (Culleredo)",0,"Liga","J11",null],
+    [14,"U.D. Paiosaco H.Añón","2026-12-05",null,"As Marías",1,"Liga","J12",null],
+    [15,"Oza de los Ríos","2026-12-12",null,"O Loureiro (Oza De Los Rios)",0,"Liga","J13",null],
+    [16,"San Martín S.D.","2026-12-19",null,"A Revolta (Queixas)",0,"Liga","J14",null]
+  ]) P('INSERT INTO matches (id,rival,date,time,venue,home,competition,round,result) VALUES (?,?,?,?,?,?,?,?,?)', m);
   for (const r of [[1,"2026-07-25","Sada CF","CD Pilar",3,1,"Campo de Sada"],[2,"2026-07-18","UD Ponte","Sada CF",0,2,"Campo da Ponte"],[3,"2026-07-11","Sada CF","CF Narón",1,1,"Campo de Sada"],[4,"2026-07-04","SD Bergondo","Sada CF",2,1,"Campo de Bergondo"],[5,"2026-06-27","Sada CF","CD Meira",4,0,"Campo de Sada"],[6,"2026-06-20","UD Montaña","Sada CF",1,3,"Campo da Montaña"]]) P('INSERT INTO results (id,date,home,away,homeScore,awayScore,venue) VALUES (?,?,?,?,?,?,?)', r);
   for (const st of [[1,"Sada CF",14,10,2,2,28,10,32],[2,"CD Pilar",14,9,3,2,25,12,30],[3,"UD Ponte",14,8,2,4,22,15,26],[4,"CF Narón",14,7,4,3,20,14,25],[5,"SD Bergondo",14,7,2,5,19,16,23],[6,"CD Meira",14,6,3,5,18,17,21],[7,"UD Montaña",14,5,2,7,15,20,17],[8,"CD Oleiros",14,4,3,7,14,21,15],[9,"SD Culleredo",14,4,1,9,12,24,13],[10,"CF Cambre",14,3,2,9,10,26,11]]) P('INSERT INTO standings (pos,team,played,won,drawn,lost,gf,ga,pts) VALUES (?,?,?,?,?,?,?,?,?)', st);
   P('INSERT INTO appearance (key,value) VALUES (?,?)', ['primaryColor','#1e40af']);

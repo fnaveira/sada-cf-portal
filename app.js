@@ -409,6 +409,9 @@ function renderCalendar() {
 
         const homeTeam = match.home ? "Sada CF" : match.rival;
         const awayTeam = match.home ? match.rival : "Sada CF";
+        const compBadge = match.competition === 'Copa' ? '<span class="badge-copa">COPA</span>' : '';
+        const roundLabel = match.round ? `<span class="match-round">${match.round}</span>` : '';
+        const resultLabel = match.result ? `<span class="match-result">${match.result}</span>` : '';
 
         return `
             <div class="calendar-card">
@@ -418,9 +421,10 @@ function renderCalendar() {
                 </div>
                 <div class="calendar-teams">
                     ${homeTeam} <span class="vs">vs</span> ${awayTeam}
+                    ${compBadge}
                 </div>
                 <div class="calendar-meta">
-                    <div class="time">${match.time}</div>
+                    <div class="time">${match.time || ''} ${roundLabel} ${resultLabel}</div>
                     <div class="venue">${match.home ? "🏠 " : "🚌 "}${match.venue}</div>
                 </div>
             </div>
