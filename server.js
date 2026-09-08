@@ -73,7 +73,8 @@ async function initDB() {
     date TEXT,
     tag TEXT
   )`);
-  await db.execute(`CREATE TABLE IF NOT EXISTS matches (
+  await db.execute(`DROP TABLE IF EXISTS matches`);
+  await db.execute(`CREATE TABLE matches (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     rival TEXT,
     date TEXT,
