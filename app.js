@@ -204,6 +204,7 @@ function renderConvocatoria() {
                     const suspendedBadge = suspended ? '<span class="conv-suspended-badge" title="Sancionado"><i class="fas fa-ban"></i></span>' : '';
                     return `
                         <div class="conv-player${statusClass}" style="left:${pos.x}%;top:${pos.y}%;">
+                            ${player.photo ? `<img src="${player.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid #fff;margin:0 auto 2px;display:block;">` : ''}
                             <div class="conv-player-jersey">
                                 <span class="conv-player-num">${player.number}</span>
                                 ${suspendedBadge}
@@ -237,7 +238,7 @@ function renderConvocatoria() {
                         const statusIcon = suspended ? ' 🚫' : player.status === 'lesionado' ? ' 🤕' : player.status === 'no_disponible' ? ' ✖' : '';
                         return `
                         <div class="conv-bench-item${statusClass}">
-                            <div class="conv-bench-number">${player.number}</div>
+                            ${player.photo ? `<img src="${player.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : `<div class="conv-bench-number">${player.number}</div>`}
                             <div class="conv-bench-info">
                                 <span class="conv-bench-name">${pName}${statusIcon}</span>
                                 <span class="conv-bench-pos">${formatPosition(player.position)}</span>
@@ -267,7 +268,7 @@ function renderPlayers(filter = "todos") {
         const recoveryLabel = player.status === 'lesionado' && player.recoveryDate ? `<span class="player-recovery"><i class="fas fa-calendar-check"></i> Vuelve: ${player.recoveryDate}</span>` : '';
         return `
         <div class="player-card ${statusClass}">
-            <div class="player-avatar">${getInitials(player.name)}</div>
+            <div class="player-avatar">${player.photo ? `<img src="${player.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : getInitials(player.name)}</div>
             <div class="player-details">
                 <h3>${player.nickname || player.name}</h3>
                 <span class="position">${formatPosition(player.position)}</span>

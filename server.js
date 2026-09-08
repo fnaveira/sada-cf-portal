@@ -226,9 +226,9 @@ app.get('/api/init', async (req, res) => {
 
 // --- API: PLAYERS ---
 app.put('/api/players/:id', async (req, res) => {
-  const { name, nickname, number, position, age, status, goals, yellowCards, redCards, recoveryDate } = req.body;
+  const { name, nickname, number, position, age, status, goals, yellowCards, redCards, recoveryDate, photo } = req.body;
   const newStatus = status || 'disponible';
-  await db.execute({ sql: 'UPDATE players SET name=?, nickname=?, number=?, position=?, age=?, status=?, goals=?, yellowCards=?, redCards=?, recoveryDate=? WHERE id=?', args: [name, nickname || null, number, position, age || null, newStatus, goals || 0, yellowCards || 0, redCards || 0, recoveryDate || null, req.params.id] });
+  await db.execute({ sql: 'UPDATE players SET name=?, nickname=?, number=?, position=?, age=?, status=?, goals=?, yellowCards=?, redCards=?, recoveryDate=?, photo=? WHERE id=?', args: [name, nickname || null, number, position, age || null, newStatus, goals || 0, yellowCards || 0, redCards || 0, recoveryDate || null, photo || null, req.params.id] });
   const pid = parseInt(req.params.id);
   if (newStatus !== 'disponible') {
     const fRow = (await db.execute('SELECT positions FROM formation WHERE id = 1')).rows[0];
@@ -260,6 +260,13 @@ app.put('/api/players/:id/stats', async (req, res) => {
   const { goals, yellowCards, redCards } = req.body;
   await db.execute({ sql: 'UPDATE players SET goals=?, yellowCards=?, redCards=? WHERE id=?', args: [goals, yellowCards, redCards, req.params.id] });
   res.json({ ok: true });
+});
+
+app.put('/api/players/:id/photo', upload.single('photo'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No se envió archivo' });
+  const photoUrl = '/uploads/' + req.file.filename;
+  await db.execute({ sql: 'UPDATE players SET photo=? WHERE id=?', args: [photoUrl, req.params.id] });
+  res.json({ ok: true, photo: photoUrl });
 });
 
 // --- API: CONVOCATORIA ---

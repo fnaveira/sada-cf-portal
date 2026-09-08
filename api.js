@@ -42,6 +42,14 @@ const Api = {
   async deletePlayer(id) { return this.del(`/api/players/${id}`); },
   async savePlayerStats(id, stats) { return this.put(`/api/players/${id}/stats`, stats); },
 
+  async uploadPlayerPhoto(id, file) {
+    const formData = new FormData();
+    formData.append('photo', file);
+    const res = await fetch(`/api/players/${id}/photo`, { method: 'PUT', body: formData });
+    if (!res.ok) throw new Error('Upload failed');
+    return res.json();
+  },
+
   async saveConvocatoria(playerIds) { return this.put('/api/convocatoria', { playerIds }); },
   async saveFormation(name, positions) { return this.put('/api/formation', { name, positions }); },
 

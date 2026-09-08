@@ -17,8 +17,12 @@ const Admin = {
 
         tbody.innerHTML = filtered.map(p => {
             const statusIcon = p.status === 'lesionado' ? '🤕' : p.status === 'no_disponible' ? '🚫' : '✅';
+            const photoHtml = p.photo
+                ? `<img src="${p.photo}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer;" onclick="Admin.uploadPhoto(${p.id})" title="Cambiar foto">`
+                : `<div onclick="Admin.uploadPhoto(${p.id})" style="width:36px;height:36px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.8rem;color:var(--primary);" title="Subir foto"><i class="fas fa-camera"></i></div>`;
             return `
             <tr>
+                <td data-label="Foto">${photoHtml}</td>
                 <td data-label="#">${p.number}</td>
                 <td data-label="Nombre"><strong>${p.nickname || p.name}</strong><br><small style="color:var(--text-muted)">${p.nickname ? p.name : ''}</small></td>
                 <td data-label="Posición">${formatPosition(p.position)}</td>
@@ -84,6 +88,22 @@ const Admin = {
         this.renderAdminConvocatoria();
         renderPlayers();
         renderConvocatoria();
+    },
+
+    uploadPhoto(playerId) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const result = await Api.uploadPlayerPhoto(playerId, file);
+            const player = PLAYERS.find(p => p.id === playerId);
+            if (player) player.photo = result.photo;
+            this.renderAdminPlayers();
+            renderConvocatoria();
+        };
+        input.click();
     },
 
     async changeStat(playerId, field, delta) {
@@ -679,9 +699,10 @@ const Admin = {
         const renderRow = (p, buttons) => {
             const pName = p.nickname || p.name;
             const statusIcon = p.status === 'lesionado' ? ' 🤕' : p.status === 'no_disponible' ? ' 🚫' : '';
+            const photoHtml = p.photo ? `<img src="${p.photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">` : `<div class="admin-player-num">${p.number}</div>`;
             return `
             <div class="admin-player-row${p.status === 'lesionado' ? ' lesionado' : ''}" data-id="${p.id}">
-                <div class="admin-player-num">${p.number}</div>
+                ${photoHtml}
                 <div class="admin-player-info">
                     <span class="admin-player-name">${pName}${statusIcon}</span>
                     <span class="admin-player-pos">${formatPosition(p.position)}</span>
