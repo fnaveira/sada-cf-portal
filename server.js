@@ -3,6 +3,8 @@ const path = require('path');
 const crypto = require('crypto');
 const multer = require('multer');
 const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const db = require('./db');
 
 const app = express();
@@ -11,16 +13,19 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname)));
 
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
-app.use('/uploads', express.static(uploadsDir));
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, uploadsDir),
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname);
-        cb(null, Date.now() + '-' + crypto.randomBytes(4).toString('hex') + ext);
-    }
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'sada-cf/jugadores',
+    allowed_formats: ['jpg','jpeg','png','webp'],
+    transformation: [{ width: 400, height: 400, crop: 'fill' }]
+  }
 });
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
@@ -324,7 +329,7 @@ app.put('/api/players/:id/stats', async (req, res) => {
 
 app.put('/api/players/:id/photo', upload.single('photo'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No se envió archivo' });
-  const photoUrl = '/uploads/' + req.file.filename;
+  const photoUrl = req.file.path;
   await db.execute({ sql: 'UPDATE players SET photo=? WHERE id=?', args: [photoUrl, req.params.id] });
   res.json({ ok: true, photo: photoUrl });
 });
