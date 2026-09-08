@@ -271,13 +271,11 @@ function renderConvocatoria() {
                     const pName = player.nickname || player.name.split(' ').pop();
                     const suspended = isSuspended(player);
                     const statusIcon = suspended ? ' 🚫' : player.status === 'lesionado' ? ' 🤕' : player.status === 'no_disponible' ? ' ✖' : '';
-                    const isTitular = titulares.includes(player.id);
-                    const tag = isTitular ? ' <span style="font-size:0.65rem;background:var(--primary);color:#fff;padding:1px 5px;border-radius:3px;margin-left:4px;">TITULAR</span>' : '';
                     return `
                     <div class="conv-bench-item">
                         ${player.photo ? `<img src="${player.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : `<div class="conv-bench-number">${player.number}</div>`}
                         <div class="conv-bench-info">
-                            <span class="conv-bench-name">${pName}${statusIcon}${tag}</span>
+                            <span class="conv-bench-name">${pName}${statusIcon}</span>
                             <span class="conv-bench-pos">${formatPosition(player.position)}</span>
                         </div>
                     </div>`;
