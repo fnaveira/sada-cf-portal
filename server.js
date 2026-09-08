@@ -143,7 +143,7 @@ async function seedNeeded() {
   const row = (await db.execute('SELECT COUNT(*) as c FROM players')).rows[0];
   if (row.c === 0) return true;
   const check = (await db.execute('SELECT number FROM players WHERE id=1')).rows[0];
-  if (check && check.number === 1) {
+  if (check && Number(check.number) === 1) {
     await db.execute('DELETE FROM players');
     await db.execute('DELETE FROM convocatoria');
     await db.execute('DELETE FROM formation');
