@@ -153,6 +153,7 @@ function isSuspended(player) {
 
 function renderConvocatoria() {
     const container = document.getElementById("convocatoriaList");
+    const isAdmin = Auth.isAdmin();
 
     const titulares = FORMATION.positions.map(p => p.playerId);
     const convocados = CONVOCATORIA.map(id => PLAYERS.find(p => p.id === id)).filter(Boolean);
@@ -166,7 +167,10 @@ function renderConvocatoria() {
 
     const displayName = (p) => p.nickname || p.name.split(' ').pop();
 
-    let html = `
+    let html = '';
+
+    if (isAdmin) {
+        html += `
         <div class="conv-matchday">
             <div class="conv-matchday-inner">
                 <div class="conv-matchday-team">
@@ -218,9 +222,10 @@ function renderConvocatoria() {
                 }).join('')}
             </div>
         </div>
-    `;
+        `;
+    }
 
-    if (suplentes.length > 0) {
+    if (isAdmin && suplentes.length > 0) {
         html += `
             <div class="conv-bench-section">
                 <div class="conv-bench-header">
@@ -251,6 +256,35 @@ function renderConvocatoria() {
             </div>
         `;
     }
+
+    html += `
+        <div class="conv-bench-section">
+            <div class="conv-bench-header">
+                <div class="conv-bench-icon"><i class="fas fa-clipboard-list"></i></div>
+                <div>
+                    <h3>${isAdmin ? 'Convocados' : 'Lista de convocados'}</h3>
+                    <span class="conv-bench-count">${convocados.length} jugadores</span>
+                </div>
+            </div>
+            <div class="conv-bench-list">
+                ${convocados.map(player => {
+                    const pName = player.nickname || player.name.split(' ').pop();
+                    const suspended = isSuspended(player);
+                    const statusIcon = suspended ? ' 🚫' : player.status === 'lesionado' ? ' 🤕' : player.status === 'no_disponible' ? ' ✖' : '';
+                    const isTitular = titulares.includes(player.id);
+                    const tag = isTitular ? ' <span style="font-size:0.65rem;background:var(--primary);color:#fff;padding:1px 5px;border-radius:3px;margin-left:4px;">TITULAR</span>' : '';
+                    return `
+                    <div class="conv-bench-item">
+                        ${player.photo ? `<img src="${player.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : `<div class="conv-bench-number">${player.number}</div>`}
+                        <div class="conv-bench-info">
+                            <span class="conv-bench-name">${pName}${statusIcon}${tag}</span>
+                            <span class="conv-bench-pos">${formatPosition(player.position)}</span>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>
+    `;
 
     container.innerHTML = html;
 }
