@@ -179,7 +179,6 @@ async function seedData() {
   P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [19,"Pablo Graña Pita","Graña",8,"centrocampista,defensa",42,"disponible",0]);
   P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [20,"Javier Vizoso Guerra","Vizoso",7,"centrocampista",54,"lesionado",0]);
   P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [21,"Francisco Lata Cortes","Lata",37,"defensa,centrocampista",41,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [22,"Manuel Cortes","Manolo",3,"portero",50,"baja",0]);
   P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [23,"Julio Teixeira Fernández","Julio",7,"centrocampista",45,"disponible",0]);
   for (const id of [8,7,12,26,20,2,13,14,16,15]) P('INSERT INTO convocatoria (playerId) VALUES (?)', [id]);
   P('INSERT INTO formation (id,name,positions) VALUES (1,?,?)', ['4-3-2',JSON.stringify([{playerId:8,x:50,y:85},{playerId:2,x:20,y:65},{playerId:13,x:37,y:65},{playerId:16,x:63,y:65},{playerId:15,x:80,y:65},{playerId:7,x:30,y:45},{playerId:12,x:50,y:45},{playerId:26,x:70,y:45},{playerId:14,x:37,y:20},{playerId:20,x:63,y:20}])]);
