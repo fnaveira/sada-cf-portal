@@ -300,7 +300,7 @@ function renderPlayers(filter = "todos") {
         const statusLabel = player.status === 'lesionado' ? 'Lesionado' : player.status === 'no_disponible' ? 'No disponible' : '';
         const recoveryLabel = player.status === 'lesionado' && player.recoveryDate ? `<span class="player-recovery"><i class="fas fa-calendar-check"></i> Vuelve: ${player.recoveryDate}</span>` : '';
         return `
-        <div class="player-card ${statusClass}">
+        <div class="player-card ${statusClass}" onclick="showPlayerProfile(${player.id})" style="cursor:pointer;">
             <div class="player-avatar">${player.photo ? `<img src="${player.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : getInitials(player.name)}</div>
             <div class="player-details">
                 <h3>${player.nickname || player.name}</h3>
@@ -312,6 +312,45 @@ function renderPlayers(filter = "todos") {
             <div class="player-number">#${player.number}</div>
         </div>`;
     }).join("");
+}
+
+function showPlayerProfile(id) {
+    const p = PLAYERS.find(pl => pl.id === id);
+    if (!p) return;
+    const statusLabel = p.status === 'lesionado' ? 'Lesionado' : p.status === 'no_disponible' ? 'No disponible' : p.status === 'baja' ? 'Baja' : 'Disponible';
+    const statusClass = p.status === 'lesionado' ? 'lesionado' : p.status === 'no_disponible' ? 'no-disponible' : '';
+    const birthDate = p.birthDate ? new Date(p.birthDate + 'T00:00:00').toLocaleDateString('es-ES', {day:'2-digit',month:'2-digit',year:'numeric'}) : '-';
+    const photoHtml = p.photo ? `<img src="${p.photo}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);">` : `<div style="width:100px;height:100px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:1.8rem;color:var(--primary);font-weight:700;">${getInitials(p.name)}</div>`;
+
+    const modal = document.getElementById('modal');
+    document.getElementById('modalTitle').textContent = p.nickname || p.name;
+    document.getElementById('modalBody').innerHTML = `
+        <div class="player-profile">
+            <div style="text-align:center;margin-bottom:1.5rem;">${photoHtml}</div>
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <h2 style="margin:0;">${p.name}</h2>
+                <span style="color:var(--text-muted);font-size:0.9rem;">${p.nickname ? '(' + p.nickname + ')' : ''}</span>
+                <div style="margin-top:0.5rem;">
+                    <span style="background:var(--primary);color:#fff;padding:3px 12px;border-radius:20px;font-size:0.8rem;font-weight:600;">#${p.number}</span>
+                    <span class="player-status-badge ${p.status}" style="margin-left:6px;">${statusLabel}</span>
+                </div>
+            </div>
+            <div class="profile-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                <div class="profile-field"><strong>Posición:</strong><br>${formatPosition(p.position)}</div>
+                <div class="profile-field"><strong>Edad:</strong><br>${p.age || '-'} años</div>
+                <div class="profile-field"><strong>DNI:</strong><br>${p.dni || '-'}</div>
+                <div class="profile-field"><strong>Nacimiento:</strong><br>${birthDate}</div>
+                <div class="profile-field"><strong>Lugar nacimiento:</strong><br>${p.birthPlace || '-'}</div>
+                <div class="profile-field"><strong>Nacionalidad:</strong><br>${p.nationality || '-'}</div>
+                <div class="profile-field" style="grid-column:span 2;"><strong>Domicilio:</strong><br>${p.address || '-'}</div>
+                <div class="profile-field"><strong>Población:</strong><br>${p.municipality || '-'}</div>
+                <div class="profile-field"><strong>Provincia:</strong><br>${p.province || '-'}</div>
+                <div class="profile-field"><strong>Teléfono:</strong><br>${p.phone || '-'}</div>
+                <div class="profile-field"><strong>Email:</strong><br>${p.email || '-'}</div>
+            </div>
+        </div>
+    `;
+    modal.style.display = 'flex';
 }
 
 // NEWS

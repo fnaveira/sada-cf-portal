@@ -42,8 +42,22 @@ async function initDB() {
     goals INTEGER DEFAULT 0,
     yellowCards INTEGER DEFAULT 0,
     redCards INTEGER DEFAULT 0,
-    recoveryDate TEXT
+    recoveryDate TEXT,
+    photo TEXT,
+    dni TEXT,
+    birthDate TEXT,
+    address TEXT,
+    phone TEXT,
+    email TEXT,
+    municipality TEXT,
+    province TEXT,
+    birthPlace TEXT,
+    nationality TEXT
   )`);
+  const cols = ['photo','dni','birthDate','address','phone','email','municipality','province','birthPlace','nationality'];
+  for (const c of cols) {
+    try { await db.execute(`ALTER TABLE players ADD COLUMN ${c} TEXT`); } catch(e) {}
+  }
   await db.execute(`CREATE TABLE IF NOT EXISTS convocatoria (
     playerId INTEGER PRIMARY KEY
   )`);
@@ -163,28 +177,32 @@ async function seedData() {
   const tables = ['players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
   for (const t of tables) s.push({ sql: `DELETE FROM ${t}`, args: [] });
   const P = (sql, args) => s.push({ sql, args });
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [1,"Carlos Caamaño Cambon","Caamaño",33,"portero",49,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [2,"Miguel Ángel Garea Parga","Garea",1,"defensa,centrocampista",46,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [3,"David Mourelo Mouzo","Mourelo",10,"defensa,centrocampista,delantero",36,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [4,"Alfonso Martínez Váquez","Alfonso",24,"delantero,defensa",39,"disponible",1]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [5,"Carlos M. Álvarez Labora","Charlie",39,"delantero,defensa",56,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [6,"Diego Fernández Cabana","Cabana",20,"centrocampista,defensa",46,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [7,"Miguel Amor Haz","Miguel",2,"defensa,centrocampista,delantero",46,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [8,"Iván Fernández Álvarez","Pirulo",14,"portero,defensa,centrocampista,delantero",46,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [9,"Gonzalo Ferro Rozas","Ferro",32,"delantero,centrocampista",46,"lesionado",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [10,"Miguel Boo Fernández","Boo",31,"delantero,defensa",41,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [11,"Santiago Seijo Cancelo","Santi",28,"centrocampista,defensa",46,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [12,"Sergio Seijo Cancelo","Sergio",28,"centrocampista,defensa",38,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [13,"Bernardo Gómez Cagiao","Bernardo",45,"defensa,centrocampista",47,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [14,"Jose Luis Mallo López","Pepe",1,"delantero,defensa",41,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [15,"Antonio Seoane Barros","Toni",33,"centrocampista,defensa",39,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [16,"César Freire Lesta","César",10,"defensa,centrocampista,delantero",46,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [17,"Alberto Durán Alfonsín","Durán",34,"centrocampista",42,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [18,"Alberto Roibás Naveiro","Roibás",26,"defensa,centrocampista",45,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [19,"Pablo Graña Pita","Graña",8,"centrocampista,defensa",42,"disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [20,"Javier Vizoso Guerra","Vizoso",7,"centrocampista",54,"lesionado",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [21,"Francisco Lata Cortes","Lata",37,"defensa,centrocampista",41,"no_disponible",0]);
-  P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [23,"Julio Teixeira Fernández","Julio",7,"centrocampista",45,"disponible",0]);
+  const PS = 'INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards,dni,birthDate,address,phone,email,municipality,province,birthPlace,nationality) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+  P(PS, [1,"Carlos Caamaño Cambon","Caamaño",33,"portero",49,"disponible",0,0,0,"32839497M","1976-10-04","TARABELO","654789352","carlos.caamano.cambon@gmail.com","Sada","A Coruña","Sada","Española"]);
+  P(PS, [2,"Miguel Ángel Garea Parga","Garea",1,"defensa,centrocampista",46,"disponible",0,0,0,"79323805W","1980-01-07","CHABURRA","632589647","garea10@hotmail.com","Sada","A Coruña","Sada","Española"]);
+  P(PS, [3,"David Mourelo Mouzo","Mourelo",10,"defensa,centrocampista,delantero",36,"no_disponible",0,0,0,"79338090G","1989-09-22","AVDA ROSALIA DE CASTRO","9699403232","davidmourelomou@gmail.com","Sada","A Coruña","Coiros","Española"]);
+  P(PS, [4,"Alfonso Martínez Váquez","Alfonso",24,"delantero,defensa",39,"disponible",0,1,0,"47388203S","1987-03-23","LGAR CAMPIÑA","645420633","martinezvazquezalfonso@gmail.com","Bergondo","A Coruña","Bergondo","Española"]);
+  P(PS, [5,"Carlos M. Álvarez Labora","Charlie",39,"delantero,defensa",56,"no_disponible",0,0,0,"32801641F","1970-03-11","AV DEL PUERTO","637830353","carlosalvarezlabora@gmail.com","Sada","A Coruña","Sada","Española"]);
+  P(PS, [6,"Diego Fernández Cabana","Cabana",20,"centrocampista,defensa",46,"disponible",0,0,0,"46896400K","1980-03-08","REBOREDO","617416874","diegofernandezcabana@gmail.com","Bergondo","A Coruña","Bergondo","Española"]);
+  P(PS, [7,"Miguel Amor Haz","Miguel",2,"defensa,centrocampista,delantero",46,"disponible",0,0,0,"47355952X","1980-05-31","CUESTA DE LA TAPIA","678592631","michaelamor777@gmail.com","Sada","A Coruña","Sada","Española"]);
+  P(PS, [8,"Iván Fernández Álvarez","Pirulo",14,"portero,defensa,centrocampista,delantero",46,"no_disponible",0,0,0,"79316222D","1980-05-09","SADADAREA","659833245","ivan.piru@hotmail.com","Sada","A Coruña","Bergondo","Española"]);
+  P(PS, [9,"Gonzalo Ferro Rozas","Ferro",32,"delantero,centrocampista",46,"lesionado",0,0,0,"34898127C","1980-08-18","FIUNCHEDO","699703262","gontimba@gmail.com","Sada","A Coruña","Sada","Española"]);
+  P(PS, [10,"Miguel Boo Fernández","Boo",31,"delantero,defensa",41,"disponible",0,0,0,"47367252V","1985-04-09","PARROCO VILLANUEVA","690221170","miguelboofdez@gmail.com","Sada","A Coruña","Sada","Española"]);
+  P(PS, [11,"Santiago Seijo Cancelo","Santi",28,"centrocampista,defensa",46,"no_disponible",0,0,0,"53163373T","1980-07-24","GANDARIO","663495926","santiseijo8@hotmail.com","Sada","A Coruña","Bergondo","Española"]);
+  P(PS, [12,"Sergio Seijo Cancelo","Sergio",28,"centrocampista,defensa",38,"no_disponible",0,0,0,"79330197T","1988-03-13","GANDARIO","697335698","sergioseijo@gmail.com","Bergondo","A Coruña","Bergondo","Española"]);
+  P(PS, [13,"Bernardo Gómez Cagiao","Bernardo",45,"defensa,centrocampista",47,"disponible",0,0,0,"79321949D","1979-05-18","BARRIE DE LA MAZA","639400981","berl2332@hotmail.com","Sada","A Coruña","A Coruña","Española"]);
+  P(PS, [14,"Jose Luis Mallo López","Pepe",1,"delantero,defensa",41,"disponible",0,0,0,"47372440F","1984-10-21","FONTAN","607366765","pepitosada@gmail.com","Sada","A Coruña","Sada","Española"]);
+  P(PS, [15,"Antonio Seoane Barros","Toni",33,"centrocampista,defensa",39,"disponible",0,0,0,"53305250J","1987-01-15","PUERTO","670283555","antoseoane87@gmail.com","Sada","A Coruña","Sada","Española"]);
+  P(PS, [16,"César Freire Lesta","César",10,"defensa,centrocampista,delantero",46,"disponible",0,0,0,"79325247H","1980-02-08","XOAN VICENTE","663495926","cesarfreirelesta@gmail.com","Sada","A Coruña","Sada","Española"]);
+  P(PS, [17,"Alberto Durán Alfonsín","Durán",34,"centrocampista",42,"no_disponible",0,0,0,"32839757N","1984-02-24","C/PARAMO","632145678","duriflexia@hotmail.com","A Coruña","A Coruña","A Coruña","Española"]);
+  P(PS, [18,"Alberto Roibás Naveiro","Roibás",26,"defensa,centrocampista",45,"no_disponible",0,0,0,"46917135X","1981-06-03","DE LA PLAYA","632147258","roi.mendezsua@gmail.com","Sada","A Coruña","Oleiros","Española"]);
+  P(PS, [19,"Pablo Graña Pita","Graña",8,"centrocampista,defensa",42,"disponible",0,0,0,"79336019A","1984-05-31","LGAR A PENA","625635910","pablogranapita84@gmail.com","Paderne","A Coruña","Paderne","Española"]);
+  P(PS, [20,"Javier Vizoso Guerra","Vizoso",7,"centrocampista",54,"lesionado",0,0,0,"79311954L","1971-09-19","PLAZA CORMELANA","647804232","javi@geonor.es","A Coruña","A Coruña","Sada","Española"]);
+  P(PS, [21,"Francisco Lata Cortes","Lata",37,"defensa,centrocampista",41,"no_disponible",0,0,0,"79330784N","1985-04-16","SAN CIDRE","614741258","fran-lata@hotmail.com","Bergondo","A Coruña","Betanzos","Española"]);
+  P(PS, [23,"Julio Teixeira Fernández","Julio",7,"centrocampista",45,"disponible",0,0,0,"53166043W","1981-09-04","CLUIS LOPEZ CASANEGRA","609027738","juliotttep@gmail.com","A Coruña","A Coruña","A Coruña","Española"]);
+  P(PS, [24,"Miguel Angel Albarracin","Albarracin",65,"defensa,centrocampista,delantero",45,"disponible",0,0,0,"Y7742882S","1981-06-08","AVDA MARIÑA","664010009","miguelalbarracincaj@gmail.com","Sada","A Coruña","Argentina","Argentina"]);
+  P(PS, [25,"Marcos Iglesias Castro","Marcos",40,"centrocampista",40,"disponible",0,0,0,"53167480J","1986-05-17","C/SAN IGNACIO","675219902","marcos.iglesias.castro@gmail.com","A Coruña","A Coruña","A Coruña","Española"]);
+  P(PS, [26,"Damián Paris Labandeira","Damián",16,"defensa,centrocampista",37,"disponible",0,0,0,"53303285A","1988-11-05","PAZOS","682658072","damian-pl@hotmail.es","Mazaricos","A Coruña","Sada","Española"]);
   for (const id of [8,7,12,26,20,2,13,14,16,15]) P('INSERT INTO convocatoria (playerId) VALUES (?)', [id]);
   P('INSERT INTO formation (id,name,positions) VALUES (1,?,?)', ['4-3-2',JSON.stringify([{playerId:8,x:50,y:85},{playerId:2,x:20,y:65},{playerId:13,x:37,y:65},{playerId:16,x:63,y:65},{playerId:15,x:80,y:65},{playerId:7,x:30,y:45},{playerId:12,x:50,y:45},{playerId:26,x:70,y:45},{playerId:14,x:37,y:20},{playerId:20,x:63,y:20}])]);
   for (const [k,v] of Object.entries({federationName:"Sada F.C. A Nosa Viña (Veteranos)",federationAddress:"Reboredo, 20 Ouces - 15165 Bergondo, A Coruña",stadium:"Campo Municipal de Sada",stadiumAddress:"Avda. de la Marina, s/n - 15160 Sada",stadiumCapacity:"2.000 espectadores",founded:"1975",president:"D. Diego Fernández Cabana",cif:"G70501242",phone1:"663495926",phone2:"659833245",email:"diegofernandezcabana@gmail.com"})) P('INSERT INTO club_info (key,value) VALUES (?,?)', [k,v]);
@@ -268,9 +286,9 @@ app.get('/api/init', async (req, res) => {
 
 // --- API: PLAYERS ---
 app.put('/api/players/:id', async (req, res) => {
-  const { name, nickname, number, position, age, status, goals, yellowCards, redCards, recoveryDate, photo } = req.body;
+  const { name, nickname, number, position, age, status, goals, yellowCards, redCards, recoveryDate, photo, dni, birthDate, address, phone, email, municipality, province, birthPlace, nationality } = req.body;
   const newStatus = status || 'disponible';
-  await db.execute({ sql: 'UPDATE players SET name=?, nickname=?, number=?, position=?, age=?, status=?, goals=?, yellowCards=?, redCards=?, recoveryDate=?, photo=? WHERE id=?', args: [name, nickname || null, number, position, age || null, newStatus, goals || 0, yellowCards || 0, redCards || 0, recoveryDate || null, photo || null, req.params.id] });
+  await db.execute({ sql: 'UPDATE players SET name=?, nickname=?, number=?, position=?, age=?, status=?, goals=?, yellowCards=?, redCards=?, recoveryDate=?, photo=?, dni=?, birthDate=?, address=?, phone=?, email=?, municipality=?, province=?, birthPlace=?, nationality=? WHERE id=?', args: [name, nickname || null, number, position, age || null, newStatus, goals || 0, yellowCards || 0, redCards || 0, recoveryDate || null, photo || null, dni || null, birthDate || null, address || null, phone || null, email || null, municipality || null, province || null, birthPlace || null, nationality || null, req.params.id] });
   const pid = parseInt(req.params.id);
   if (newStatus !== 'disponible') {
     const fRow = (await db.execute('SELECT positions FROM formation WHERE id = 1')).rows[0];
