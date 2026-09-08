@@ -146,7 +146,9 @@ async function seedNeeded() {
   const num = check ? Number(check.number) : 0;
   if (num !== 33) {
     const tables = ['players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
-    for (const t of tables) await db.execute({ sql: `DELETE FROM ${t}`, args: [] });
+    for (const t of tables) {
+      try { await db.execute('DELETE FROM ' + t); } catch(e) {}
+    }
     return true;
   }
   return false;
@@ -154,6 +156,8 @@ async function seedNeeded() {
 
 async function seedData() {
   const s = [];
+  const tables = ['players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
+  for (const t of tables) s.push({ sql: `DELETE FROM ${t}`, args: [] });
   const P = (sql, args) => s.push({ sql, args });
   P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [1,"Carlos Caamaño Cambon","Caamaño",33,"portero",49,"disponible",0]);
   P('INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards) VALUES (?,?,?,?,?,?,?,?,0,0)', [2,"Miguel Ángel Garea Parga","Garea",1,"defensa,centrocampista",46,"disponible",0]);
