@@ -183,7 +183,7 @@ async function seedNeeded() {
   const convCount = (await db.execute('SELECT COUNT(*) as c FROM convocatoria')).rows[0];
   const hasOldConv = Number(convCount.c) !== 17;
   if (num !== 33 || isOldFormation || hasOldConv) {
-    const photoRows = (await db.execute('SELECT id, photo FROM players WHERE photo IS NOT NULL AND photo != ""')).rows;
+    const photoRows = (await db.execute("SELECT id, photo FROM players WHERE photo IS NOT NULL AND photo != ''")).rows;
     globalThis._savedPhotos = {};
     for (const r of photoRows) globalThis._savedPhotos[Number(r.id)] = r.photo;
     const tables = ['players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
