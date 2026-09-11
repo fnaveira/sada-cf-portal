@@ -222,8 +222,8 @@ async function seedData() {
   P(PS, [24,"Miguel Angel Albarracin","Albarracin",65,"defensa,centrocampista,delantero",45,"disponible",0,0,0,"Y7742882S","1981-06-08","AVDA MARIÑA","664010009","miguelalbarracincaj@gmail.com","Sada","A Coruña","Argentina","Argentina"]);
   P(PS, [25,"Marcos Iglesias Castro","Marcos",40,"centrocampista",40,"disponible",0,0,0,"53167480J","1986-05-17","C/SAN IGNACIO","675219902","marcos.iglesias.castro@gmail.com","A Coruña","A Coruña","A Coruña","Española"]);
   P(PS, [26,"Damián Paris Labandeira","Damián",16,"defensa,centrocampista",37,"disponible",0,0,0,"53303285A","1988-11-05","PAZOS","682658072","damian-pl@hotmail.es","Mazaricos","A Coruña","Sada","Española"]);
-  for (const id of [8,7,12,26,20,2,13,14,16,15]) P('INSERT INTO convocatoria (playerId) VALUES (?)', [id]);
-  P('INSERT INTO formation (id,name,positions) VALUES (1,?,?)', ['4-3-2',JSON.stringify([{playerId:8,x:50,y:85},{playerId:2,x:20,y:65},{playerId:13,x:37,y:65},{playerId:16,x:63,y:65},{playerId:15,x:80,y:65},{playerId:7,x:30,y:45},{playerId:12,x:50,y:45},{playerId:26,x:70,y:45},{playerId:14,x:37,y:20},{playerId:20,x:63,y:20}])]);
+  for (const id of [7,12,26,20,2,13,14,16,15,19,1,24,23,4,5,8]) P('INSERT INTO convocatoria (playerId) VALUES (?)', [id]);
+  P('INSERT INTO formation (id,name,positions) VALUES (1,?,?)', ['4-3-3',JSON.stringify([{playerId:1,x:50,y:85},{playerId:2,x:20,y:65},{playerId:13,x:37,y:65},{playerId:26,x:63,y:65},{playerId:7,x:80,y:65},{playerId:12,x:30,y:45},{playerId:15,x:50,y:45},{playerId:19,x:70,y:45},{playerId:14,x:20,y:20},{playerId:4,x:50,y:20},{playerId:16,x:80,y:20}])]);
   for (const [k,v] of Object.entries({federationName:"Sada F.C. A Nosa Viña (Veteranos)",federationAddress:"Reboredo, 20 Ouces - 15165 Bergondo, A Coruña",stadium:"Campo Municipal de Sada",stadiumAddress:"Avda. de la Marina, s/n - 15160 Sada",stadiumCapacity:"2.000 espectadores",founded:"1975",president:"D. Diego Fernández Cabana",cif:"G70501242",phone1:"663495926",phone2:"659833245",email:"diegofernandezcabana@gmail.com"})) P('INSERT INTO club_info (key,value) VALUES (?,?)', [k,v]);
   P('INSERT INTO staff (id,name,role) VALUES (?,?,?)', [1,"Fran Naveira","Entrenador"]);
   P('INSERT INTO staff (id,name,role) VALUES (?,?,?)', [2,"Santi Seijo","Entrenador Auxiliar"]);
@@ -239,7 +239,7 @@ async function seedData() {
   P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [5,"Amistoso vs Carnoedo","Este domingo 23 de agosto a las 10:00 jugamos un amistoso en el Campo del Carnoedo. ¡Todos a animar!","2026-08-23","Partido"]);
   for (const m of [
     [1,"C.D. Larín","2026-09-05","19:00","Meicende Grande (Arteixo)",0,"Copa","Treintadosavos","1-4"],
-    [2,"Narón Silver Catering","2026-09-13","10:00","O Cabaixo",0,"Liga","J1",null],
+    [2,"Narón Silver Catering","2026-09-13","10:00","O Cadaval (Narón)",0,"Liga","J1",null],
     [3,"Sporting Cambre As Travesas","2026-09-19",null,"As Marías",1,"Liga","J2",null],
     [4,"Portazgo S.D.","2026-09-26",null,"A Lavandeira (Culleredo)",0,"Liga","J3",null],
     [5,"Liceo de Monelos S.D.","2026-10-03",null,"As Marías",1,"Liga","J4",null],
