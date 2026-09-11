@@ -181,7 +181,7 @@ async function seedNeeded() {
   const formCheck = (await db.execute('SELECT name FROM formation WHERE id=1')).rows[0];
   const isOldFormation = formCheck && formCheck.name === '4-3-2';
   const convCount = (await db.execute('SELECT COUNT(*) as c FROM convocatoria')).rows[0];
-  const hasOldConv = Number(convCount.c) !== 17;
+  const hasOldConv = Number(convCount.c) !== 16;
   if (num !== 33 || isOldFormation || hasOldConv) {
     const photoRows = (await db.execute("SELECT id, photo FROM players WHERE photo IS NOT NULL AND photo != ''")).rows;
     globalThis._savedPhotos = {};
@@ -227,8 +227,8 @@ async function seedData() {
   await P(PS, [24,"Miguel Angel Albarracin","Albarracin",65,"defensa,centrocampista,delantero",45,"disponible",0,0,0,"Y7742882S","1981-06-08","AVDA MARIÑA","664010009","miguelalbarracincaj@gmail.com","Sada","A Coruña","Argentina","Argentina"]);
   await P(PS, [25,"Marcos Iglesias Castro","Marcos",40,"centrocampista",40,"disponible",0,0,0,"53167480J","1986-05-17","C/SAN IGNACIO","675219902","marcos.iglesias.castro@gmail.com","A Coruña","A Coruña","A Coruña","Española"]);
   await P(PS, [26,"Damián Paris Labandeira","Damián",16,"defensa,centrocampista",37,"disponible",0,0,0,"53303285A","1988-11-05","PAZOS","682658072","damian-pl@hotmail.es","Mazaricos","A Coruña","Sada","Española"]);
-  for (const id of [7,12,26,20,2,13,14,16,15,19,1,24,23,4,5,8,18]) await P('INSERT INTO convocatoria (playerId) VALUES (?)', [id]);
-  await P('INSERT INTO formation (id,name,positions) VALUES (1,?,?)', ['4-3-3',JSON.stringify([{playerId:1,x:50,y:85},{playerId:2,x:20,y:65},{playerId:13,x:37,y:65},{playerId:26,x:63,y:65},{playerId:7,x:80,y:65},{playerId:12,x:30,y:45},{playerId:15,x:50,y:45},{playerId:19,x:70,y:45},{playerId:14,x:20,y:20},{playerId:4,x:50,y:20},{playerId:16,x:80,y:20}])]);
+  for (const id of [7,12,26,20,2,13,14,16,15,19,24,23,4,5,8,18]) await P('INSERT INTO convocatoria (playerId) VALUES (?)', [id]);
+  await P('INSERT INTO formation (id,name,positions) VALUES (1,?,?)', ['4-3-3',JSON.stringify([{playerId:8,x:50,y:85},{playerId:2,x:20,y:65},{playerId:13,x:37,y:65},{playerId:26,x:63,y:65},{playerId:7,x:80,y:65},{playerId:15,x:30,y:45},{playerId:12,x:50,y:45},{playerId:19,x:70,y:45},{playerId:14,x:20,y:20},{playerId:4,x:50,y:20},{playerId:16,x:80,y:20}])]);
   for (const [k,v] of Object.entries({federationName:"Sada F.C. A Nosa Viña (Veteranos)",federationAddress:"Reboredo, 20 Ouces - 15165 Bergondo, A Coruña",stadium:"Campo Municipal de Sada",stadiumAddress:"Avda. de la Marina, s/n - 15160 Sada",stadiumCapacity:"2.000 espectadores",founded:"1975",president:"D. Diego Fernández Cabana",cif:"G70501242",phone1:"663495926",phone2:"659833245",email:"diegofernandezcabana@gmail.com"})) await P('INSERT INTO club_info (key,value) VALUES (?,?)', [k,v]);
   await P('INSERT INTO staff (id,name,role) VALUES (?,?,?)', [1,"Fran Naveira","Entrenador"]);
   await P('INSERT INTO staff (id,name,role) VALUES (?,?,?)', [2,"Santi Seijo","Entrenador Auxiliar"]);
