@@ -180,7 +180,9 @@ async function seedNeeded() {
   const num = check ? Number(check.number) : 0;
   const formCheck = (await db.execute('SELECT name FROM formation WHERE id=1')).rows[0];
   const isOldFormation = formCheck && formCheck.name === '4-3-2';
-  if (num !== 33 || isOldFormation) {
+  const convCount = (await db.execute('SELECT COUNT(*) as c FROM convocatoria')).rows[0];
+  const hasOldConv = Number(convCount.c) !== 16;
+  if (num !== 33 || isOldFormation || hasOldConv) {
     const photoRows = (await db.execute('SELECT id, photo FROM players WHERE photo IS NOT NULL AND photo != ""')).rows;
     globalThis._savedPhotos = {};
     for (const r of photoRows) globalThis._savedPhotos[Number(r.id)] = r.photo;
@@ -218,7 +220,7 @@ async function seedData() {
   P(PS, [17,"Alberto Durán Alfonsín","Durán",34,"centrocampista",42,"no_disponible",0,0,0,"32839757N","1984-02-24","C/PARAMO","632145678","duriflexia@hotmail.com","A Coruña","A Coruña","A Coruña","Española"]);
   P(PS, [18,"Alberto Roibás Naveiro","Roibás",26,"defensa,centrocampista",45,"no_disponible",0,0,0,"46917135X","1981-06-03","DE LA PLAYA","632147258","roi.mendezsua@gmail.com","Sada","A Coruña","Oleiros","Española"]);
   P(PS, [19,"Pablo Graña Pita","Graña",8,"centrocampista,defensa",42,"disponible",0,0,0,"79336019A","1984-05-31","LGAR A PENA","625635910","pablogranapita84@gmail.com","Paderne","A Coruña","Paderne","Española"]);
-  P(PS, [20,"Javier Vizoso Guerra","Vizoso",7,"centrocampista",54,"lesionado",0,0,0,"79311954L","1971-09-19","PLAZA CORMELANA","647804232","javi@geonor.es","A Coruña","A Coruña","Sada","Española"]);
+  P(PS, [20,"Javier Vizoso Guerra","Vizoso",7,"centrocampista",54,"disponible",0,0,0,"79311954L","1971-09-19","PLAZA CORMELANA","647804232","javi@geonor.es","A Coruña","A Coruña","Sada","Española"]);
   P(PS, [21,"Francisco Lata Cortes","Lata",37,"defensa,centrocampista",41,"no_disponible",0,0,0,"79330784N","1985-04-16","SAN CIDRE","614741258","fran-lata@hotmail.com","Bergondo","A Coruña","Betanzos","Española"]);
   P(PS, [23,"Julio Teixeira Fernández","Julio",7,"centrocampista",45,"disponible",0,0,0,"53166043W","1981-09-04","CLUIS LOPEZ CASANEGRA","609027738","juliotttep@gmail.com","A Coruña","A Coruña","A Coruña","Española"]);
   P(PS, [24,"Miguel Angel Albarracin","Albarracin",65,"defensa,centrocampista,delantero",45,"disponible",0,0,0,"Y7742882S","1981-06-08","AVDA MARIÑA","664010009","miguelalbarracincaj@gmail.com","Sada","A Coruña","Argentina","Argentina"]);
