@@ -196,51 +196,52 @@ async function seedNeeded() {
 }
 
 async function seedData() {
-  const s = [];
   const tables = ['players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
-  for (const t of tables) s.push({ sql: `DELETE FROM ${t}`, args: [] });
-  const P = (sql, args) => s.push({ sql, args });
+  for (const t of tables) {
+    try { await db.execute('DELETE FROM ' + t); } catch(e) {}
+  }
+  const P = async (sql, args) => { await db.execute({ sql, args: args.map(a => a === undefined ? null : a) }); };
   const PS = 'INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards,dni,birthDate,address,phone,email,municipality,province,birthPlace,nationality) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
-  P(PS, [1,"Carlos Caamaño Cambon","Caamaño",33,"portero",49,"disponible",0,0,0,"32839497M","1976-10-04","TARABELO","654789352","carlos.caamano.cambon@gmail.com","Sada","A Coruña","Sada","Española"]);
-  P(PS, [2,"Miguel Ángel Garea Parga","Garea",1,"defensa,centrocampista",46,"disponible",0,0,0,"79323805W","1980-01-07","CHABURRA","632589647","garea10@hotmail.com","Sada","A Coruña","Sada","Española"]);
-  P(PS, [3,"David Mourelo Mouzo","Mourelo",10,"defensa,centrocampista,delantero",36,"no_disponible",0,0,0,"79338090G","1989-09-22","AVDA ROSALIA DE CASTRO","9699403232","davidmourelomou@gmail.com","Sada","A Coruña","Coiros","Española"]);
-  P(PS, [4,"Alfonso Martínez Váquez","Alfonso",24,"delantero,defensa",39,"disponible",0,1,0,"47388203S","1987-03-23","LGAR CAMPIÑA","645420633","martinezvazquezalfonso@gmail.com","Bergondo","A Coruña","Bergondo","Española"]);
-  P(PS, [5,"Carlos M. Álvarez Labora","Charlie",39,"delantero,defensa",56,"no_disponible",0,0,0,"32801641F","1970-03-11","AV DEL PUERTO","637830353","carlosalvarezlabora@gmail.com","Sada","A Coruña","Sada","Española"]);
-  P(PS, [6,"Diego Fernández Cabana","Cabana",20,"centrocampista,defensa",46,"disponible",0,0,0,"46896400K","1980-03-08","REBOREDO","617416874","diegofernandezcabana@gmail.com","Bergondo","A Coruña","Bergondo","Española"]);
-  P(PS, [7,"Miguel Amor Haz","Miguel",2,"defensa,centrocampista,delantero",46,"disponible",0,0,0,"47355952X","1980-05-31","CUESTA DE LA TAPIA","678592631","michaelamor777@gmail.com","Sada","A Coruña","Sada","Española"]);
-  P(PS, [8,"Iván Fernández Álvarez","Pirulo",14,"portero,defensa,centrocampista,delantero",46,"no_disponible",0,0,0,"79316222D","1980-05-09","SADADAREA","659833245","ivan.piru@hotmail.com","Sada","A Coruña","Bergondo","Española"]);
-  P(PS, [9,"Gonzalo Ferro Rozas","Ferro",32,"delantero,centrocampista",46,"lesionado",0,0,0,"34898127C","1980-08-18","FIUNCHEDO","699703262","gontimba@gmail.com","Sada","A Coruña","Sada","Española"]);
-  P(PS, [10,"Miguel Boo Fernández","Boo",31,"delantero,defensa",41,"disponible",0,0,0,"47367252V","1985-04-09","PARROCO VILLANUEVA","690221170","miguelboofdez@gmail.com","Sada","A Coruña","Sada","Española"]);
-  P(PS, [11,"Santiago Seijo Cancelo","Santi",28,"centrocampista,defensa",46,"no_disponible",0,0,0,"53163373T","1980-07-24","GANDARIO","663495926","santiseijo8@hotmail.com","Sada","A Coruña","Bergondo","Española"]);
-  P(PS, [12,"Sergio Seijo Cancelo","Sergio",28,"centrocampista,defensa",38,"no_disponible",0,0,0,"79330197T","1988-03-13","GANDARIO","697335698","sergioseijo@gmail.com","Bergondo","A Coruña","Bergondo","Española"]);
-  P(PS, [13,"Bernardo Gómez Cagiao","Bernardo",45,"defensa,centrocampista",47,"disponible",0,0,0,"79321949D","1979-05-18","BARRIE DE LA MAZA","639400981","berl2332@hotmail.com","Sada","A Coruña","A Coruña","Española"]);
-  P(PS, [14,"Jose Luis Mallo López","Pepe",1,"delantero,defensa",41,"disponible",0,0,0,"47372440F","1984-10-21","FONTAN","607366765","pepitosada@gmail.com","Sada","A Coruña","Sada","Española"]);
-  P(PS, [15,"Antonio Seoane Barros","Toni",33,"centrocampista,defensa",39,"disponible",0,0,0,"53305250J","1987-01-15","PUERTO","670283555","antoseoane87@gmail.com","Sada","A Coruña","Sada","Española"]);
-  P(PS, [16,"César Freire Lesta","César",10,"defensa,centrocampista,delantero",46,"disponible",0,0,0,"79325247H","1980-02-08","XOAN VICENTE","663495926","cesarfreirelesta@gmail.com","Sada","A Coruña","Sada","Española"]);
-  P(PS, [17,"Alberto Durán Alfonsín","Durán",34,"centrocampista",42,"no_disponible",0,0,0,"32839757N","1984-02-24","C/PARAMO","632145678","duriflexia@hotmail.com","A Coruña","A Coruña","A Coruña","Española"]);
-  P(PS, [18,"Alberto Roibás Naveiro","Roibás",26,"defensa,centrocampista",45,"no_disponible",0,0,0,"46917135X","1981-06-03","DE LA PLAYA","632147258","roi.mendezsua@gmail.com","Sada","A Coruña","Oleiros","Española"]);
-  P(PS, [19,"Pablo Graña Pita","Graña",8,"centrocampista,defensa",42,"disponible",0,0,0,"79336019A","1984-05-31","LGAR A PENA","625635910","pablogranapita84@gmail.com","Paderne","A Coruña","Paderne","Española"]);
-  P(PS, [20,"Javier Vizoso Guerra","Vizoso",7,"centrocampista",54,"disponible",0,0,0,"79311954L","1971-09-19","PLAZA CORMELANA","647804232","javi@geonor.es","A Coruña","A Coruña","Sada","Española"]);
-  P(PS, [21,"Francisco Lata Cortes","Lata",37,"defensa,centrocampista",41,"no_disponible",0,0,0,"79330784N","1985-04-16","SAN CIDRE","614741258","fran-lata@hotmail.com","Bergondo","A Coruña","Betanzos","Española"]);
-  P(PS, [23,"Julio Teixeira Fernández","Julio",7,"centrocampista",45,"disponible",0,0,0,"53166043W","1981-09-04","CLUIS LOPEZ CASANEGRA","609027738","juliotttep@gmail.com","A Coruña","A Coruña","A Coruña","Española"]);
-  P(PS, [24,"Miguel Angel Albarracin","Albarracin",65,"defensa,centrocampista,delantero",45,"disponible",0,0,0,"Y7742882S","1981-06-08","AVDA MARIÑA","664010009","miguelalbarracincaj@gmail.com","Sada","A Coruña","Argentina","Argentina"]);
-  P(PS, [25,"Marcos Iglesias Castro","Marcos",40,"centrocampista",40,"disponible",0,0,0,"53167480J","1986-05-17","C/SAN IGNACIO","675219902","marcos.iglesias.castro@gmail.com","A Coruña","A Coruña","A Coruña","Española"]);
-  P(PS, [26,"Damián Paris Labandeira","Damián",16,"defensa,centrocampista",37,"disponible",0,0,0,"53303285A","1988-11-05","PAZOS","682658072","damian-pl@hotmail.es","Mazaricos","A Coruña","Sada","Española"]);
-  for (const id of [7,12,26,20,2,13,14,16,15,19,1,24,23,4,5,8,18]) P('INSERT INTO convocatoria (playerId) VALUES (?)', [id]);
-  P('INSERT INTO formation (id,name,positions) VALUES (1,?,?)', ['4-3-3',JSON.stringify([{playerId:1,x:50,y:85},{playerId:2,x:20,y:65},{playerId:13,x:37,y:65},{playerId:26,x:63,y:65},{playerId:7,x:80,y:65},{playerId:12,x:30,y:45},{playerId:15,x:50,y:45},{playerId:19,x:70,y:45},{playerId:14,x:20,y:20},{playerId:4,x:50,y:20},{playerId:16,x:80,y:20}])]);
-  for (const [k,v] of Object.entries({federationName:"Sada F.C. A Nosa Viña (Veteranos)",federationAddress:"Reboredo, 20 Ouces - 15165 Bergondo, A Coruña",stadium:"Campo Municipal de Sada",stadiumAddress:"Avda. de la Marina, s/n - 15160 Sada",stadiumCapacity:"2.000 espectadores",founded:"1975",president:"D. Diego Fernández Cabana",cif:"G70501242",phone1:"663495926",phone2:"659833245",email:"diegofernandezcabana@gmail.com"})) P('INSERT INTO club_info (key,value) VALUES (?,?)', [k,v]);
-  P('INSERT INTO staff (id,name,role) VALUES (?,?,?)', [1,"Fran Naveira","Entrenador"]);
-  P('INSERT INTO staff (id,name,role) VALUES (?,?,?)', [2,"Santi Seijo","Entrenador Auxiliar"]);
-  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [1,"Diego Fernández Cabana","Presidente"]);
-  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [2,"Iván Fernández Álvarez","Secretario"]);
-  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [3,"Santiago Seijo Cancelo","Vicesecretario"]);
-  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [4,"Alberto Roibás Naveiro","Tesorero"]);
-  P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [5,"Gonzalo Ferro Rozas","Vocal"]);
-  P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [1,"Derrota para aprender de los errores","Hemos perdido nuestro primer partido amistoso contra un rival de menor categoria por demeritos propios, tres fallos en defensa condenaron al equipo a ir a remolque todo el partido, mejorando sustanciablemente en la segunda parte con la entrada de los revulsivos. Derrota para aprender.","2026-07-25","Crónica"]);
-  P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [2,"Debut de Julio","Julio debuta en el amistoso contra el SPM con gran rendimiento.","2026-07-22","Fichaje"]);
-  P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [3,"Vizoso, baja temporal","Vizoso recae de un problema en el tendon de aquiles que le tendrá entre 2 y 3 semanas de baja. El equipo le desea una pronta recuperación.","2026-07-18","Bajas"]);
-  P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [4,"Temporada 2026/27 - Objetivo: ascenso","La directiva del club ha confirmado que el objetivo de la temporada será el ascenso de categoría. Se ha reforzado la plantilla con varios fichajes estratégicos.","2026-07-10","Club"]);
-  P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [5,"Amistoso vs Carnoedo","Este domingo 23 de agosto a las 10:00 jugamos un amistoso en el Campo del Carnoedo. ¡Todos a animar!","2026-08-23","Partido"]);
+  await P(PS, [1,"Carlos Caamaño Cambon","Caamaño",33,"portero",49,"disponible",0,0,0,"32839497M","1976-10-04","TARABELO","654789352","carlos.caamano.cambon@gmail.com","Sada","A Coruña","Sada","Española"]);
+  await P(PS, [2,"Miguel Ángel Garea Parga","Garea",1,"defensa,centrocampista",46,"disponible",0,0,0,"79323805W","1980-01-07","CHABURRA","632589647","garea10@hotmail.com","Sada","A Coruña","Sada","Española"]);
+  await P(PS, [3,"David Mourelo Mouzo","Mourelo",10,"defensa,centrocampista,delantero",36,"no_disponible",0,0,0,"79338090G","1989-09-22","AVDA ROSALIA DE CASTRO","9699403232","davidmourelomou@gmail.com","Sada","A Coruña","Coiros","Española"]);
+  await P(PS, [4,"Alfonso Martínez Váquez","Alfonso",24,"delantero,defensa",39,"disponible",0,1,0,"47388203S","1987-03-23","LGAR CAMPIÑA","645420633","martinezvazquezalfonso@gmail.com","Bergondo","A Coruña","Bergondo","Española"]);
+  await P(PS, [5,"Carlos M. Álvarez Labora","Charlie",39,"delantero,defensa",56,"no_disponible",0,0,0,"32801641F","1970-03-11","AV DEL PUERTO","637830353","carlosalvarezlabora@gmail.com","Sada","A Coruña","Sada","Española"]);
+  await P(PS, [6,"Diego Fernández Cabana","Cabana",20,"centrocampista,defensa",46,"disponible",0,0,0,"46896400K","1980-03-08","REBOREDO","617416874","diegofernandezcabana@gmail.com","Bergondo","A Coruña","Bergondo","Española"]);
+  await P(PS, [7,"Miguel Amor Haz","Miguel",2,"defensa,centrocampista,delantero",46,"disponible",0,0,0,"47355952X","1980-05-31","CUESTA DE LA TAPIA","678592631","michaelamor777@gmail.com","Sada","A Coruña","Sada","Española"]);
+  await P(PS, [8,"Iván Fernández Álvarez","Pirulo",14,"portero,defensa,centrocampista,delantero",46,"disponible",0,0,0,"79316222D","1980-05-09","SADADAREA","659833245","ivan.piru@hotmail.com","Sada","A Coruña","Bergondo","Española"]);
+  await P(PS, [9,"Gonzalo Ferro Rozas","Ferro",32,"delantero,centrocampista",46,"lesionado",0,0,0,"34898127C","1980-08-18","FIUNCHEDO","699703262","gontimba@gmail.com","Sada","A Coruña","Sada","Española"]);
+  await P(PS, [10,"Miguel Boo Fernández","Boo",31,"delantero,defensa",41,"disponible",0,0,0,"47367252V","1985-04-09","PARROCO VILLANUEVA","690221170","miguelboofdez@gmail.com","Sada","A Coruña","Sada","Española"]);
+  await P(PS, [11,"Santiago Seijo Cancelo","Santi",28,"centrocampista,defensa",46,"no_disponible",0,0,0,"53163373T","1980-07-24","GANDARIO","663495926","santiseijo8@hotmail.com","Sada","A Coruña","Bergondo","Española"]);
+  await P(PS, [12,"Sergio Seijo Cancelo","Sergio",28,"centrocampista,defensa",38,"no_disponible",0,0,0,"79330197T","1988-03-13","GANDARIO","697335698","sergioseijo@gmail.com","Bergondo","A Coruña","Bergondo","Española"]);
+  await P(PS, [13,"Bernardo Gómez Cagiao","Bernardo",45,"defensa,centrocampista",47,"disponible",0,0,0,"79321949D","1979-05-18","BARRIE DE LA MAZA","639400981","berl2332@hotmail.com","Sada","A Coruña","A Coruña","Española"]);
+  await P(PS, [14,"Jose Luis Mallo López","Pepe",1,"delantero,defensa",41,"disponible",0,0,0,"47372440F","1984-10-21","FONTAN","607366765","pepitosada@gmail.com","Sada","A Coruña","Sada","Española"]);
+  await P(PS, [15,"Antonio Seoane Barros","Toni",33,"centrocampista,defensa",39,"disponible",0,0,0,"53305250J","1987-01-15","PUERTO","670283555","antoseoane87@gmail.com","Sada","A Coruña","Sada","Española"]);
+  await P(PS, [16,"César Freire Lesta","César",10,"defensa,centrocampista,delantero",46,"disponible",0,0,0,"79325247H","1980-02-08","XOAN VICENTE","663495926","cesarfreirelesta@gmail.com","Sada","A Coruña","Sada","Española"]);
+  await P(PS, [17,"Alberto Durán Alfonsín","Durán",34,"centrocampista",42,"no_disponible",0,0,0,"32839757N","1984-02-24","C/PARAMO","632145678","duriflexia@hotmail.com","A Coruña","A Coruña","A Coruña","Española"]);
+  await P(PS, [18,"Alberto Roibás Naveiro","Roibás",26,"defensa,centrocampista",45,"no_disponible",0,0,0,"46917135X","1981-06-03","DE LA PLAYA","632147258","roi.mendezsua@gmail.com","Sada","A Coruña","Oleiros","Española"]);
+  await P(PS, [19,"Pablo Graña Pita","Graña",8,"centrocampista,defensa",42,"disponible",0,0,0,"79336019A","1984-05-31","LGAR A PENA","625635910","pablogranapita84@gmail.com","Paderne","A Coruña","Paderne","Española"]);
+  await P(PS, [20,"Javier Vizoso Guerra","Vizoso",7,"centrocampista",54,"disponible",0,0,0,"79311954L","1971-09-19","PLAZA CORMELANA","647804232","javi@geonor.es","A Coruña","A Coruña","Sada","Española"]);
+  await P(PS, [21,"Francisco Lata Cortes","Lata",37,"defensa,centrocampista",41,"no_disponible",0,0,0,"79330784N","1985-04-16","SAN CIDRE","614741258","fran-lata@hotmail.com","Bergondo","A Coruña","Betanzos","Española"]);
+  await P(PS, [23,"Julio Teixeira Fernández","Julio",7,"centrocampista",45,"disponible",0,0,0,"53166043W","1981-09-04","CLUIS LOPEZ CASANEGRA","609027738","juliotttep@gmail.com","A Coruña","A Coruña","A Coruña","Española"]);
+  await P(PS, [24,"Miguel Angel Albarracin","Albarracin",65,"defensa,centrocampista,delantero",45,"disponible",0,0,0,"Y7742882S","1981-06-08","AVDA MARIÑA","664010009","miguelalbarracincaj@gmail.com","Sada","A Coruña","Argentina","Argentina"]);
+  await P(PS, [25,"Marcos Iglesias Castro","Marcos",40,"centrocampista",40,"disponible",0,0,0,"53167480J","1986-05-17","C/SAN IGNACIO","675219902","marcos.iglesias.castro@gmail.com","A Coruña","A Coruña","A Coruña","Española"]);
+  await P(PS, [26,"Damián Paris Labandeira","Damián",16,"defensa,centrocampista",37,"disponible",0,0,0,"53303285A","1988-11-05","PAZOS","682658072","damian-pl@hotmail.es","Mazaricos","A Coruña","Sada","Española"]);
+  for (const id of [7,12,26,20,2,13,14,16,15,19,1,24,23,4,5,8,18]) await P('INSERT INTO convocatoria (playerId) VALUES (?)', [id]);
+  await P('INSERT INTO formation (id,name,positions) VALUES (1,?,?)', ['4-3-3',JSON.stringify([{playerId:1,x:50,y:85},{playerId:2,x:20,y:65},{playerId:13,x:37,y:65},{playerId:26,x:63,y:65},{playerId:7,x:80,y:65},{playerId:12,x:30,y:45},{playerId:15,x:50,y:45},{playerId:19,x:70,y:45},{playerId:14,x:20,y:20},{playerId:4,x:50,y:20},{playerId:16,x:80,y:20}])]);
+  for (const [k,v] of Object.entries({federationName:"Sada F.C. A Nosa Viña (Veteranos)",federationAddress:"Reboredo, 20 Ouces - 15165 Bergondo, A Coruña",stadium:"Campo Municipal de Sada",stadiumAddress:"Avda. de la Marina, s/n - 15160 Sada",stadiumCapacity:"2.000 espectadores",founded:"1975",president:"D. Diego Fernández Cabana",cif:"G70501242",phone1:"663495926",phone2:"659833245",email:"diegofernandezcabana@gmail.com"})) await P('INSERT INTO club_info (key,value) VALUES (?,?)', [k,v]);
+  await P('INSERT INTO staff (id,name,role) VALUES (?,?,?)', [1,"Fran Naveira","Entrenador"]);
+  await P('INSERT INTO staff (id,name,role) VALUES (?,?,?)', [2,"Santi Seijo","Entrenador Auxiliar"]);
+  await P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [1,"Diego Fernández Cabana","Presidente"]);
+  await P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [2,"Iván Fernández Álvarez","Secretario"]);
+  await P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [3,"Santiago Seijo Cancelo","Vicesecretario"]);
+  await P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [4,"Alberto Roibás Naveiro","Tesorero"]);
+  await P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [5,"Gonzalo Ferro Rozas","Vocal"]);
+  await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [1,"Derrota para aprender de los errores","Hemos perdido nuestro primer partido amistoso contra un rival de menor categoria por demeritos propios, tres fallos en defensa condenaron al equipo a ir a remolque todo el partido, mejorando sustanciablemente en la segunda parte con la entrada de los revulsivos. Derrota para aprender.","2026-07-25","Crónica"]);
+  await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [2,"Debut de Julio","Julio debuta en el amistoso contra el SPM con gran rendimiento.","2026-07-22","Fichaje"]);
+  await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [3,"Vizoso, baja temporal","Vizoso recae de un problema en el tendon de aquiles que le tendrá entre 2 y 3 semanas de baja. El equipo le desea una pronta recuperación.","2026-07-18","Bajas"]);
+  await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [4,"Temporada 2026/27 - Objetivo: ascenso","La directiva del club ha confirmado que el objetivo de la temporada será el ascenso de categoría. Se ha reforzado la plantilla con varios fichajes estratégicos.","2026-07-10","Club"]);
+  await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [5,"Amistoso vs Carnoedo","Este domingo 23 de agosto a las 10:00 jugamos un amistoso en el Campo del Carnoedo. ¡Todos a animar!","2026-08-23","Partido"]);
   for (const m of [
     [1,"C.D. Larín","2026-09-05","19:00","Meicende Grande (Arteixo)",0,"Copa","Treintadosavos","1-4"],
     [2,"Narón Silver Catering","2026-09-13","10:00","O Cadaval (Narón)",0,"Liga","J1",null],
@@ -258,20 +259,19 @@ async function seedData() {
     [14,"U.D. Paiosaco H.Añón","2026-12-05",null,"As Marías",1,"Liga","J12",null],
     [15,"Oza de los Ríos","2026-12-12",null,"O Loureiro (Oza De Los Rios)",0,"Liga","J13",null],
     [16,"San Martín S.D.","2026-12-19",null,"A Revolta (Queixas)",0,"Liga","J14",null]
-  ]) P('INSERT INTO matches (id,rival,date,time,venue,home,competition,round,result) VALUES (?,?,?,?,?,?,?,?,?)', m);
-  for (const r of [[1,"2026-07-25","Sada CF","CD Pilar",3,1,"Campo de Sada"],[2,"2026-07-18","UD Ponte","Sada CF",0,2,"Campo da Ponte"],[3,"2026-07-11","Sada CF","CF Narón",1,1,"Campo de Sada"],[4,"2026-07-04","SD Bergondo","Sada CF",2,1,"Campo de Bergondo"],[5,"2026-06-27","Sada CF","CD Meira",4,0,"Campo de Sada"],[6,"2026-06-20","UD Montaña","Sada CF",1,3,"Campo da Montaña"]]) P('INSERT INTO results (id,date,home,away,homeScore,awayScore,venue) VALUES (?,?,?,?,?,?,?)', r);
-  for (const st of [[1,"Sada CF",14,10,2,2,28,10,32],[2,"CD Pilar",14,9,3,2,25,12,30],[3,"UD Ponte",14,8,2,4,22,15,26],[4,"CF Narón",14,7,4,3,20,14,25],[5,"SD Bergondo",14,7,2,5,19,16,23],[6,"CD Meira",14,6,3,5,18,17,21],[7,"UD Montaña",14,5,2,7,15,20,17],[8,"CD Oleiros",14,4,3,7,14,21,15],[9,"SD Culleredo",14,4,1,9,12,24,13],[10,"CF Cambre",14,3,2,9,10,26,11]]) P('INSERT INTO standings (pos,team,played,won,drawn,lost,gf,ga,pts) VALUES (?,?,?,?,?,?,?,?,?)', st);
-  P('INSERT INTO appearance (key,value) VALUES (?,?)', ['primaryColor','#1e40af']);
-  P('INSERT INTO appearance (key,value) VALUES (?,?)', ['brandName','Sada F.C. A Nosa Viña (Veteranos)']);
-  P('INSERT INTO appearance (key,value) VALUES (?,?)', ['logoText','SADA']);
-  P('INSERT INTO appearance (key,value) VALUES (?,?)', ['teamLogo','/assets/logo.jpeg']);
+  ]) await P('INSERT INTO matches (id,rival,date,time,venue,home,competition,round,result) VALUES (?,?,?,?,?,?,?,?,?)', m);
+  for (const r of [[1,"2026-07-25","Sada CF","CD Pilar",3,1,"Campo de Sada"],[2,"2026-07-18","UD Ponte","Sada CF",0,2,"Campo da Ponte"],[3,"2026-07-11","Sada CF","CF Narón",1,1,"Campo de Sada"],[4,"2026-07-04","SD Bergondo","Sada CF",2,1,"Campo de Bergondo"],[5,"2026-06-27","Sada CF","CD Meira",4,0,"Campo de Sada"],[6,"2026-06-20","UD Montaña","Sada CF",1,3,"Campo da Montaña"]]) await P('INSERT INTO results (id,date,home,away,homeScore,awayScore,venue) VALUES (?,?,?,?,?,?,?)', r);
+  for (const st of [[1,"Sada CF",14,10,2,2,28,10,32],[2,"CD Pilar",14,9,3,2,25,12,30],[3,"UD Ponte",14,8,2,4,22,15,26],[4,"CF Narón",14,7,4,3,20,14,25],[5,"SD Bergondo",14,7,2,5,19,16,23],[6,"CD Meira",14,6,3,5,18,17,21],[7,"UD Montaña",14,5,2,7,15,20,17],[8,"CD Oleiros",14,4,3,7,14,21,15],[9,"SD Culleredo",14,4,1,9,12,24,13],[10,"CF Cambre",14,3,2,9,10,26,11]]) await P('INSERT INTO standings (pos,team,played,won,drawn,lost,gf,ga,pts) VALUES (?,?,?,?,?,?,?,?,?)', st);
+  await P('INSERT INTO appearance (key,value) VALUES (?,?)', ['primaryColor','#1e40af']);
+  await P('INSERT INTO appearance (key,value) VALUES (?,?)', ['brandName','Sada F.C. A Nosa Viña (Veteranos)']);
+  await P('INSERT INTO appearance (key,value) VALUES (?,?)', ['logoText','SADA']);
+  await P('INSERT INTO appearance (key,value) VALUES (?,?)', ['teamLogo','/assets/logo.jpeg']);
   const salt = crypto.randomBytes(16).toString('hex');
   const hash = crypto.pbkdf2Sync('admin123', salt, 10000, 64, 'sha512').toString('hex');
-  P('INSERT INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', ['admin',hash,salt,'admin',null]);
+  await P('INSERT INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', ['admin',hash,salt,'admin',null]);
   const salt2 = crypto.randomBytes(16).toString('hex');
   const hash2 = crypto.pbkdf2Sync('1234', salt2, 10000, 64, 'sha512').toString('hex');
-  P('INSERT INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', ['usuario',hash2,salt2,'jugador',null]);
-  await db.batch(s);
+  await P('INSERT INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', ['usuario',hash2,salt2,'jugador',null]);
   if (globalThis._savedPhotos) {
     for (const [id, photo] of Object.entries(globalThis._savedPhotos)) {
       await db.execute({ sql: 'UPDATE players SET photo=? WHERE id=?', args: [photo, Number(id)] });
