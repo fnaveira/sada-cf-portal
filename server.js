@@ -178,7 +178,9 @@ async function seedNeeded() {
   if (row.c === 0) return true;
   const check = (await db.execute('SELECT number FROM players WHERE id=1')).rows[0];
   const num = check ? Number(check.number) : 0;
-  if (num !== 33) {
+  const formCheck = (await db.execute('SELECT name FROM formation WHERE id=1')).rows[0];
+  const isOldFormation = formCheck && formCheck.name === '4-3-2';
+  if (num !== 33 || isOldFormation) {
     const photoRows = (await db.execute('SELECT id, photo FROM players WHERE photo IS NOT NULL AND photo != ""')).rows;
     globalThis._savedPhotos = {};
     for (const r of photoRows) globalThis._savedPhotos[Number(r.id)] = r.photo;
