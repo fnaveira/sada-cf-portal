@@ -181,7 +181,7 @@ async function seedNeeded() {
   const formCheck = (await db.execute('SELECT name FROM formation WHERE id=1')).rows[0];
   const isOldFormation = formCheck && formCheck.name === '4-3-2';
   const convCount = (await db.execute('SELECT COUNT(*) as c FROM convocatoria')).rows[0];
-  const hasOldConv = Number(convCount.c) !== 17;
+  const hasOldConv = Number(convCount.c) !== 14;
   if (num !== 33 || isOldFormation || hasOldConv) {
     const photoRows = (await db.execute("SELECT id, photo FROM players WHERE photo IS NOT NULL AND photo != ''")).rows;
     globalThis._savedPhotos = {};
