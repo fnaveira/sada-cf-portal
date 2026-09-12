@@ -190,7 +190,10 @@ function renderConvocatoria() {
                 <div class="conv-matchday-badge">${matchRound || 'ALINEACIÓN'}</div>
                 ${matchComp ? '<div style="margin-top:4px;">' + matchComp + '</div>' : ''}
                 <div class="conv-matchday-formation" style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">${matchDateStr}${nextMatch && nextMatch.time ? ' · ' + nextMatch.time : ''}</div>
-                ${nextMatch ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">${nextMatch.home ? '🏠' : '🚌'} ${nextMatch.venue || ''}</div>` : ''}
+                ${nextMatch ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">${nextMatch.home ? '🏠' : '🚌'} <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nextMatch.venue || '')}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;border-bottom:1px dashed var(--accent);">${nextMatch.venue || ''}</a></div>` : ''}
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-top:6px;padding:4px 8px;background:rgba(255,255,255,0.08);border-radius:6px;">
+                    <i class="fas fa-clock" style="margin-right:3px;"></i>Llegar <strong>30 min antes</strong> del saque inicial. El <strong>11 titular</strong> se confirmará según los jugadores que lleguen.
+                </div>
             </div>
             <div class="conv-matchday-team">
                 <div class="conv-matchday-crest rival">${rivalShield ? `<img src="${rivalShield}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;">` : '?'}</div>
