@@ -119,6 +119,24 @@ async function initDB() {
     shieldUrl TEXT
   )`);
   try { await db.execute(`ALTER TABLE matches ADD COLUMN shieldUrl TEXT`); } catch(e) {}
+  const shields = {
+    'C.D. Larín': 'https://www.futbuteo.com/escudos/80/gal-1845.webp',
+    'Narón Silver Catering': 'https://www.futbuteo.com/escudos/80/gal-17520434.webp',
+    'Sporting Cambre As Travesas': 'https://www.futbuteo.com/escudos/80/gal-4227660.webp',
+    'Liceo de Monelos S.D.': 'https://www.futbuteo.com/escudos/80/gal-564.webp',
+    'Xuventude Dorneda': 'https://www.futbuteo.com/escudos/80/gal-2409271.webp',
+    'Betanzos Norte': 'https://www.futbuteo.com/escudos/80/gal-4214191.webp',
+    'Atlético Perillo': 'https://www.futbuteo.com/escudos/80/gal-2769.webp',
+    'C.D. Sigras': 'https://www.futbuteo.com/escudos/80/gal-9552526.webp',
+    'Campanal de Loureda F.C.': 'https://www.futbuteo.com/escudos/80/gal-15892692.webp',
+    'U.D. Narahío': 'https://www.futbuteo.com/escudos/80/gal-14119716.webp',
+    'Sporting Burgo': 'https://www.futbuteo.com/escudos/80/gal-24259450.webp',
+    'U.D. Paiosaco H.Añón': 'https://www.futbuteo.com/escudos/80/gal-734.webp',
+    'San Martín S.D.': 'https://www.futbuteo.com/escudos/80/gal-7576246.webp'
+  };
+  for (const [rival, url] of Object.entries(shields)) {
+    await db.execute({ sql: 'UPDATE matches SET shieldUrl = ? WHERE rival = ?', args: [url, rival] });
+  }
   const mc = await db.execute('SELECT COUNT(*) as c FROM matches');
   if (mc.rows[0].c === 0) {
     for (const m of [
