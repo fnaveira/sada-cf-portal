@@ -220,9 +220,9 @@ function renderConvocatoria() {
                 <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;padding:4px 8px;background:rgba(255,255,255,0.08);border-radius:6px;">
                     <i class="fas fa-futbol" style="margin-right:3px;"></i><strong>Faltas/Corners:</strong> 1º Bernardo · 2º César &nbsp;|&nbsp; <strong>Penaltis:</strong> Decisión del staff
                 </div>
-                <button onclick="openMatchSheet()" style="margin-top:8px;padding:6px 14px;background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4);border-radius:8px;font-size:0.75rem;cursor:pointer;font-weight:600;">
+                ${isAdmin ? `<button onclick="openMatchSheet()" style="margin-top:8px;padding:6px 14px;background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4);border-radius:8px;font-size:0.75rem;cursor:pointer;font-weight:600;">
                     <i class="fas fa-print" style="margin-right:4px;"></i>Hoja de Partido
-                </button>
+                </button>` : ''}
             </div>
             <div class="conv-matchday-team">
                 <div class="conv-matchday-crest rival">${rivalShield ? `<img src="${rivalShield}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;">` : '?'}</div>
@@ -984,10 +984,8 @@ function openMatchSheet() {
         </div>
 
         <div class="ms-section">
-            <div class="ms-section-title">Convocados (${convocados.length})</div>
-            <div style="display:flex;flex-wrap:wrap;gap:4px;">
-                ${convocados.map(p => `<span style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:9px;">#${p.number} ${p.nickname || p.name.split(' ').pop()}</span>`).join(' ')}
-            </div>
+            <div class="ms-section-title">Convocados</div>
+            <div class="ms-lines"></div>
         </div>
 
         <div class="ms-grid-2">
