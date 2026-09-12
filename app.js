@@ -137,11 +137,22 @@ function initNavigation() {
 
     mobileBtn.addEventListener("click", () => {
         navLinksContainer.classList.toggle("open");
+        mobileBtn.classList.toggle("open");
+    });
+
+    document.addEventListener("click", (e) => {
+        if (navLinksContainer.classList.contains("open") &&
+            !navLinksContainer.contains(e.target) &&
+            !mobileBtn.contains(e.target)) {
+            navLinksContainer.classList.remove("open");
+            mobileBtn.classList.remove("open");
+        }
     });
 
     window.addEventListener("resize", () => {
         if (window.innerWidth > 768) {
             navLinksContainer.classList.remove("open");
+            mobileBtn.classList.remove("open");
         }
     });
 }
