@@ -397,6 +397,25 @@ app.put('/api/players/:id/stats', async (req, res) => {
   res.json({ ok: true });
 });
 
+app.post('/api/sync-stats', async (req, res) => {
+  const { stats } = req.body;
+  if (!Array.isArray(stats)) return res.status(400).json({ error: 'stats must be an array' });
+  let updated = 0;
+  for (const s of stats) {
+    const player = (await db.execute({ sql: 'SELECT id, goals, yellowCards, redCards FROM players WHERE LOWER(nickname)=? OR LOWER(name)=?', args: [(s.name||'').toLowerCase(), (s.name||'').toLowerCase()] })).rows[0];
+    if (player) {
+      const g = s.goals != null ? Math.max(player.goals||0, s.goals) : player.goals||0;
+      const y = s.yellowCards != null ? Math.max(player.yellowCards||0, s.yellowCards) : player.yellowCards||0;
+      const r = s.redCards != null ? Math.max(player.redCards||0, s.redCards) : player.redCards||0;
+      if (g !== player.goals || y !== player.yellowCards || r !== player.redCards) {
+        await db.execute({ sql: 'UPDATE players SET goals=?, yellowCards=?, redCards=? WHERE id=?', args: [g, y, r, player.id] });
+        updated++;
+      }
+    }
+  }
+  res.json({ ok: true, updated });
+});
+
 app.put('/api/players/:id/photo', upload.single('photo'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No se envió archivo' });
   const photoUrl = req.file.path;
