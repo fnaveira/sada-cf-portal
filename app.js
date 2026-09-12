@@ -174,8 +174,7 @@ function renderConvocatoria() {
     const nextMatch = MATCHES.find(m => new Date(m.date + 'T00:00:00') >= today) || MATCHES[MATCHES.length - 1];
     const matchDate = nextMatch ? new Date(nextMatch.date + 'T00:00:00') : null;
     const matchDateStr = matchDate ? matchDate.toLocaleDateString('es-ES', {weekday:'long',day:'numeric',month:'long'}) : '';
-    const homeTeam = nextMatch && nextMatch.home ? 'Sada CF' : (nextMatch ? nextMatch.rival : '?');
-    const awayTeam = nextMatch && nextMatch.home ? nextMatch.rival : 'Sada CF';
+    const rivalTeam = nextMatch ? nextMatch.rival : '?';
     const matchComp = nextMatch && nextMatch.competition === 'Copa' ? '<span class="badge-copa">COPA</span>' : '';
     const matchRound = nextMatch && nextMatch.round ? nextMatch.round : '';
 
@@ -194,7 +193,7 @@ function renderConvocatoria() {
             </div>
             <div class="conv-matchday-team">
                 <div class="conv-matchday-crest rival">?</div>
-                <span>${awayTeam}</span>
+                <span>${rivalTeam}</span>
             </div>
         </div>
     </div>
