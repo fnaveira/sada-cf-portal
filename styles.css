@@ -24,6 +24,13 @@ body {
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+}
+
+input, button, textarea, select {
+    font-size: 16px !important;
 }
 
 /* NAVBAR */
@@ -1987,6 +1994,36 @@ body {
     margin-top: 1px;
 }
 
+.card-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.55rem;
+    font-weight: 700;
+    padding: 1px 3px;
+    border-radius: 3px;
+    margin-left: 3px;
+    vertical-align: middle;
+    line-height: 1;
+}
+.card-yellow {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.card-red {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.card-warning {
+    animation: cardPulse 2s infinite;
+    border-color: #f59e0b;
+}
+@keyframes cardPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+    50% { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0); }
+}
+
 /* ADMIN PITCH (kept for admin panel) */
 .admin-pitch {
     max-width: 350px;
@@ -2432,3 +2469,96 @@ body {
 
 .star-input:hover,
 .star-input.active { color: #f59e0b; }
+
+/* ========== MOBILE UX ========== */
+@media (max-width: 768px) {
+    /* Navbar */
+    .navbar { height: 56px; padding: 0 0.75rem; }
+    .nav-brand { font-size: 1rem; margin-right: 0.5rem; }
+    .nav-brand img { height: 28px !important; width: 28px !important; }
+    .nav-links { gap: 0; }
+    .nav-link { padding: 0.5rem 0.6rem; font-size: 0.78rem; }
+    .nav-link i { font-size: 0.75rem; }
+    .nav-user { display: none; }
+
+    /* Main content */
+    .main-content { padding: 0.75rem; max-width: 100vw; overflow-x: hidden; }
+    .section-header { margin-bottom: 1rem; }
+    .section-header h1 { font-size: 1.15rem; }
+
+    /* Convocatoria matchday header */
+    .conv-matchday-inner { flex-direction: column; gap: 0.8rem; padding: 1rem; }
+    .conv-matchday-crest { width: 44px; height: 44px; font-size: 1.2rem; }
+    .conv-matchday-vs { font-size: 0.8rem; }
+    .conv-matchday-formation { font-size: 1.4rem; }
+    .conv-matchday-badge { font-size: 0.55rem; }
+    .conv-matchday-meta { font-size: 0.75rem; text-align: center; }
+
+    /* Pitch */
+    .conv-pitch-wrapper { max-width: 100%; margin: 0 auto 1.5rem; }
+    .conv-pitch { padding-bottom: 160%; }
+    .conv-player-num { font-size: 0.65rem; }
+    .conv-player-name { font-size: 0.55rem; }
+    .conv-player-pos { font-size: 0.48rem; }
+
+    /* Player cards on pitch */
+    .conv-player { width: 44px !important; }
+    .conv-player img { width: 26px !important; height: 26px !important; }
+
+    /* Bench */
+    .conv-bench-list { grid-template-columns: 1fr; }
+    .conv-bench-item { padding: 0.5rem; gap: 0.5rem; }
+    .conv-bench-item img { width: 28px !important; height: 28px !important; }
+    .conv-bench-number { width: 28px; height: 28px; font-size: 0.7rem; }
+
+    /* Players grid */
+    .players-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+    .player-card { padding: 1rem; gap: 0.8rem; }
+    .player-avatar { width: 48px !important; height: 48px !important; font-size: 1rem !important; }
+    .player-details h3 { font-size: 0.95rem; }
+    .player-details .info { font-size: 0.8rem; }
+
+    /* Filters */
+    .filters { gap: 0.3rem; }
+    .filter-btn { padding: 0.4rem 0.7rem; font-size: 0.75rem; }
+
+    /* Calendar */
+    .calendar-card { flex-direction: column; text-align: center; gap: 0.8rem; padding: 1rem; }
+    .calendar-meta { text-align: center; }
+    .calendar-shield { width: 40px; height: 40px; }
+    .calendar-date { font-size: 0.85rem; }
+
+    /* News */
+    .news-grid { grid-template-columns: 1fr; }
+
+    /* Login */
+    .login-container { width: 90%; padding: 1.5rem; }
+    .login-logo { width: 70px; height: 70px; }
+
+    /* Player profile modal */
+    #modal { padding: 0.5rem; }
+    #modalBody { padding: 1rem; }
+    .player-profile { font-size: 0.85rem; }
+
+    /* Forms */
+    .cronica-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+    .cronica-row label { min-width: unset; }
+
+    /* Cards badge */
+    .card-badge { font-size: 0.5rem; padding: 0px 2px; }
+
+    /* Admin conv layout */
+    .admin-conv-layout { grid-template-columns: 1fr !important; }
+
+    /* Tactical board */
+    .tactical-board-wrapper { max-width: 100%; }
+}
+
+@media (max-width: 400px) {
+    .navbar { padding: 0 0.5rem; }
+    .nav-link span { display: none; }
+    .nav-link { padding: 0.5rem; }
+    .conv-matchday-crest { width: 36px; height: 36px; font-size: 1rem; }
+    .conv-player { width: 38px !important; }
+    .conv-player img { width: 22px !important; height: 22px !important; }
+}

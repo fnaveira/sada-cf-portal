@@ -151,6 +151,18 @@ function isSuspended(player) {
     return (player.yellowCards >= 5) || (player.redCards >= 1);
 }
 
+function getCardBadges(player) {
+    let html = '';
+    if (player.yellowCards > 0) {
+        const warning = player.yellowCards >= 3 ? 'card-warning' : '';
+        html += `<span class="card-badge card-yellow ${warning}" title="${player.yellowCards} amarilla${player.yellowCards > 1 ? 's' : ''}">${player.yellowCards}<i class="fas fa-square" style="color:#f59e0b;margin-left:1px;font-size:0.6rem;"></i></span>`;
+    }
+    if (player.redCards > 0) {
+        html += `<span class="card-badge card-red" title="${player.redCards} roja${player.redCards > 1 ? 's' : ''}">${player.redCards}<i class="fas fa-square" style="color:#ef4444;margin-left:1px;font-size:0.6rem;"></i></span>`;
+    }
+    return html;
+}
+
 function renderConvocatoria() {
     const container = document.getElementById("convocatoriaList");
     const isAdmin = Auth.isAdmin();
@@ -236,6 +248,7 @@ function renderConvocatoria() {
                             <div class="conv-player-label">
                                 <span class="conv-player-name">${pName}</span>
                                 <span class="conv-player-pos">${posLabels[getPrimaryPosition(player.position)] || ''}</span>
+                                ${getCardBadges(player)}
                                 ${player.status === 'lesionado' && player.recoveryDate ? `<span class="conv-recovery">Vuelve: ${player.recoveryDate}</span>` : ''}
                             </div>
                         </div>`;
@@ -267,6 +280,7 @@ function renderConvocatoria() {
                             <div class="conv-bench-info">
                                 <span class="conv-bench-name">${pName}${statusIcon}</span>
                                 <span class="conv-bench-pos">${formatPosition(player.position)}</span>
+                                ${getCardBadges(player)}
                                 ${player.status === 'lesionado' && player.recoveryDate ? `<span class="conv-recovery">Vuelve: ${player.recoveryDate}</span>` : ''}
                             </div>
                             ${suspended ? '<span class="conv-suspended-text" title="Sancionado - suspendido 1 partido"><i class="fas fa-exclamation-triangle"></i> Sancionado</span>' : ''}
@@ -298,6 +312,7 @@ function renderConvocatoria() {
                             <div class="conv-bench-info">
                                 <span class="conv-bench-name">${pName}${statusIcon}</span>
                                 <span class="conv-bench-pos">${formatPosition(player.position)}</span>
+                                ${getCardBadges(player)}
                             </div>
                         </div>`;
                     }).join('')}
