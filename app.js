@@ -968,7 +968,17 @@ function openMatchSheet() {
             <table>
                 <thead><tr><th style="width:30px;">#</th><th style="width:30px;">Dorsal</th><th>Jugador</th><th style="width:100px;">Posición</th></tr></thead>
                 <tbody>
-                    ${[1,2,3,4,5,6,7,8,9,10,11].map(num => `<tr><td style="font-weight:700;color:#1e40af;">${num}</td><td></td><td></td><td></td></tr>`).join('')}
+                    <tr><td style="font-weight:700;color:#1e40af;">1</td><td>12</td><td>Fernández Álvarez, Iván</td><td class="ms-pos">Portero</td></tr>
+                    <tr><td style="font-weight:700;color:#1e40af;">2</td><td>25</td><td>Roibás Naveiro, Alberto</td><td class="ms-pos">Defensa</td></tr>
+                    <tr><td style="font-weight:700;color:#1e40af;">3</td><td>4</td><td>Martínez Vázquez, Alfonso</td><td class="ms-pos">Defensa</td></tr>
+                    <tr><td style="font-weight:700;color:#1e40af;">4</td><td>7</td><td>Amor Haz, Miguel</td><td class="ms-pos">Defensa</td></tr>
+                    <tr><td style="font-weight:700;color:#1e40af;">5</td><td>29</td><td>Mallo López, Jose Luis</td><td class="ms-pos">Mediocentro</td></tr>
+                    <tr><td style="font-weight:700;color:#1e40af;">6</td><td>22</td><td>París Labandeira, Damián</td><td class="ms-pos">Mediocentro</td></tr>
+                    <tr><td style="font-weight:700;color:#1e40af;">7</td><td>21</td><td>Seoane Barros, Antonio</td><td class="ms-pos">Mediocentro</td></tr>
+                    <tr><td style="font-weight:700;color:#1e40af;">8</td><td>15</td><td>Teixeira Fernández, Julio</td><td class="ms-pos">Mediocentro</td></tr>
+                    <tr><td style="font-weight:700;color:#1e40af;">9</td><td>11</td><td>Boo Fernández, Miguel</td><td class="ms-pos">Mediapunta</td></tr>
+                    <tr><td style="font-weight:700;color:#1e40af;">10</td><td>23</td><td>Freire Lesta, César</td><td class="ms-pos">Mediocentro</td></tr>
+                    <tr><td style="font-weight:700;color:#1e40af;">11</td><td>26</td><td>Graña Pita, Pablo</td><td class="ms-pos">Delantero</td></tr>
                 </tbody>
             </table>
         </div>
@@ -984,8 +994,23 @@ function openMatchSheet() {
         </div>
 
         <div class="ms-section">
-            <div class="ms-section-title">Convocados</div>
-            <div class="ms-lines"></div>
+            <div class="ms-section-title">Suplentes</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;">
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#1</strong> Albarracín, Miguel Á.</div>
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#3</strong> Mourelo, David</div>
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#5</strong> Caamaño, Carlos</div>
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#6</strong> Lata, Francisco</div>
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#13</strong> Seijo, Sergio</div>
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#14</strong> Seijo, Santiago</div>
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#17</strong> Iglesias, Marcos</div>
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#20</strong> Fernández, Diego</div>
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#26</strong> Álvarez, Carlos M.</div>
+            </div>
+        </div>
+
+        <div class="ms-section">
+            <div class="ms-section-title">Cuerpo Técnico</div>
+            <div style="font-size:10px;color:#555;">Delegado: Francisco Navaira García</div>
         </div>
 
         <div class="ms-grid-2">
