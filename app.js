@@ -682,7 +682,8 @@ function formatPosition(pos) {
 
 function getPrimaryPosition(pos) {
     if (!pos) return '';
-    return pos.split(',')[0];
+    if (Array.isArray(pos)) return pos[0] || '';
+    return String(pos).split(',')[0].trim();
 }
 
 function hasPosition(player, position) {
