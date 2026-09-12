@@ -169,25 +169,39 @@ function renderConvocatoria() {
 
     let html = '';
 
-    if (isAdmin) {
-        html += `
-        <div class="conv-matchday">
-            <div class="conv-matchday-inner">
-                <div class="conv-matchday-team">
-                    <div class="conv-matchday-crest"><img src="${APPEARANCE.teamLogo || '/assets/logo.jpeg'}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;"></div>
-                    <span>${APPEARANCE.brandName || 'Sada CF'}</span>
-                </div>
-                <div class="conv-matchday-vs">
-                    <div class="conv-matchday-badge">ALINEACIÓN</div>
-                    <div class="conv-matchday-formation">${FORMATION.name}</div>
-                </div>
-                <div class="conv-matchday-team">
-                    <div class="conv-matchday-crest rival">?</div>
-                    <span>Próximo rival</span>
-                </div>
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const nextMatch = MATCHES.find(m => new Date(m.date + 'T00:00:00') >= today) || MATCHES[MATCHES.length - 1];
+    const matchDate = nextMatch ? new Date(nextMatch.date + 'T00:00:00') : null;
+    const matchDateStr = matchDate ? matchDate.toLocaleDateString('es-ES', {weekday:'long',day:'numeric',month:'long'}) : '';
+    const homeTeam = nextMatch && nextMatch.home ? 'Sada CF' : (nextMatch ? nextMatch.rival : '?');
+    const awayTeam = nextMatch && nextMatch.home ? nextMatch.rival : 'Sada CF';
+    const matchComp = nextMatch && nextMatch.competition === 'Copa' ? '<span class="badge-copa">COPA</span>' : '';
+    const matchRound = nextMatch && nextMatch.round ? nextMatch.round : '';
+
+    html += `
+    <div class="conv-matchday">
+        <div class="conv-matchday-inner">
+            <div class="conv-matchday-team">
+                <div class="conv-matchday-crest"><img src="${APPEARANCE.teamLogo || '/assets/logo.jpeg'}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;"></div>
+                <span>${APPEARANCE.brandName || 'Sada CF'}</span>
+            </div>
+            <div class="conv-matchday-vs">
+                <div class="conv-matchday-badge">${matchRound || 'ALINEACIÓN'}</div>
+                ${matchComp ? '<div style="margin-top:4px;">' + matchComp + '</div>' : ''}
+                <div class="conv-matchday-formation" style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">${matchDateStr}${nextMatch && nextMatch.time ? ' · ' + nextMatch.time : ''}</div>
+                ${nextMatch ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">${nextMatch.home ? '🏠' : '🚌'} ${nextMatch.venue || ''}</div>` : ''}
+            </div>
+            <div class="conv-matchday-team">
+                <div class="conv-matchday-crest rival">?</div>
+                <span>${awayTeam}</span>
             </div>
         </div>
+    </div>
+    `;
 
+    if (isAdmin) {
+        html += `
         <div class="conv-pitch-wrapper">
             <div class="conv-pitch">
                 <div class="conv-pitch-grass"></div>
