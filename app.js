@@ -968,10 +968,7 @@ function openMatchSheet() {
             <table>
                 <thead><tr><th style="width:30px;">#</th><th style="width:30px;">Dorsal</th><th>Jugador</th><th style="width:100px;">Posición</th></tr></thead>
                 <tbody>
-                    ${[1,2,3,4,5,6,7,8,9,10,11].map((num, i) => {
-                        const player = titularesPlayers[i];
-                        return `<tr><td style="font-weight:700;color:#1e40af;">${num}</td><td>${player ? player.number : ''}</td><td>${player ? (player.nickname || player.name) : '________________'}</td><td class="ms-pos">${player ? formatPos(player) : ''}</td></tr>`;
-                    }).join('')}
+                    ${[1,2,3,4,5,6,7,8,9,10,11].map(num => `<tr><td style="font-weight:700;color:#1e40af;">${num}</td><td></td><td></td><td></td></tr>`).join('')}
                 </tbody>
             </table>
         </div>
@@ -981,15 +978,15 @@ function openMatchSheet() {
             <table>
                 <thead><tr><th style="width:25px;">#</th><th style="width:40px;">Entra</th><th>Jugador entra</th><th style="width:40px;">Sale</th><th>Jugador sale</th></tr></thead>
                 <tbody>
-                    ${[1,2,3,4,5].map(num => `<tr><td style="font-weight:700;color:#1e40af;">${num}</td><td>____</td><td>________________________</td><td>____</td><td>________________________</td></tr>`).join('')}
+                    ${[1,2,3,4,5].map(num => `<tr><td style="font-weight:700;color:#1e40af;">${num}</td><td></td><td></td><td></td><td></td></tr>`).join('')}
                 </tbody>
             </table>
         </div>
 
         <div class="ms-section">
-            <div class="ms-section-title">Suplentes en Banquillo</div>
-            <div class="ms-sub-list">
-                ${suplentesPlayers.map(p => `<div class="ms-sub-item"><span class="ms-sub-num">#${p.number}</span><span>${p.nickname || p.name.split(' ').pop()}</span></div>`).join('')}
+            <div class="ms-section-title">Convocados (${convocados.length})</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                ${convocados.map(p => `<span style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:9px;">#${p.number} ${p.nickname || p.name.split(' ').pop()}</span>`).join(' ')}
             </div>
         </div>
 
