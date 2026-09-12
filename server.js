@@ -106,8 +106,7 @@ async function initDB() {
     date TEXT,
     tag TEXT
   )`);
-  await db.execute(`DROP TABLE IF EXISTS matches`);
-  await db.execute(`CREATE TABLE matches (
+  await db.execute(`CREATE TABLE IF NOT EXISTS matches (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     rival TEXT,
     date TEXT,
@@ -118,6 +117,28 @@ async function initDB() {
     round TEXT,
     result TEXT
   )`);
+  const mc = await db.execute('SELECT COUNT(*) as c FROM matches');
+  if (mc.rows[0].c === 0) {
+    for (const m of [
+      [1,"C.D. Larín","2026-09-05","19:00","Meicende Grande (Arteixo)",0,"Copa","Treintadosavos","1-4"],
+      [2,"Narón Silver Catering","2026-09-13","10:00","O Cadaval (Narón)",0,"Liga","J1",null],
+      [3,"Sporting Cambre As Travesas","2026-09-19",null,"As Marías",1,"Liga","J2",null],
+      [4,"Portazgo S.D.","2026-09-26",null,"A Lavandeira (Culleredo)",0,"Liga","J3",null],
+      [5,"Liceo de Monelos S.D.","2026-10-03",null,"As Marías",1,"Liga","J4",null],
+      [6,"Xuventude Dorneda","2026-10-10",null,"A Marola",0,"Liga","J5",null],
+      [7,"Cedeira S.D.","2026-10-17",null,"As Marías",1,"Liga","J6",null],
+      [8,"Betanzos Norte","2026-10-24",null,"O Carregal (Betanzos)",0,"Liga","J7",null],
+      [9,"Atlético Perillo","2026-10-31",null,"O Redondo (Monterrei)",0,"Copa","Dieciseisavos",null],
+      [10,"C.D. Sigras","2026-11-07",null,"As Marías",1,"Liga","J8",null],
+      [11,"Campanal de Loureda F.C.","2026-11-15","11:00","Campo de Freián",0,"Liga","J9",null],
+      [12,"U.D. Narahío","2026-11-21",null,"As Marías",1,"Liga","J10",null],
+      [13,"Sporting Burgo","2026-11-28",null,"A Lavandeira (Culleredo)",0,"Liga","J11",null],
+      [14,"U.D. Paiosaco H.Añón","2026-12-05",null,"As Marías",1,"Liga","J12",null],
+      [15,"Oza de los Ríos","2026-12-12",null,"O Loureiro (Oza De Los Rios)",0,"Liga","J13",null],
+      [16,"San Martín S.D.","2026-12-19",null,"A Revolta (Queixas)",0,"Liga","J14",null]
+    ]) await P('INSERT INTO matches (id,rival,date,time,venue,home,competition,round,result) VALUES (?,?,?,?,?,?,?,?,?)', m);
+    console.log('✅ Matches inserted (was empty)');
+  }
   await db.execute(`CREATE TABLE IF NOT EXISTS results (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     date TEXT,
