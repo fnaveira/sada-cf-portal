@@ -141,6 +141,12 @@ async function initDB() {
   if (n6.rows[0].c === 0) {
     await db.execute({ sql: 'INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', args: [6,"Copa: Victoria contundente en Meicende (1-4)","Golazo de Ferro (2), Damián Paris y Boo sentencian la eliminatoria. Actuación sólida del equipo ante el C.D. Larín en los Treintadosavos de Copa. Julio Teixeira vio tarjeta amarilla (67'). Próximo rival: Narón Silver Catering (Liga J1, 13 sept).","2026-09-05","Crónica"] });
   }
+  const uUpd = await db.execute({ sql: 'SELECT salt FROM users WHERE username = ?', args: ['usuario'] });
+  if (uUpd.rows.length > 0) {
+    const newSalt = crypto.randomBytes(16).toString('hex');
+    const newHash = crypto.pbkdf2Sync('sadaanosa2026', newSalt, 10000, 64, 'sha512').toString('hex');
+    await db.execute({ sql: 'UPDATE users SET password=?, salt=? WHERE username=?', args: [newHash, newSalt, 'usuario'] });
+  }
   const mc = await db.execute('SELECT COUNT(*) as c FROM matches');
   if (mc.rows[0].c === 0) {
     for (const m of [
@@ -316,7 +322,7 @@ async function seedData() {
   const hash = crypto.pbkdf2Sync('admin123', salt, 10000, 64, 'sha512').toString('hex');
   await P('INSERT INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', ['admin',hash,salt,'admin',null]);
   const salt2 = crypto.randomBytes(16).toString('hex');
-  const hash2 = crypto.pbkdf2Sync('1234', salt2, 10000, 64, 'sha512').toString('hex');
+  const hash2 = crypto.pbkdf2Sync('sadaanosa2026', salt2, 10000, 64, 'sha512').toString('hex');
   await P('INSERT INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', ['usuario',hash2,salt2,'jugador',null]);
   if (globalThis._savedPhotos) {
     for (const [id, photo] of Object.entries(globalThis._savedPhotos)) {
