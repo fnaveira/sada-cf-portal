@@ -175,6 +175,7 @@ function renderConvocatoria() {
     const matchDate = nextMatch ? new Date(nextMatch.date + 'T00:00:00') : null;
     const matchDateStr = matchDate ? matchDate.toLocaleDateString('es-ES', {weekday:'long',day:'numeric',month:'long'}) : '';
     const rivalTeam = nextMatch ? nextMatch.rival : '?';
+    const rivalShield = nextMatch && nextMatch.shieldUrl ? nextMatch.shieldUrl : '';
     const matchComp = nextMatch && nextMatch.competition === 'Copa' ? '<span class="badge-copa">COPA</span>' : '';
     const matchRound = nextMatch && nextMatch.round ? nextMatch.round : '';
 
@@ -192,7 +193,7 @@ function renderConvocatoria() {
                 ${nextMatch ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">${nextMatch.home ? '🏠' : '🚌'} ${nextMatch.venue || ''}</div>` : ''}
             </div>
             <div class="conv-matchday-team">
-                <div class="conv-matchday-crest rival">?</div>
+                <div class="conv-matchday-crest rival">${rivalShield ? `<img src="${rivalShield}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;">` : '?'}</div>
                 <span>${rivalTeam}</span>
             </div>
         </div>
@@ -464,6 +465,10 @@ function renderCalendar() {
         const compBadge = match.competition === 'Copa' ? '<span class="badge-copa">COPA</span>' : '';
         const roundLabel = match.round ? `<span class="match-round">${match.round}</span>` : '';
         const resultLabel = match.result ? `<span class="match-result">${match.result}</span>` : '';
+        const rivalShield = match.shieldUrl ? `<img src="${match.shieldUrl}" style="height:28px;width:28px;object-fit:contain;vertical-align:middle;margin-right:6px;">` : '';
+        const sadaShield = `<img src="${APPEARANCE.teamLogo || '/assets/logo.jpeg'}" style="height:28px;width:28px;object-fit:contain;border-radius:50%;vertical-align:middle;margin-right:6px;">`;
+        const homeHtml = match.home ? sadaShield + 'Sada CF' : rivalShield + match.rival;
+        const awayHtml = match.home ? rivalShield + match.rival : sadaShield + 'Sada CF';
 
         return `
             <div class="calendar-card">
@@ -472,7 +477,7 @@ function renderCalendar() {
                     <span class="month">${month}</span>
                 </div>
                 <div class="calendar-teams">
-                    ${homeTeam} <span class="vs">vs</span> ${awayTeam}
+                    ${homeHtml} <span class="vs">vs</span> ${awayHtml}
                     ${compBadge}
                 </div>
                 <div class="calendar-meta">
