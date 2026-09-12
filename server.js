@@ -363,7 +363,13 @@ app.get('/api/init', async (req, res) => {
 app.put('/api/players/:id', async (req, res) => {
   const { name, nickname, number, position, age, status, goals, yellowCards, redCards, recoveryDate, photo, dni, birthDate, address, phone, email, municipality, province, birthPlace, nationality } = req.body;
   const newStatus = status || 'disponible';
-  await db.execute({ sql: 'UPDATE players SET name=?, nickname=?, number=?, position=?, age=?, status=?, goals=?, yellowCards=?, redCards=?, recoveryDate=?, photo=?, dni=?, birthDate=?, address=?, phone=?, email=?, municipality=?, province=?, birthPlace=?, nationality=? WHERE id=?', args: [name, nickname || null, number, position, age || null, newStatus, goals || 0, yellowCards || 0, redCards || 0, recoveryDate || null, photo || null, dni || null, birthDate || null, address || null, phone || null, email || null, municipality || null, province || null, birthPlace || null, nationality || null, req.params.id] });
+  // Preserve photo if not sent in request
+  let photoVal = photo || null;
+  if (!photo && name) {
+    const existing = (await db.execute({ sql: 'SELECT photo FROM players WHERE id=?', args: [req.params.id] })).rows[0];
+    if (existing) photoVal = existing.photo;
+  }
+  await db.execute({ sql: 'UPDATE players SET name=?, nickname=?, number=?, position=?, age=?, status=?, goals=?, yellowCards=?, redCards=?, recoveryDate=?, photo=?, dni=?, birthDate=?, address=?, phone=?, email=?, municipality=?, province=?, birthPlace=?, nationality=? WHERE id=?', args: [name, nickname || null, number, position, age || null, newStatus, goals || 0, yellowCards || 0, redCards || 0, recoveryDate || null, photoVal, dni || null, birthDate || null, address || null, phone || null, email || null, municipality || null, province || null, birthPlace || null, nationality || null, req.params.id] });
   const pid = parseInt(req.params.id);
   if (newStatus !== 'disponible') {
     const fRow = (await db.execute('SELECT positions FROM formation WHERE id = 1')).rows[0];
