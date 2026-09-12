@@ -136,7 +136,7 @@ async function initDB() {
       [14,"U.D. Paiosaco H.Añón","2026-12-05",null,"As Marías",1,"Liga","J12",null],
       [15,"Oza de los Ríos","2026-12-12",null,"O Loureiro (Oza De Los Rios)",0,"Liga","J13",null],
       [16,"San Martín S.D.","2026-12-19",null,"A Revolta (Queixas)",0,"Liga","J14",null]
-    ]) await P('INSERT INTO matches (id,rival,date,time,venue,home,competition,round,result) VALUES (?,?,?,?,?,?,?,?,?)', m);
+    ]) await db.execute({ sql: 'INSERT INTO matches (id,rival,date,time,venue,home,competition,round,result) VALUES (?,?,?,?,?,?,?,?,?)', args: m.map(a => a === undefined ? null : a) });
     console.log('✅ Matches inserted (was empty)');
   }
   await db.execute(`CREATE TABLE IF NOT EXISTS results (
