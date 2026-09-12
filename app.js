@@ -194,6 +194,9 @@ function renderConvocatoria() {
                 <div style="font-size:0.7rem;color:var(--text-muted);margin-top:6px;padding:4px 8px;background:rgba(255,255,255,0.08);border-radius:6px;">
                     <i class="fas fa-clock" style="margin-right:3px;"></i>Llegar <strong>30 min antes</strong> del saque inicial. El <strong>11 titular</strong> se confirmará según los jugadores que lleguen.
                 </div>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;padding:4px 8px;background:rgba(255,255,255,0.08);border-radius:6px;">
+                    <i class="fas fa-futbol" style="margin-right:3px;"></i><strong>Faltas/Corners:</strong> 1º Bernardo · 2º César &nbsp;|&nbsp; <strong>Penaltis:</strong> Decisión del staff
+                </div>
             </div>
             <div class="conv-matchday-team">
                 <div class="conv-matchday-crest rival">${rivalShield ? `<img src="${rivalShield}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;">` : '?'}</div>
