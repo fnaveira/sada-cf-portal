@@ -996,10 +996,11 @@ function openMatchSheet() {
         <div class="ms-section">
             <div class="ms-section-title">Suplentes</div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;">
-                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#1</strong> Albarracín, Miguel Á.</div>
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#2</strong> Garea, Miguel Á.</div>
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#3</strong> Charlie</div>
                 <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#13</strong> Seijo, Sergio</div>
-                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#14</strong> Seijo, Santiago</div>
-                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#26</strong> Álvarez, Carlos M.</div>
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#18</strong> Vizoso</div>
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#1</strong> Albarracín, Miguel Á.</div>
             </div>
         </div>
 
