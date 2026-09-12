@@ -44,8 +44,8 @@ async function login(page) {
   if (result.includes('estado="1"')) {
     const urlMatch = result.match(/NURL="([^"]+)"/);
     const redirectUrl = urlMatch ? urlMatch[1] : FUTGAL_URL + 'NPortada';
-    await page.goto(redirectUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await WAIT(2000);
+    await page.goto(redirectUrl, { waitUntil: 'load', timeout: 30000 }).catch(() => {});
+    await WAIT(3000);
     console.log('✅ Login OK - URL:', page.url());
   } else {
     throw new Error('Login failed');
@@ -53,8 +53,8 @@ async function login(page) {
 }
 
 async function safeGoto(page, url) {
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => {});
-  await WAIT(2000);
+  await page.goto(url, { waitUntil: 'load', timeout: 30000 }).catch(() => {});
+  await WAIT(3000);
 }
 
 function parseGoalsFromText(text) {
@@ -276,40 +276,30 @@ async function scrapeSanciones(page) {
 // ====== SCRAPER: PLANTILLA OFICIAL ======
 async function scrapePlantilla(page) {
   console.log('\n👥 Scraping plantilla oficial...');
-  const url = `${FUTGAL_URL}NPcd/NFG_VisEquipos?Codigo_Equipo=4261861`;
+  const url = `${FUTGAL_URL}NPcd/NFG_VisEquipos?cod_primaria=1000102&Codigo_Equipo=4261861`;
   await safeGoto(page, url);
-  await WAIT(3000);
 
   const squad = await page.evaluate(() => {
     const players = [];
-    const rows = document.querySelectorAll('table tr');
-    for (const row of rows) {
-      const cells = [...row.querySelectorAll('td')];
-      if (cells.length >= 3) {
-        const texts = cells.map(c => c.textContent.trim());
-        const dorsal = texts.find(t => /^\d+$/.test(t));
-        const name = texts.find(t => t.length > 3 && !/^\d+$/.test(t));
-        if (name && dorsal) {
-          players.push({
-            dorsal: parseInt(dorsal),
-            name: name,
-            position: texts.find(t => /^(Portero|Defensa|Centrocampista|Delantero)/i.test(t)) || '',
-            license: texts.find(t => /licencia|futgal|\d{5,}/i.test(t)) || '',
-            allText: texts.join(' | '),
-          });
-        }
+    const bodyText = document.body.innerText;
+    
+    const nameRegex = /([A-ZÁÉÍÓÚÑ\s,\.]+?)\s+VETERANO MASCULINO/g;
+    let m;
+    const names = new Set();
+    while ((m = nameRegex.exec(bodyText)) !== null) {
+      const name = m[1].trim().replace(/\s+/g, ' ');
+      if (name.length > 3 && !names.has(name)) {
+        names.add(name);
+        players.push({ name });
       }
     }
-    return { players, bodyText: document.body.innerText.substring(0, 3000) };
+    
+    return { players, bodyText: bodyText.substring(0, 2000) };
   });
 
-  console.log(`  Found ${squad.players.length} players`);
-  if (squad.players.length === 0) {
-    console.log('  Page text:', squad.bodyText.substring(0, 800));
-  }
-
+  console.log(`  Found ${squad.players.length} jugadores oficiales`);
   for (const p of squad.players) {
-    console.log(`  #${p.dorsal} ${p.name} - ${p.position || p.allText}`);
+    console.log(`  📋 ${p.name}`);
   }
 
   return squad;

@@ -2508,6 +2508,46 @@ input, button, textarea, select {
     font-size: 0.85rem;
 }
 
+/* CONVOCATORIA CARD WARNINGS */
+.conv-card-warnings {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+.conv-card-warnings-header {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    padding: 0.6rem 1rem;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.conv-card-warnings-header i { font-size: 0.9rem; }
+.conv-card-warnings-list {
+    padding: 0.5rem;
+}
+.conv-card-warning-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 8px;
+    margin-bottom: 0.3rem;
+    font-size: 0.8rem;
+    border-left: 3px solid transparent;
+}
+.conv-card-warning-item.warning { background: rgba(245,158,11,0.06); border-left-color: #f59e0b; }
+.conv-card-warning-item.danger { background: rgba(239,68,68,0.06); border-left-color: #ef4444; }
+.conv-card-warning-item.critical { background: rgba(239,68,68,0.12); border-left-color: #dc2626; }
+.conv-card-warning-img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.conv-card-warning-num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+.conv-card-warning-name { font-weight: 600; min-width: 80px; }
+.conv-card-warning-msg { flex: 1; color: var(--text-muted); font-size: 0.75rem; }
+.conv-card-warning-badges { flex-shrink: 0; }
+
 .cronica-stars { display: flex; gap: 0.25rem; }
 
 .star-input {

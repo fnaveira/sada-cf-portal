@@ -220,6 +220,9 @@ function renderConvocatoria() {
                 <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;padding:4px 8px;background:rgba(255,255,255,0.08);border-radius:6px;">
                     <i class="fas fa-futbol" style="margin-right:3px;"></i><strong>Faltas/Corners:</strong> 1º Bernardo · 2º César &nbsp;|&nbsp; <strong>Penaltis:</strong> Decisión del staff
                 </div>
+                <button onclick="openMatchSheet()" style="margin-top:8px;padding:6px 14px;background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4);border-radius:8px;font-size:0.75rem;cursor:pointer;font-weight:600;">
+                    <i class="fas fa-print" style="margin-right:4px;"></i>Hoja de Partido
+                </button>
             </div>
             <div class="conv-matchday-team">
                 <div class="conv-matchday-crest rival">${rivalShield ? `<img src="${rivalShield}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;">` : '?'}</div>
@@ -228,6 +231,38 @@ function renderConvocatoria() {
         </div>
     </div>
     `;
+
+    // Card warnings
+    const warningPlayers = convocados.filter(p => p.yellowCards >= 3 || p.redCards >= 1);
+    const criticalPlayers = convocados.filter(p => p.yellowCards >= 4);
+
+    if (warningPlayers.length > 0) {
+        html += `<div class="conv-card-warnings">
+            <div class="conv-card-warnings-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Norma: <strong>3 amarillas</strong> = 1 partido susp. | <strong>5 amarillas</strong> = 1 partido susp. | <strong>1 roja</strong> = mínimo 1 partido susp.</span>
+            </div>
+            <div class="conv-card-warnings-list">
+                ${warningPlayers.map(p => {
+                    const pName = p.nickname || p.name.split(' ').pop();
+                    const yellows = p.yellowCards;
+                    const reds = p.redCards;
+                    let msg = '';
+                    let cls = '';
+                    if (yellows >= 5) { msg = `${yellows} amarillas → Suspendido`; cls = 'critical'; }
+                    else if (yellows === 4) { msg = `${yellows} amarillas → ¡A 1 de suspensión!`; cls = 'danger'; }
+                    else if (yellows === 3) { msg = `${yellows} amarillas → A 2 de suspensión`; cls = 'warning'; }
+                    if (reds >= 1) { msg += (msg ? ' + ' : '') + `${reds} roja${reds > 1 ? 's'}`; cls = 'critical'; }
+                    return `<div class="conv-card-warning-item ${cls}">
+                        ${p.photo ? `<img src="${p.photo}" class="conv-card-warning-img">` : `<div class="conv-card-warning-num">${p.number}</div>`}
+                        <span class="conv-card-warning-name">${pName}</span>
+                        <span class="conv-card-warning-msg">${msg}</span>
+                        <span class="conv-card-warning-badges">${getCardBadges(p)}</span>
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>`;
+    }
 
     if (isAdmin) {
         html += `
@@ -841,6 +876,207 @@ function closeLightbox(e) {
         document.getElementById('photoLightbox').classList.remove('active');
         document.body.style.overflow = '';
     }
+}
+
+// MATCH SHEET (PRINTABLE)
+function openMatchSheet() {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const nextMatch = MATCHES.find(m => new Date(m.date + 'T00:00:00') >= today) || MATCHES[MATCHES.length - 1];
+    const matchDate = nextMatch ? new Date(nextMatch.date + 'T00:00:00') : null;
+    const matchDateStr = matchDate ? matchDate.toLocaleDateString('es-ES', {weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '';
+    const rival = nextMatch ? nextMatch.rival : '';
+    const venue = nextMatch ? nextMatch.venue : '';
+    const time = nextMatch ? nextMatch.time || '' : '';
+    const home = nextMatch ? nextMatch.home : true;
+    const round = nextMatch ? nextMatch.round || '' : '';
+    const comp = nextMatch ? nextMatch.competition || '' : '';
+
+    const convocados = CONVOCATORIA.map(id => PLAYERS.find(p => p.id === id)).filter(Boolean);
+    const positionOrder = { portero: 0, defensa: 1, centrocampista: 2, delantero: 3 };
+    convocados.sort((a, b) => (positionOrder[getPrimaryPosition(a.position)] ?? 99) - (positionOrder[getPrimaryPosition(b.position)] ?? 99) || a.number - b.number);
+
+    const titulares = FORMATION.positions.map(p => p.playerId);
+    const titularesPlayers = titulares.map(id => PLAYERS.find(p => p.id === id)).filter(Boolean);
+    const suplentesPlayers = convocados.filter(p => !titulares.includes(p.id) && p.status === 'disponible');
+
+    const posLabels = { portero: 'Portero', defensa: 'Defensa', centrocampista: 'Centrocampista', delantero: 'Delantero' };
+    const formatPos = (p) => {
+        const primary = getPrimaryPosition(p);
+        return posLabels[primary] || p.position || '';
+    };
+
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Hoja de Partido - ${rival}</title>
+<style>
+    @page { size: A4; margin: 12mm; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; color: #1a1a2e; font-size: 11px; line-height: 1.3; }
+    
+    .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #1e40af; padding-bottom: 8px; margin-bottom: 10px; }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .header-left img { height: 40px; width: 40px; border-radius: 50%; object-fit: contain; }
+    .header-left h1 { font-size: 16px; color: #1e40af; }
+    .header-right { text-align: right; font-size: 10px; color: #666; }
+    
+    .match-info { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; background: #f0f4ff; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #dbeafe; }
+    .match-info-item { text-align: center; }
+    .match-info-label { font-size: 9px; text-transform: uppercase; color: #666; letter-spacing: 0.5px; }
+    .match-info-value { font-size: 13px; font-weight: 700; color: #1e40af; }
+    
+    .vs-line { display: flex; align-items: center; justify-content: center; gap: 15px; padding: 6px 0; margin-bottom: 10px; }
+    .vs-team { font-weight: 700; font-size: 12px; }
+    .vs-text { font-size: 10px; color: #999; background: #f3f4f6; padding: 2px 8px; border-radius: 4px; }
+    
+    .section { margin-bottom: 10px; }
+    .section-title { font-size: 11px; font-weight: 700; color: #1e40af; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #dbeafe; padding-bottom: 3px; margin-bottom: 6px; }
+    
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #1e40af; color: white; font-size: 9px; text-transform: uppercase; padding: 4px 6px; text-align: left; }
+    td { padding: 3px 6px; border-bottom: 1px solid #e5e7eb; font-size: 10px; }
+    tr:nth-child(even) { background: #f9fafb; }
+    .pos-cell { font-weight: 600; color: #1e40af; }
+    
+    .notes-area { border: 1px solid #d1d5db; border-radius: 6px; padding: 8px; min-height: 60px; margin-top: 6px; }
+    .notes-title { font-size: 10px; font-weight: 600; color: #666; margin-bottom: 4px; }
+    .notes-lines { border-bottom: 1px solid #e5e7eb; height: 18px; }
+    
+    .sub-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 4px; }
+    .sub-item { display: flex; align-items: center; gap: 4px; padding: 2px 4px; background: #f3f4f6; border-radius: 4px; font-size: 10px; }
+    .sub-num { font-weight: 700; color: #1e40af; min-width: 18px; }
+    
+    .footer { margin-top: 12px; padding-top: 6px; border-top: 1px solid #d1d5db; font-size: 9px; color: #999; display: flex; justify-content: space-between; }
+    
+    @media print {
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .no-print { display: none !important; }
+    }
+    
+    .print-btn { display: block; margin: 10px auto; padding: 10px 24px; background: #1e40af; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+    .print-btn:hover { background: #1e3a8a; }
+</style>
+</head>
+<body>
+    <button class="print-btn no-print" onclick="window.print();window.close();">🖨️ Imprimir Hoja de Partido</button>
+    
+    <div class="header">
+        <div class="header-left">
+            <img src="${APPEARANCE.teamLogo || '/assets/logo.jpeg'}" alt="Logo">
+            <h1>${APPEARANCE.brandName || 'Sada CF'}</h1>
+        </div>
+        <div class="header-right">
+            <div>Hoja de Partido</div>
+            <div>${new Date().toLocaleDateString('es-ES')}</div>
+        </div>
+    </div>
+    
+    <div class="match-info">
+        <div class="match-info-item">
+            <div class="match-info-label">Fecha</div>
+            <div class="match-info-value">${matchDateStr}</div>
+        </div>
+        <div class="match-info-item">
+            <div class="match-info-label">Hora</div>
+            <div class="match-info-value">${time || 'Por confirmar'}</div>
+        </div>
+        <div class="match-info-item">
+            <div class="match-info-label">Campo</div>
+            <div class="match-info-value">${venue || 'Por confirmar'}</div>
+        </div>
+    </div>
+    
+    <div class="vs-line">
+        <span class="vs-team">${home ? (APPEARANCE.brandName || 'Sada CF') : rival}</span>
+        <span class="vs-text">${round} · ${comp || 'Liga'}</span>
+        <span class="vs-team">${home ? rival : (APPEARANCE.brandName || 'Sada CF')}</span>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">1ª Parte - Alineación Titular</div>
+        <table>
+            <thead><tr><th style="width:30px;">#</th><th style="width:30px;">Dorsal</th><th>Jugador</th><th style="width:100px;">Posición</th></tr></thead>
+            <tbody>
+                ${[1,2,3,4,5,6,7,8,9,10,11].map((num, i) => {
+                    const player = titularesPlayers[i];
+                    return `<tr>
+                        <td style="font-weight:700;color:#1e40af;">${num}</td>
+                        <td>${player ? player.number : ''}</td>
+                        <td>${player ? (player.nickname || player.name) : '________________'}</td>
+                        <td class="pos-cell">${player ? formatPos(player) : ''}</td>
+                    </tr>`;
+                }).join('')}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">2ª Parte - Cambios</div>
+        <table>
+            <thead><tr><th style="width:30px;">#</th><th style="width:30px;">Entra</th><th>Jugador</th><th style="width:30px;">Sale</th><th>Jugador sale</th></tr></thead>
+            <tbody>
+                ${[1,2,3,4,5].map(num => {
+                    return `<tr>
+                        <td style="font-weight:700;color:#1e40af;">${num}</td>
+                        <td>____</td>
+                        <td>________________________</td>
+                        <td>____</td>
+                        <td>________________________</td>
+                    </tr>`;
+                }).join('')}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Suplentes en Banquillo</div>
+        <div class="sub-list">
+            ${suplentesPlayers.map(p => `
+                <div class="sub-item">
+                    <span class="sub-num">#${p.number}</span>
+                    <span>${p.nickname || p.name.split(' ').pop()}</span>
+                </div>
+            `).join('')}
+        </div>
+    </div>
+    
+    <div class="section" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+            <div class="notes-title">Notas del Partido</div>
+            <div class="notes-area">
+                <div class="notes-lines"></div>
+                <div class="notes-lines"></div>
+                <div class="notes-lines"></div>
+                <div class="notes-lines"></div>
+            </div>
+        </div>
+        <div>
+            <div class="notes-title">Goles</div>
+            <div class="notes-area">
+                <div class="notes-lines"></div>
+                <div class="notes-lines"></div>
+                <div class="notes-lines"></div>
+            </div>
+            <div style="margin-top:8px;">
+                <div class="notes-title">Tarjetas</div>
+                <div class="notes-area">
+                    <div class="notes-lines"></div>
+                    <div class="notes-lines"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <span>Sada F.C. A Nosa Viña (Veteranos)</span>
+        <span>Firma del entrenador: _________________</span>
+    </div>
+</body>
+</html>`);
+    w.document.close();
 }
 
 document.addEventListener("DOMContentLoaded", initApp);
