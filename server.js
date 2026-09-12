@@ -137,6 +137,10 @@ async function initDB() {
   for (const [rival, url] of Object.entries(shields)) {
     await db.execute({ sql: 'UPDATE matches SET shieldUrl = ? WHERE rival = ?', args: [url, rival] });
   }
+  const n6 = await db.execute('SELECT COUNT(*) as c FROM news WHERE id = 6');
+  if (n6.rows[0].c === 0) {
+    await db.execute({ sql: 'INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', args: [6,"Copa: Victoria contundente en Meicende (1-4)","Golazo de Ferro (2), Damián Paris y Boo sentencian la eliminatoria. Actuación sólida del equipo ante el C.D. Larín en los Treintadosavos de Copa. Julio Teixeira vio tarjeta amarilla (67'). Próximo rival: Narón Silver Catering (Liga J1, 13 sept).","2026-09-05","Crónica"] });
+  }
   const mc = await db.execute('SELECT COUNT(*) as c FROM matches');
   if (mc.rows[0].c === 0) {
     for (const m of [
@@ -283,6 +287,7 @@ async function seedData() {
   await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [3,"Vizoso, baja temporal","Vizoso recae de un problema en el tendon de aquiles que le tendrá entre 2 y 3 semanas de baja. El equipo le desea una pronta recuperación.","2026-07-18","Bajas"]);
   await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [4,"Temporada 2026/27 - Objetivo: ascenso","La directiva del club ha confirmado que el objetivo de la temporada será el ascenso de categoría. Se ha reforzado la plantilla con varios fichajes estratégicos.","2026-07-10","Club"]);
   await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [5,"Amistoso vs Carnoedo","Este domingo 23 de agosto a las 10:00 jugamos un amistoso en el Campo del Carnoedo. ¡Todos a animar!","2026-08-23","Partido"]);
+  await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [6,"Copa: Victoria contundente en Meicende (1-4)","Golazo de Ferro (2), Damián Paris y Boo sentencian la eliminatoria. Actuación sólida del equipo ante el C.D. Larín en los Treintadosavos de Copa. Julio Teixeira vio tarjeta amarilla (67'). Próximo rival: Narón Silver Catering (Liga J1, 13 sept).","2026-09-05","Crónica"]);
   for (const m of [
     [1,"C.D. Larín","2026-09-05","19:00","Meicende Grande (Arteixo)",0,"Copa","Treintadosavos","1-4","https://www.futbuteo.com/escudos/80/gal-1845.webp"],
     [2,"Narón Silver Catering","2026-09-13","10:00","O Cadaval (Narón)",0,"Liga","J1",null,"https://www.futbuteo.com/escudos/80/gal-17520434.webp"],
