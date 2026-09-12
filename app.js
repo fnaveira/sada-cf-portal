@@ -252,7 +252,7 @@ function renderConvocatoria() {
                     if (yellows >= 5) { msg = `${yellows} amarillas → Suspendido`; cls = 'critical'; }
                     else if (yellows === 4) { msg = `${yellows} amarillas → ¡A 1 de suspensión!`; cls = 'danger'; }
                     else if (yellows === 3) { msg = `${yellows} amarillas → A 2 de suspensión`; cls = 'warning'; }
-                    if (reds >= 1) { msg += (msg ? ' + ' : '') + `${reds} roja${reds > 1 ? 's'}`; cls = 'critical'; }
+                    if (reds >= 1) { msg += (msg ? ' + ' : '') + `${reds} roja${reds > 1 ? 's' : ''}`; cls = 'critical'; }
                     return `<div class="conv-card-warning-item ${cls}">
                         ${p.photo ? `<img src="${p.photo}" class="conv-card-warning-img">` : `<div class="conv-card-warning-num">${p.number}</div>`}
                         <span class="conv-card-warning-name">${pName}</span>
