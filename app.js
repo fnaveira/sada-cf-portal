@@ -71,6 +71,7 @@ function showMainApp() {
     renderConvocatoria();
     renderPlayers();
     renderNews();
+    renderMatchActa();
     renderPublicStats();
     renderCalendar();
     renderResults();
@@ -433,6 +434,125 @@ function showPlayerProfile(id) {
         </div>
     `;
     modal.style.display = 'flex';
+}
+
+// MATCH ACTA - J1 Narón 3-3 Sada
+const MATCH_ACTA = {
+    rival: 'Club Deportivo Narón Silver Catering',
+    result: '3 - 3',
+    date: '2026-09-13',
+    time: '10:00',
+    venue: 'O Cadaval',
+    city: 'Narón',
+    referee: 'Vicente Hortelano, Daniel',
+    competition: 'Liga | 1ª División Veteranos',
+    round: 'Jornada 1',
+    goals: [
+        { minute: 17, scorer: 'Mallo López, Jose Luis', team: 'sada', score: '0-1' },
+        { minute: 30, scorer: 'Gómez López, Francisco J', team: 'rival', score: '1-1' },
+        { minute: 37, scorer: 'Segade Fandiño, Iván', team: 'rival', score: '2-1' },
+        { minute: 58, scorer: 'Segade Fandiño, Iván', team: 'rival', score: '3-1' },
+        { minute: 79, scorer: 'Boo Fernández, Miguel A', team: 'sada', score: '3-2' },
+        { minute: 86, scorer: 'Graña Pita, Pablo', team: 'sada', score: '3-3' }
+    ],
+    cards: [
+        { minute: 66, player: 'Sedes Lorenzo, Carlos', team: 'rival', type: 'yellow' },
+        { minute: 70, player: 'Otero Rodríguez, Óscar', team: 'rival', type: 'yellow' },
+        { minute: 81, player: 'González Coto, Manuel', team: 'rival', type: 'yellow' }
+    ],
+    lineup: [
+        { dorsal: 12, name: 'Fernández Álvarez, Iván', position: 'Portero' },
+        { dorsal: 25, name: 'Roibás Naveiro, Alberto', position: 'Defensa' },
+        { dorsal: 4, name: 'Martínez Vázquez, Alfonso', position: 'Defensa' },
+        { dorsal: 7, name: 'Amor Haz, Miguel', position: 'Defensa' },
+        { dorsal: 29, name: 'Mallo López, Jose Luis', position: 'Mediocentro' },
+        { dorsal: 22, name: 'París Labandeira, Damián', position: 'Mediocentro' },
+        { dorsal: 21, name: 'Seoane Barros, Antonio', position: 'Mediocentro' },
+        { dorsal: 15, name: 'Teixeira Fernández, Julio', position: 'Mediocentro' },
+        { dorsal: 11, name: 'Boo Fernández, Miguel', position: 'Mediapunta' },
+        { dorsal: 23, name: 'Freire Lesta, César', position: 'Mediocentro' },
+        { dorsal: 26, name: 'Graña Pita, Pablo', position: 'Delantero' }
+    ],
+    subs: [
+        { dorsal: 2, name: 'Garea Parga, Miguel Á' },
+        { dorsal: 5, name: 'Álvarez Labora, Carlos' },
+        { dorsal: 13, name: 'Teixeira Fernández, Julio' },
+        { dorsal: 14, name: 'Seijo Cancelo, Santiago' },
+        { dorsal: 17, name: 'Albarracín, Miguel Ángel' },
+        { dorsal: 27, name: 'Vizoso Guerra, Javier' },
+        { dorsal: 30, name: 'Lata Cortes, Francisco' }
+    ],
+    delegado: 'Navaira García, Francisco',
+    summary: 'Gran remontada del Sada en O Cadaval. Con el 3-1 en el marcador tras un doblete de Segade Fandiño, el equipo reaccionó con goles de Mallo (17\'), Boo (79\') y el empate de Graña Pita en el 86\'. El Sada no se rindió y sacó un punto de oro en campo rival.'
+};
+
+function renderMatchActa() {
+    const container = document.getElementById('matchActa');
+    if (!container || !MATCH_ACTA) return;
+    
+    const goalsSada = MATCH_ACTA.goals.filter(g => g.team === 'sada');
+    const goalsRival = MATCH_ACTA.goals.filter(g => g.team === 'rival');
+    
+    container.innerHTML = `
+        <div class="acta-card">
+            <div class="acta-header">
+                <div class="acta-teams">
+                    <span class="acta-team acta-team-sada">Sada F.C.</span>
+                    <span class="acta-result">${MATCH_ACTA.result}</span>
+                    <span class="acta-team acta-team-rival">${MATCH_ACTA.rival.replace('Club Deportivo ', '')}</span>
+                </div>
+                <div class="acta-meta">
+                    <span><i class="fas fa-calendar"></i> ${formatDate(MATCH_ACTA.date)}</span>
+                    <span><i class="fas fa-clock"></i> ${MATCH_ACTA.time}</span>
+                    <span><i class="fas fa-map-marker-alt"></i> ${MATCH_ACTA.venue}, ${MATCH_ACTA.city}</span>
+                    <span><i class="fas fa-user-md"></i> Árbitro: ${MATCH_ACTA.referee}</span>
+                </div>
+            </div>
+            
+            <div class="acta-summary">
+                <p>${MATCH_ACTA.summary}</p>
+            </div>
+
+            <div class="acta-grid">
+                <div class="acta-col">
+                    <h4><i class="fas fa-futbol"></i> Goles</h4>
+                    <div class="acta-goals">
+                        ${MATCH_ACTA.goals.map(g => `
+                            <div class="acta-goal ${g.team === 'sada' ? 'acta-goal-sada' : 'acta-goal-rival'}">
+                                <span class="acta-goal-score">${g.score}</span>
+                                <span class="acta-goal-scorer">${g.scorer}</span>
+                                <span class="acta-goal-min">${g.minute}'</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="acta-col">
+                    <h4><i class="fas fa-square"></i> Tarjetas</h4>
+                    <div class="acta-cards">
+                        ${MATCH_ACTA.cards.length > 0 ? MATCH_ACTA.cards.map(c => `
+                            <div class="acta-card-item">
+                                <span class="acta-card-icon yellow-card"></span>
+                                <span class="acta-card-player">${c.player}</span>
+                                <span class="acta-card-min">${c.minute}'</span>
+                            </div>
+                        `).join('') : '<p class="acta-none">Sin tarjetas para el Sada</p>'}
+                    </div>
+                    
+                    <h4 style="margin-top:12px;"><i class="fas fa-users"></i> Alineación</h4>
+                    <div class="acta-lineup">
+                        ${MATCH_ACTA.lineup.map(p => `
+                            <div class="acta-lineup-item">
+                                <span class="acta-lineup-num">${p.dorsal}</span>
+                                <span class="acta-lineup-name">${p.name}</span>
+                                <span class="acta-lineup-pos">${p.position}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 // NEWS
