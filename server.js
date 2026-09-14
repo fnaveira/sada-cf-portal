@@ -156,7 +156,7 @@ async function initDB() {
     for (const m of [
       [1,"C.D. Larín","2026-09-05","19:00","Meicende Grande (Arteixo)",0,"Copa","Treintadosavos","1-4","https://www.futbuteo.com/escudos/80/gal-1845.webp"],
       [2,"Narón Silver Catering","2026-09-13","10:00","O Cadaval (Narón)",0,"Liga","J1",null,"https://www.futbuteo.com/escudos/80/gal-17520434.webp"],
-      [3,"Sporting Cambre As Travesas","2026-09-19",null,"As Mariñas/Carnoedo",1,"Liga","J2",null,"https://www.futbuteo.com/escudos/80/gal-4227660.webp"],
+[3,"Sporting Cambre As Travesas","2026-09-19",null,"O Campo do Cambre",0,"Liga","J2",null,"https://www.futbuteo.com/escudos/80/gal-4227660.webp"],
       [4,"Portazgo S.D.","2026-09-26",null,"A Lavandeira (Culleredo)",0,"Liga","J3",null,null],
       [5,"Liceo de Monelos S.D.","2026-10-03",null,"As Mariñas/Carnoedo",1,"Liga","J4",null,"https://www.futbuteo.com/escudos/80/gal-564.webp"],
       [6,"Xuventude Dorneda","2026-10-10",null,"A Marola",0,"Liga","J5",null,"https://www.futbuteo.com/escudos/80/gal-2409271.webp"],
@@ -301,7 +301,7 @@ async function seedData() {
   for (const m of [
     [1,"C.D. Larín","2026-09-05","19:00","Meicende Grande (Arteixo)",0,"Copa","Treintadosavos","1-4","https://www.futbuteo.com/escudos/80/gal-1845.webp"],
     [2,"Narón Silver Catering","2026-09-13","10:00","O Cadaval (Narón)",0,"Liga","J1",null,"https://www.futbuteo.com/escudos/80/gal-17520434.webp"],
-    [3,"Sporting Cambre As Travesas","2026-09-19",null,"As Mariñas/Carnoedo",1,"Liga","J2",null,"https://www.futbuteo.com/escudos/80/gal-4227660.webp"],
+    [3,"Sporting Cambre As Travesas","2026-09-19",null,"O Campo do Cambre",0,"Liga","J2",null,"https://www.futbuteo.com/escudos/80/gal-4227660.webp"],
     [4,"Portazgo S.D.","2026-09-26",null,"A Lavandeira (Culleredo)",0,"Liga","J3",null,null],
     [5,"Liceo de Monelos S.D.","2026-10-03",null,"As Mariñas/Carnoedo",1,"Liga","J4",null,"https://www.futbuteo.com/escudos/80/gal-564.webp"],
     [6,"Xuventude Dorneda","2026-10-10",null,"A Marola",0,"Liga","J5",null,"https://www.futbuteo.com/escudos/80/gal-2409271.webp"],
