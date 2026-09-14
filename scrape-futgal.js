@@ -336,7 +336,7 @@ async function scrapeAllActas(page) {
         const found = await page.evaluate(() => {
           return [...document.querySelectorAll('a')]
             .map(a => a.getAttribute('href') || '')
-            .filter(h => h.includes('CmpPrevio'))
+            .filter(h => h.includes('CmpPartido') || h.includes('CmpPrevio'))
             .map(h => { const m = h.match(/CodActa=(\d+)/); return m ? m[1] : null; })
             .filter(Boolean);
         });
@@ -345,31 +345,38 @@ async function scrapeAllActas(page) {
         actas.push(...found);
       }
 
-      for (const actaId of actas) {
-        const previoUrl = `${FUTGAL_URL}NPcd/NFG_CmpPrevio?cod_primaria=${LIGA.cod_primaria}&CodActa=${actaId}`;
+      const uniqueActas = [...new Set(actas)];
+      for (const actaId of uniqueActas) {
+        const previoUrl = `${FUTGAL_URL}NPcd/NFG_CmpPartido?cod_primaria=${comp.params.cod_primaria}&CodActa=${actaId}&cod_acta=${actaId}`;
         await safeGoto(page, previoUrl);
 
-        const matchInfo = await page.evaluate(() => {
-          const html = document.body.innerHTML;
-          const teamRegex = /class="tituloprograma"[^>]*>([^<]+)/g;
-          const teams = [];
-          let m;
-          while ((m = teamRegex.exec(html)) !== null) teams.push(m[1].trim());
-          const isOurMatch = teams.some(t => t.includes('SADA F.C.') || t.includes('NOSA VI'));
-          const resultEl = document.body.innerText.match(/(\d+)\s*[-–]\s*(\d+)/);
-          return { teams, isOurMatch, result: resultEl ? `${resultEl[1]}-${resultEl[2]}` : null };
-        });
+        let matchInfo;
+        try {
+          matchInfo = await page.evaluate(() => {
+            const html = document.body.innerHTML;
+            const teamRegex = /class="tituloprograma"[^>]*>([^<]+)/g;
+            const teams = [];
+            let m;
+            while ((m = teamRegex.exec(html)) !== null) teams.push(m[1].trim());
+            const isOurMatch = teams.some(t => t.includes('SADA F.C.') || t.includes('NOSA VI'));
+            const resultEl = document.body.innerText.match(/(\d+)\s*[-–]\s*(\d+)/);
+            return { teams, isOurMatch, result: resultEl ? `${resultEl[1]}-${resultEl[2]}` : null };
+          });
+        } catch (e) {
+          console.log(`  ⚠ Skip acta ${actaId} (${comp.name}): ${e.message.substring(0, 50)}`);
+          continue;
+        }
 
         if (!matchInfo.isOurMatch) continue;
 
         console.log(`  ${comp.name} ${jornada.text}: ${matchInfo.teams.join(' vs ')} (${actaId})`);
 
-        const statUrl = `${FUTGAL_URL}NPcd/NFG_CMP_Alineacion_Resultados?cod_primaria=${LIGA.cod_primaria}&codacta=${actaId}`;
+        const statUrl = `${FUTGAL_URL}NPcd/NFG_CMP_Alineacion_Resultados?cod_primaria=${comp.params.cod_primaria}&codacta=${actaId}`;
         await safeGoto(page, statUrl);
         await WAIT(2000);
 
         const stats = await page.evaluate(() => {
-          const results = { sadaPlayers: [], rivalPlayers: [], goals: {} };
+          const results = { sadaPlayers: [], rivalPlayers: [], goals: {}, cards: [] };
           const tables = document.querySelectorAll('table');
 
           for (const table of tables) {
@@ -413,7 +420,57 @@ async function scrapeAllActas(page) {
           return results;
         });
 
-        allStats.push({ actaId, competition: comp.name, jornada: jornada.text, teams: matchInfo.teams, result: matchInfo.result, stats });
+        // Scrape TARJETAS from CmpPartido page (more reliable card data with minutes)
+        const cmpUrl = `${FUTGAL_URL}NPcd/NFG_CmpPartido?cod_primaria=${comp.params.cod_primaria}&CodActa=${actaId}&cod_acta=${actaId}&N_Ajax=1`;
+        await safeGoto(page, cmpUrl);
+        await WAIT(2000);
+
+        const cards = await page.evaluate((sadaNames) => {
+          const result = { sada: [], rival: [] };
+          const bodyText = document.body.innerText;
+          
+          // Find TARJETAS section
+          const tarjSection = bodyText.match(/TARJETAS([\s\S]*?)(?=SUSTITUCIONES|EQUIPO ARBITRAL|ENTRENADORES|$)/i);
+          if (!tarjSection) return result;
+          
+          const allCards = [];
+          
+          // Parse cards with minutes: "NAME (MM')"
+          const lines = tarjSection[1].split('\n');
+          for (const line of lines) {
+            const cardMatch = line.match(/([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ\s,\.]+?)\s*\((\d+)/);
+            if (cardMatch) {
+              allCards.push({ name: cardMatch[1].trim(), minute: parseInt(cardMatch[2]), type: 'yellow' });
+            }
+          }
+          
+          // Also try regex on HTML for yellow card images
+          const html = document.body.innerHTML;
+          const cardRegex = /tarj_amar[^\"]*\.gif[\s\S]{0,300}?([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ\s,\.]+?)\s*\((\d+)/g;
+          let m;
+          while ((m = cardRegex.exec(html)) !== null) {
+            const already = allCards.some(c => c.name === m[1].trim() && c.minute === parseInt(m[2]));
+            if (!already) allCards.push({ name: m[1].trim(), minute: parseInt(m[2]), type: 'yellow' });
+          }
+          
+          // Red cards
+          const redRegex = /tarj_roj[^\"]*\.gif[\s\S]{0,300}?([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ\s,\.]+?)\s*\((\d+)/g;
+          while ((m = redRegex.exec(html)) !== null) {
+            const already = allCards.some(c => c.name === m[1].trim() && c.minute === parseInt(m[2]));
+            if (!already) allCards.push({ name: m[1].trim(), minute: parseInt(m[2]), type: 'red' });
+          }
+          
+          // Classify: if name matches a Sada player, it's Sada's card
+          for (const card of allCards) {
+            const isSada = sadaNames.some(sn => card.name.toUpperCase().includes(sn.toUpperCase()));
+            if (isSada) result.sada.push(card);
+            else result.rival.push(card);
+          }
+          
+          return result;
+        }, stats.sadaPlayers.map(p => p.name.split(',')[0].trim()));
+
+        allStats.push({ actaId, competition: comp.name, jornada: jornada.text, teams: matchInfo.teams, result: matchInfo.result, stats, cards });
       }
     }
   }
@@ -425,10 +482,28 @@ async function scrapeAllActas(page) {
 async function updateDBFromStats(allStats) {
   console.log('\n💾 Updating database from actas...');
 
-  const aggregate = {};
   for (const match of allStats) {
-    const { stats } = match;
+    const { actaId, competition, jornada, teams, result, stats, cards } = match;
 
+    // Find match in DB by date extracted from jornada
+    const dateMatch = jornada.match(/(\d{2})-(\d{2})-(\d{4})/);
+    let matchDate = null;
+    if (dateMatch) matchDate = `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
+
+    let matchId = null;
+    if (matchDate) {
+      const existing = await db.execute({ sql: 'SELECT id FROM matches WHERE date=? AND competition=?', args: [matchDate, competition] });
+      if (existing.rows.length > 0) {
+        matchId = existing.rows[0].id;
+        // Update result if not set
+        if (result && !existing.rows[0].result) {
+          await db.execute({ sql: 'UPDATE matches SET result=? WHERE id=?', args: [result, matchId] });
+          console.log(`  📅 ${competition} ${matchDate}: result ${result}`);
+        }
+      }
+    }
+
+    // Goals aggregation
     for (const [futgalName, count] of Object.entries(stats.goals)) {
       const entry = Object.entries(FUTGAL_MAP).find(([id, nick]) => {
         const upper = futgalName.toUpperCase();
@@ -436,48 +511,78 @@ async function updateDBFromStats(allStats) {
       });
       if (entry) {
         const nick = entry[1].toLowerCase();
-        if (!aggregate[nick]) aggregate[nick] = { goals: 0, yellow: 0, red: 0 };
-        aggregate[nick].goals += count;
+        const player = (await db.execute({ sql: 'SELECT id, goals FROM players WHERE LOWER(nickname)=?', args: [nick] })).rows[0];
+        if (player) {
+          const newGoals = Math.max(player.goals || 0, count);
+          await db.execute({ sql: 'UPDATE players SET goals=? WHERE id=?', args: [newGoals, player.id] });
+          if (newGoals > 0) console.log(`  ⚽ ${nick}: ${newGoals} goals`);
+        }
       }
     }
 
-    for (const player of stats.sadaPlayers) {
-      const entry = Object.entries(FUTGAL_MAP).find(([id, nick]) => {
-        return player.name.toUpperCase().includes(nick.toUpperCase()) ||
-               nick.toUpperCase().includes(player.name.split(',')[0].trim().toUpperCase());
-      });
-      if (entry) {
-        const nick = entry[1].toLowerCase();
-        if (!aggregate[nick]) aggregate[nick] = { goals: 0, yellow: 0, red: 0 };
-        aggregate[nick].yellow += player.yellow;
-        aggregate[nick].red += player.red;
-      }
-    }
-  }
+    // Cards to match_cards table (only for Sada players)
+    if (matchId && cards && cards.sada) {
+      // Clear existing cards for this match first
+      await db.execute({ sql: 'DELETE FROM match_cards WHERE matchId=?', args: [matchId] });
 
-  for (const [nickname, data] of Object.entries(aggregate)) {
-    try {
-      const player = (await db.execute({
-        sql: 'SELECT id, goals, yellowCards, redCards FROM players WHERE LOWER(nickname)=?',
-        args: [nickname]
-      })).rows[0];
-
-      if (player) {
-        const newGoals = Math.max(player.goals || 0, data.goals);
-        const newY = Math.max(player.yellowCards || 0, data.yellow);
-        const newR = Math.max(player.redCards || 0, data.red);
-        await db.execute({
-          sql: 'UPDATE players SET goals=?, yellowCards=?, redCards=? WHERE id=?',
-          args: [newGoals, newY, newR, player.id]
+      for (const card of cards.sada) {
+        // Find player by name match
+        const entry = Object.entries(FUTGAL_MAP).find(([id, nick]) => {
+          return card.name.toUpperCase().includes(nick.toUpperCase()) ||
+                 nick.toUpperCase().includes(card.name.split(',')[0].trim().toUpperCase());
         });
-        const changes = [];
-        if (newGoals > 0) changes.push(`⚽${newGoals}`);
-        if (newY > 0) changes.push(`🟨${newY}`);
-        if (newR > 0) changes.push(`🟥${newR}`);
-        if (changes.length > 0) console.log(`  ${nickname}: ${changes.join(' ')}`);
+        if (entry) {
+          const nick = entry[1].toLowerCase();
+          const player = (await db.execute({ sql: 'SELECT id FROM players WHERE LOWER(nickname)=?', args: [nick] })).rows[0];
+          if (player) {
+            await db.execute({
+              sql: 'INSERT INTO match_cards (playerId, matchId, type, minute, competition) VALUES (?, ?, ?, ?, ?)',
+              args: [player.id, matchId, card.type, card.minute, competition]
+            });
+            const icon = card.type === 'yellow' ? '🟨' : '🟥';
+            console.log(`  ${icon} ${nick} (${card.minute}') - ${competition}`);
+          }
+        }
       }
-    } catch (e) {
-      console.error(`  ❌ ${nickname}:`, e.message);
+    }
+
+    // Also count cards from alineacion table (A1/A2/R columns) as fallback
+    if (matchId && stats.sadaPlayers) {
+      for (const player of stats.sadaPlayers) {
+        if (player.yellow > 0 || player.red > 0) {
+          const entry = Object.entries(FUTGAL_MAP).find(([id, nick]) => {
+            return player.name.toUpperCase().includes(nick.toUpperCase()) ||
+                   nick.toUpperCase().includes(player.name.split(',')[0].trim().toUpperCase());
+          });
+          if (entry) {
+            const nick = entry[1].toLowerCase();
+            const dbPlayer = (await db.execute({ sql: 'SELECT id FROM players WHERE LOWER(nickname)=?', args: [nick] })).rows[0];
+            if (dbPlayer) {
+              // Check if card already exists for this match
+              const existing = await db.execute({
+                sql: 'SELECT id FROM match_cards WHERE playerId=? AND matchId=?',
+                args: [dbPlayer.id, matchId]
+              });
+              if (existing.rows.length === 0) {
+                for (let i = 0; i < player.yellow; i++) {
+                  await db.execute({
+                    sql: 'INSERT INTO match_cards (playerId, matchId, type, competition) VALUES (?, ?, ?, ?)',
+                    args: [dbPlayer.id, matchId, 'yellow', competition]
+                  });
+                  console.log(`  🟨 ${nick} - ${competition} (from alineacion)`);
+                }
+                for (let i = 0; i < player.red; i++) {
+                  await db.execute({
+                    sql: 'INSERT INTO match_cards (playerId, matchId, type, competition) VALUES (?, ?, ?, ?)',
+                    args: [dbPlayer.id, matchId, 'red', competition]
+                  });
+                  console.log(`  🟥 ${nick} - ${competition} (from alineacion)`);
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

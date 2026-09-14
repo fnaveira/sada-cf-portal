@@ -139,16 +139,16 @@ async function initDB() {
   }
   const n6 = await db.execute('SELECT COUNT(*) as c FROM news WHERE id = 6');
   if (n6.rows[0].c === 0) {
-    await db.execute({ sql: 'INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', args: [6,"Copa: Victoria contundente en Meicende (1-4)","Golazo de Ferro (2), Damián Paris y Boo sentencian la eliminatoria. Actuación sólida del equipo ante el C.D. Larín en los Treintadosavos de Copa. Julio Teixeira vio tarjeta amarilla (67'). Próximo rival: Narón Silver Catering (Liga J1, 13 sept).","2026-09-05","Crónica"] });
+    await db.execute({ sql: 'INSERT OR IGNORE INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', args: [6,"Copa: Victoria contundente en Meicende (1-4)","Golazo de Ferro (2), Damián Paris y Boo sentencian la eliminatoria. Actuación sólida del equipo ante el C.D. Larín en los Treintadosavos de Copa. Julio Teixeira vio tarjeta amarilla (67'). Próximo rival: Narón Silver Catering (Liga J1, 13 sept).","2026-09-05","Crónica"] });
   }
   const uUpd = await db.execute({ sql: 'SELECT COUNT(*) as c FROM users' });
   if (uUpd.rows[0].c === 0) {
     const salt = crypto.randomBytes(16).toString('hex');
     const hash = crypto.pbkdf2Sync('admin123', salt, 10000, 64, 'sha512').toString('hex');
-    await db.execute({ sql: 'INSERT INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', args: ['admin',hash,salt,'admin',null] });
+    await db.execute({ sql: 'INSERT OR IGNORE INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', args: ['admin',hash,salt,'admin',null] });
     const salt2 = crypto.randomBytes(16).toString('hex');
     const hash2 = crypto.pbkdf2Sync('sadaanosa2026', salt2, 10000, 64, 'sha512').toString('hex');
-    await db.execute({ sql: 'INSERT INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', args: ['usuario',hash2,salt2,'jugador',null] });
+    await db.execute({ sql: 'INSERT OR IGNORE INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', args: ['usuario',hash2,salt2,'jugador',null] });
     console.log('✅ Users inserted');
   }
   const mc = await db.execute('SELECT COUNT(*) as c FROM matches');
@@ -170,7 +170,7 @@ async function initDB() {
       [14,"U.D. Paiosaco H.Añón","2026-12-05",null,"As Mariñas/Carnoedo",1,"Liga","J12",null,"https://www.futbuteo.com/escudos/80/gal-734.webp"],
       [15,"Oza de los Ríos","2026-12-12",null,"O Loureiro (Oza De Los Rios)",0,"Liga","J13",null,null],
       [16,"San Martín S.D.","2026-12-19",null,"A Revolta (Queixas)",0,"Liga","J14",null,"https://www.futbuteo.com/escudos/80/gal-7576246.webp"]
-    ]) await db.execute({ sql: 'INSERT INTO matches (id,rival,date,time,venue,home,competition,round,result,shieldUrl) VALUES (?,?,?,?,?,?,?,?,?,?)', args: m.map(a => a === undefined ? null : a) });
+    ]) await db.execute({ sql: 'INSERT OR IGNORE INTO matches (id,rival,date,time,venue,home,competition,round,result,shieldUrl) VALUES (?,?,?,?,?,?,?,?,?,?)', args: m.map(a => a === undefined ? null : a) });
     console.log('✅ Matches inserted (was empty)');
   }
   await db.execute(`CREATE TABLE IF NOT EXISTS results (
@@ -241,7 +241,7 @@ async function seedNeeded() {
     const photoRows = (await db.execute("SELECT id, photo FROM players WHERE photo IS NOT NULL AND photo != ''")).rows;
     globalThis._savedPhotos = {};
     for (const r of photoRows) globalThis._savedPhotos[Number(r.id)] = r.photo;
-    const tables = ['players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
+    const tables = ['match_cards','players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
     for (const t of tables) {
       try { await db.execute('DELETE FROM ' + t); } catch(e) {}
     }
@@ -251,12 +251,12 @@ async function seedNeeded() {
 }
 
 async function seedData() {
-  const tables = ['players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
+  const tables = ['match_cards','players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
   for (const t of tables) {
     try { await db.execute('DELETE FROM ' + t); } catch(e) {}
   }
   const P = async (sql, args) => { await db.execute({ sql, args: args.map(a => a === undefined ? null : a) }); };
-  const PS = 'INSERT INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards,dni,birthDate,address,phone,email,municipality,province,birthPlace,nationality) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+  const PS = 'INSERT OR IGNORE INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards,dni,birthDate,address,phone,email,municipality,province,birthPlace,nationality) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
   await P(PS, [1,"Carlos Caamaño Cambon","Caamaño",33,"portero",49,"disponible",0,0,0,"32839497M","1976-10-04","TARABELO","654789352","carlos.caamano.cambon@gmail.com","Sada","A Coruña","Sada","Española"]);
   await P(PS, [2,"Miguel Ángel Garea Parga","Garea",1,"defensa,centrocampista",46,"disponible",0,0,0,"79323805W","1980-01-07","CHABURRA","632589647","garea10@hotmail.com","Sada","A Coruña","Sada","Española"]);
   await P(PS, [3,"David Mourelo Mouzo","Mourelo",10,"defensa,centrocampista,delantero",36,"no_disponible",0,0,0,"79338090G","1989-09-22","AVDA ROSALIA DE CASTRO","9699403232","davidmourelomou@gmail.com","Sada","A Coruña","Coiros","Española"]);
@@ -282,22 +282,22 @@ async function seedData() {
   await P(PS, [24,"Miguel Angel Albarracin","Albarracin",65,"defensa,centrocampista,delantero",45,"disponible",0,0,0,"Y7742882S","1981-06-08","AVDA MARIÑA","664010009","miguelalbarracincaj@gmail.com","Sada","A Coruña","Argentina","Argentina"]);
   await P(PS, [25,"Marcos Iglesias Castro","Marcos",40,"centrocampista",40,"disponible",0,0,0,"53167480J","1986-05-17","C/SAN IGNACIO","675219902","marcos.iglesias.castro@gmail.com","A Coruña","A Coruña","A Coruña","Española"]);
   await P(PS, [26,"Damián Paris Labandeira","Damián",16,"defensa,centrocampista",37,"disponible",0,0,0,"53303285A","1988-11-05","PAZOS","682658072","damian-pl@hotmail.es","Mazaricos","A Coruña","Sada","Española"]);
-  for (const id of [7,12,26,20,2,14,16,15,19,24,23,4,5,8,18]) await P('INSERT INTO convocatoria (playerId) VALUES (?)', [id]);
-  await P('INSERT INTO formation (id,name,positions) VALUES (1,?,?)', ['4-3-3',JSON.stringify([{playerId:8,x:50,y:85},{playerId:2,x:20,y:65},{playerId:13,x:37,y:65},{playerId:26,x:63,y:65},{playerId:7,x:80,y:65},{playerId:15,x:30,y:45},{playerId:12,x:50,y:45},{playerId:19,x:70,y:45},{playerId:14,x:20,y:20},{playerId:4,x:50,y:20},{playerId:16,x:80,y:20}])]);
-  for (const [k,v] of Object.entries({federationName:"Sada F.C. A Nosa Viña (Veteranos)",federationAddress:"Reboredo, 20 Ouces - 15165 Bergondo, A Coruña",stadium:"Campo Municipal de Sada",stadiumAddress:"Avda. de la Marina, s/n - 15160 Sada",stadiumCapacity:"2.000 espectadores",founded:"1975",president:"D. Diego Fernández Cabana",cif:"G70501242",phone1:"663495926",phone2:"659833245",email:"diegofernandezcabana@gmail.com"})) await P('INSERT INTO club_info (key,value) VALUES (?,?)', [k,v]);
-  await P('INSERT INTO staff (id,name,role) VALUES (?,?,?)', [1,"Fran Naveira","Entrenador"]);
-  await P('INSERT INTO staff (id,name,role) VALUES (?,?,?)', [2,"Santi Seijo","Entrenador Auxiliar"]);
-  await P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [1,"Diego Fernández Cabana","Presidente"]);
-  await P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [2,"Iván Fernández Álvarez","Secretario"]);
-  await P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [3,"Santiago Seijo Cancelo","Vicesecretario"]);
-  await P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [4,"Alberto Roibás Naveiro","Tesorero"]);
-  await P('INSERT INTO board (id,name,role) VALUES (?,?,?)', [5,"Gonzalo Ferro Rozas","Vocal"]);
-  await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [1,"Derrota para aprender de los errores","Hemos perdido nuestro primer partido amistoso contra un rival de menor categoria por demeritos propios, tres fallos en defensa condenaron al equipo a ir a remolque todo el partido, mejorando sustanciablemente en la segunda parte con la entrada de los revulsivos. Derrota para aprender.","2026-07-25","Crónica"]);
-  await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [2,"Debut de Julio","Julio debuta en el amistoso contra el SPM con gran rendimiento.","2026-07-22","Fichaje"]);
-  await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [3,"Vizoso, baja temporal","Vizoso recae de un problema en el tendon de aquiles que le tendrá entre 2 y 3 semanas de baja. El equipo le desea una pronta recuperación.","2026-07-18","Bajas"]);
-  await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [4,"Temporada 2026/27 - Objetivo: ascenso","La directiva del club ha confirmado que el objetivo de la temporada será el ascenso de categoría. Se ha reforzado la plantilla con varios fichajes estratégicos.","2026-07-10","Club"]);
-  await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [5,"Amistoso vs Carnoedo","Este domingo 23 de agosto a las 10:00 jugamos un amistoso en el Campo del Carnoedo. ¡Todos a animar!","2026-08-23","Partido"]);
-  await P('INSERT INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [6,"Copa: Victoria contundente en Meicende (1-4)","Golazo de Ferro (2), Damián Paris y Boo sentencian la eliminatoria. Actuación sólida del equipo ante el C.D. Larín en los Treintadosavos de Copa. Julio Teixeira vio tarjeta amarilla (67'). Próximo rival: Narón Silver Catering (Liga J1, 13 sept).","2026-09-05","Crónica"]);
+  for (const id of [7,12,26,20,2,14,16,15,19,24,23,4,5,8,18]) await P('INSERT OR IGNORE INTO convocatoria (playerId) VALUES (?)', [id]);
+  await P('INSERT OR IGNORE INTO formation (id,name,positions) VALUES (1,?,?)', ['4-3-3',JSON.stringify([{playerId:8,x:50,y:85},{playerId:2,x:20,y:65},{playerId:13,x:37,y:65},{playerId:26,x:63,y:65},{playerId:7,x:80,y:65},{playerId:15,x:30,y:45},{playerId:12,x:50,y:45},{playerId:19,x:70,y:45},{playerId:14,x:20,y:20},{playerId:4,x:50,y:20},{playerId:16,x:80,y:20}])]);
+  for (const [k,v] of Object.entries({federationName:"Sada F.C. A Nosa Viña (Veteranos)",federationAddress:"Reboredo, 20 Ouces - 15165 Bergondo, A Coruña",stadium:"Campo Municipal de Sada",stadiumAddress:"Avda. de la Marina, s/n - 15160 Sada",stadiumCapacity:"2.000 espectadores",founded:"1975",president:"D. Diego Fernández Cabana",cif:"G70501242",phone1:"663495926",phone2:"659833245",email:"diegofernandezcabana@gmail.com"})) await P('INSERT OR IGNORE INTO club_info (key,value) VALUES (?,?)', [k,v]);
+  await P('INSERT OR IGNORE INTO staff (id,name,role) VALUES (?,?,?)', [1,"Fran Naveira","Entrenador"]);
+  await P('INSERT OR IGNORE INTO staff (id,name,role) VALUES (?,?,?)', [2,"Santi Seijo","Entrenador Auxiliar"]);
+  await P('INSERT OR IGNORE INTO board (id,name,role) VALUES (?,?,?)', [1,"Diego Fernández Cabana","Presidente"]);
+  await P('INSERT OR IGNORE INTO board (id,name,role) VALUES (?,?,?)', [2,"Iván Fernández Álvarez","Secretario"]);
+  await P('INSERT OR IGNORE INTO board (id,name,role) VALUES (?,?,?)', [3,"Santiago Seijo Cancelo","Vicesecretario"]);
+  await P('INSERT OR IGNORE INTO board (id,name,role) VALUES (?,?,?)', [4,"Alberto Roibás Naveiro","Tesorero"]);
+  await P('INSERT OR IGNORE INTO board (id,name,role) VALUES (?,?,?)', [5,"Gonzalo Ferro Rozas","Vocal"]);
+  await P('INSERT OR IGNORE INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [1,"Derrota para aprender de los errores","Hemos perdido nuestro primer partido amistoso contra un rival de menor categoria por demeritos propios, tres fallos en defensa condenaron al equipo a ir a remolque todo el partido, mejorando sustanciablemente en la segunda parte con la entrada de los revulsivos. Derrota para aprender.","2026-07-25","Crónica"]);
+  await P('INSERT OR IGNORE INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [2,"Debut de Julio","Julio debuta en el amistoso contra el SPM con gran rendimiento.","2026-07-22","Fichaje"]);
+  await P('INSERT OR IGNORE INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [3,"Vizoso, baja temporal","Vizoso recae de un problema en el tendon de aquiles que le tendrá entre 2 y 3 semanas de baja. El equipo le desea una pronta recuperación.","2026-07-18","Bajas"]);
+  await P('INSERT OR IGNORE INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [4,"Temporada 2026/27 - Objetivo: ascenso","La directiva del club ha confirmado que el objetivo de la temporada será el ascenso de categoría. Se ha reforzado la plantilla con varios fichajes estratégicos.","2026-07-10","Club"]);
+  await P('INSERT OR IGNORE INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [5,"Amistoso vs Carnoedo","Este domingo 23 de agosto a las 10:00 jugamos un amistoso en el Campo del Carnoedo. ¡Todos a animar!","2026-08-23","Partido"]);
+  await P('INSERT OR IGNORE INTO news (id,title,summary,date,tag) VALUES (?,?,?,?,?)', [6,"Copa: Victoria contundente en Meicende (1-4)","Golazo de Ferro (2), Damián Paris y Boo sentencian la eliminatoria. Actuación sólida del equipo ante el C.D. Larín en los Treintadosavos de Copa. Julio Teixeira vio tarjeta amarilla (67'). Próximo rival: Narón Silver Catering (Liga J1, 13 sept).","2026-09-05","Crónica"]);
   for (const m of [
     [1,"C.D. Larín","2026-09-05","19:00","Meicende Grande (Arteixo)",0,"Copa","Treintadosavos","1-4","https://www.futbuteo.com/escudos/80/gal-1845.webp"],
     [2,"Narón Silver Catering","2026-09-13","10:00","O Cadaval (Narón)",0,"Liga","J1",null,"https://www.futbuteo.com/escudos/80/gal-17520434.webp"],
@@ -315,19 +315,19 @@ async function seedData() {
     [14,"U.D. Paiosaco H.Añón","2026-12-05",null,"As Mariñas/Carnoedo",1,"Liga","J12",null,"https://www.futbuteo.com/escudos/80/gal-734.webp"],
     [15,"Oza de los Ríos","2026-12-12",null,"O Loureiro (Oza De Los Rios)",0,"Liga","J13",null,null],
     [16,"San Martín S.D.","2026-12-19",null,"A Revolta (Queixas)",0,"Liga","J14",null,"https://www.futbuteo.com/escudos/80/gal-7576246.webp"]
-  ]) await P('INSERT INTO matches (id,rival,date,time,venue,home,competition,round,result,shieldUrl) VALUES (?,?,?,?,?,?,?,?,?,?)', m);
-  for (const r of [[1,"2026-07-25","Sada CF","CD Pilar",3,1,"Campo de Sada"],[2,"2026-07-18","UD Ponte","Sada CF",0,2,"Campo da Ponte"],[3,"2026-07-11","Sada CF","CF Narón",1,1,"Campo de Sada"],[4,"2026-07-04","SD Bergondo","Sada CF",2,1,"Campo de Bergondo"],[5,"2026-06-27","Sada CF","CD Meira",4,0,"Campo de Sada"],[6,"2026-06-20","UD Montaña","Sada CF",1,3,"Campo da Montaña"]]) await P('INSERT INTO results (id,date,home,away,homeScore,awayScore,venue) VALUES (?,?,?,?,?,?,?)', r);
-  for (const st of [[1,"Sada CF",14,10,2,2,28,10,32],[2,"CD Pilar",14,9,3,2,25,12,30],[3,"UD Ponte",14,8,2,4,22,15,26],[4,"CF Narón",14,7,4,3,20,14,25],[5,"SD Bergondo",14,7,2,5,19,16,23],[6,"CD Meira",14,6,3,5,18,17,21],[7,"UD Montaña",14,5,2,7,15,20,17],[8,"CD Oleiros",14,4,3,7,14,21,15],[9,"SD Culleredo",14,4,1,9,12,24,13],[10,"CF Cambre",14,3,2,9,10,26,11]]) await P('INSERT INTO standings (pos,team,played,won,drawn,lost,gf,ga,pts) VALUES (?,?,?,?,?,?,?,?,?)', st);
-  await P('INSERT INTO appearance (key,value) VALUES (?,?)', ['primaryColor','#1e40af']);
-  await P('INSERT INTO appearance (key,value) VALUES (?,?)', ['brandName','Sada F.C. A Nosa Viña (Veteranos)']);
-  await P('INSERT INTO appearance (key,value) VALUES (?,?)', ['logoText','SADA']);
-  await P('INSERT INTO appearance (key,value) VALUES (?,?)', ['teamLogo','/assets/logo.jpeg']);
+  ]) await P('INSERT OR IGNORE INTO matches (id,rival,date,time,venue,home,competition,round,result,shieldUrl) VALUES (?,?,?,?,?,?,?,?,?,?)', m);
+  for (const r of [[1,"2026-07-25","Sada CF","CD Pilar",3,1,"Campo de Sada"],[2,"2026-07-18","UD Ponte","Sada CF",0,2,"Campo da Ponte"],[3,"2026-07-11","Sada CF","CF Narón",1,1,"Campo de Sada"],[4,"2026-07-04","SD Bergondo","Sada CF",2,1,"Campo de Bergondo"],[5,"2026-06-27","Sada CF","CD Meira",4,0,"Campo de Sada"],[6,"2026-06-20","UD Montaña","Sada CF",1,3,"Campo da Montaña"]]) await P('INSERT OR IGNORE INTO results (id,date,home,away,homeScore,awayScore,venue) VALUES (?,?,?,?,?,?,?)', r);
+  for (const st of [[1,"Sada CF",14,10,2,2,28,10,32],[2,"CD Pilar",14,9,3,2,25,12,30],[3,"UD Ponte",14,8,2,4,22,15,26],[4,"CF Narón",14,7,4,3,20,14,25],[5,"SD Bergondo",14,7,2,5,19,16,23],[6,"CD Meira",14,6,3,5,18,17,21],[7,"UD Montaña",14,5,2,7,15,20,17],[8,"CD Oleiros",14,4,3,7,14,21,15],[9,"SD Culleredo",14,4,1,9,12,24,13],[10,"CF Cambre",14,3,2,9,10,26,11]]) await P('INSERT OR IGNORE INTO standings (pos,team,played,won,drawn,lost,gf,ga,pts) VALUES (?,?,?,?,?,?,?,?,?)', st);
+  await P('INSERT OR IGNORE INTO appearance (key,value) VALUES (?,?)', ['primaryColor','#1e40af']);
+  await P('INSERT OR IGNORE INTO appearance (key,value) VALUES (?,?)', ['brandName','Sada F.C. A Nosa Viña (Veteranos)']);
+  await P('INSERT OR IGNORE INTO appearance (key,value) VALUES (?,?)', ['logoText','SADA']);
+  await P('INSERT OR IGNORE INTO appearance (key,value) VALUES (?,?)', ['teamLogo','/assets/logo.jpeg']);
   const salt = crypto.randomBytes(16).toString('hex');
   const hash = crypto.pbkdf2Sync('admin123', salt, 10000, 64, 'sha512').toString('hex');
-  await P('INSERT INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', ['admin',hash,salt,'admin',null]);
+  await P('INSERT OR IGNORE INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', ['admin',hash,salt,'admin',null]);
   const salt2 = crypto.randomBytes(16).toString('hex');
   const hash2 = crypto.pbkdf2Sync('sadaanosa2026', salt2, 10000, 64, 'sha512').toString('hex');
-  await P('INSERT INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', ['usuario',hash2,salt2,'jugador',null]);
+  await P('INSERT OR IGNORE INTO users (username,password,salt,type,playerName) VALUES (?,?,?,?,?)', ['usuario',hash2,salt2,'jugador',null]);
   if (globalThis._savedPhotos) {
     for (const [id, photo] of Object.entries(globalThis._savedPhotos)) {
       await db.execute({ sql: 'UPDATE players SET photo=? WHERE id=?', args: [photo, Number(id)] });
@@ -388,7 +388,7 @@ app.put('/api/players/:id', async (req, res) => {
 
 app.post('/api/players', async (req, res) => {
   const { name, nickname, number, position, age } = req.body;
-  const info = await db.execute({ sql: 'INSERT INTO players (name, nickname, number, position, age, status, goals, yellowCards, redCards) VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0)', args: [name, nickname || null, number, position, age || null, 'disponible'] });
+  const info = await db.execute({ sql: 'INSERT OR IGNORE INTO players (name, nickname, number, position, age, status, goals, yellowCards, redCards) VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0)', args: [name, nickname || null, number, position, age || null, 'disponible'] });
   res.json({ id: Number(info.lastInsertRowid) });
 });
 
@@ -438,7 +438,7 @@ app.put('/api/convocatoria', async (req, res) => {
   const { playerIds } = req.body;
   const stmts = [{ sql: 'DELETE FROM convocatoria' }];
   for (const id of playerIds) {
-    stmts.push({ sql: 'INSERT INTO convocatoria (playerId) VALUES (?)', args: [id] });
+    stmts.push({ sql: 'INSERT OR IGNORE INTO convocatoria (playerId) VALUES (?)', args: [id] });
   }
   await db.batch(stmts);
   res.json({ ok: true });
@@ -462,7 +462,7 @@ app.put('/api/club-info', async (req, res) => {
 // --- API: STAFF ---
 app.post('/api/staff', async (req, res) => {
   const { name, role } = req.body;
-  const info = await db.execute({ sql: 'INSERT INTO staff (name, role) VALUES (?, ?)', args: [name, role] });
+  const info = await db.execute({ sql: 'INSERT OR IGNORE INTO staff (name, role) VALUES (?, ?)', args: [name, role] });
   res.json({ id: Number(info.lastInsertRowid) });
 });
 
@@ -480,7 +480,7 @@ app.delete('/api/staff/:id', async (req, res) => {
 // --- API: BOARD ---
 app.post('/api/board', async (req, res) => {
   const { name, role } = req.body;
-  const info = await db.execute({ sql: 'INSERT INTO board (name, role) VALUES (?, ?)', args: [name, role] });
+  const info = await db.execute({ sql: 'INSERT OR IGNORE INTO board (name, role) VALUES (?, ?)', args: [name, role] });
   res.json({ id: Number(info.lastInsertRowid) });
 });
 
@@ -498,7 +498,7 @@ app.delete('/api/board/:id', async (req, res) => {
 // --- API: NEWS ---
 app.post('/api/news', async (req, res) => {
   const { title, summary, date, tag } = req.body;
-  const info = await db.execute({ sql: 'INSERT INTO news (title, summary, date, tag) VALUES (?, ?, ?, ?)', args: [title, summary || '', date || new Date().toISOString().slice(0, 10), tag || ''] });
+  const info = await db.execute({ sql: 'INSERT OR IGNORE INTO news (title, summary, date, tag) VALUES (?, ?, ?, ?)', args: [title, summary || '', date || new Date().toISOString().slice(0, 10), tag || ''] });
   res.json({ id: Number(info.lastInsertRowid) });
 });
 
@@ -543,7 +543,7 @@ app.post('/api/users', async (req, res) => {
   if (existing) return res.status(409).json({ error: 'El usuario ya existe' });
   const salt = crypto.randomBytes(16).toString('hex');
   const hash = hashPassword(password, salt);
-  const info = await db.execute({ sql: 'INSERT INTO users (username, password, salt, type, playerName) VALUES (?, ?, ?, ?, ?)', args: [username, hash, salt, type, playerName || null] });
+  const info = await db.execute({ sql: 'INSERT OR IGNORE INTO users (username, password, salt, type, playerName) VALUES (?, ?, ?, ?, ?)', args: [username, hash, salt, type, playerName || null] });
   res.json({ id: Number(info.lastInsertRowid) });
 });
 
