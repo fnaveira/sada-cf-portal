@@ -1537,8 +1537,8 @@ input, button, textarea, select {
         display: flex;
     }
 
-    .nav-links.open ~ .mobile-menu-btn i,
-    .mobile-menu-btn.open i {
+    .nav-links.open ~ .mobile-menu-btn svg,
+    .mobile-menu-btn.open svg {
         transform: rotate(90deg);
     }
 
