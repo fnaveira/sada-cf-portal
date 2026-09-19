@@ -231,30 +231,10 @@ async function initDB() {
 async function seedNeeded() {
   const row = (await db.execute('SELECT COUNT(*) as c FROM players')).rows[0];
   if (row.c === 0) return true;
-  const check = (await db.execute('SELECT number FROM players WHERE id=1')).rows[0];
-  const num = check ? Number(check.number) : 0;
-  const formCheck = (await db.execute('SELECT name FROM formation WHERE id=1')).rows[0];
-  const isOldFormation = formCheck && formCheck.name === '4-3-2';
-  const convCount = (await db.execute('SELECT COUNT(*) as c FROM convocatoria')).rows[0];
-  const hasOldConv = Number(convCount.c) !== 16;
-  if (num !== 33 || isOldFormation || hasOldConv) {
-    const photoRows = (await db.execute("SELECT id, photo FROM players WHERE photo IS NOT NULL AND photo != ''")).rows;
-    globalThis._savedPhotos = {};
-    for (const r of photoRows) globalThis._savedPhotos[Number(r.id)] = r.photo;
-    const tables = ['match_cards','players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
-    for (const t of tables) {
-      try { await db.execute('DELETE FROM ' + t); } catch(e) {}
-    }
-    return true;
-  }
   return false;
 }
 
 async function seedData() {
-  const tables = ['match_cards','players','convocatoria','formation','board','staff','club_info','news','matches','results','standings','appearance','users','evaluations'];
-  for (const t of tables) {
-    try { await db.execute('DELETE FROM ' + t); } catch(e) {}
-  }
   const P = async (sql, args) => { await db.execute({ sql, args: args.map(a => a === undefined ? null : a) }); };
   const PS = 'INSERT OR IGNORE INTO players (id,name,nickname,number,position,age,status,goals,yellowCards,redCards,dni,birthDate,address,phone,email,municipality,province,birthPlace,nationality) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
   await P(PS, [1,"Carlos Caamaño Cambon","Caamaño",33,"portero",49,"disponible",0,0,0,"32839497M","1976-10-04","TARABELO","654789352","carlos.caamano.cambon@gmail.com","Sada","A Coruña","Sada","Española"]);
