@@ -340,7 +340,8 @@ app.get('/api/init', async (req, res) => {
 
   const users = (await db.execute('SELECT id, username, type, playerName FROM users')).rows;
 
-  res.json({ players, convocatoria, formation, clubInfo, staff, board, news, matches, results, standings, appearance, users });
+  const matchNotes = (await db.execute('SELECT * FROM match_notes ORDER BY date DESC')).rows;
+  res.json({ players, convocatoria, formation, clubInfo, staff, board, news, matches, results, standings, appearance, users, matchNotes });
 });
 
 // --- API: PLAYERS ---
@@ -592,6 +593,23 @@ app.post('/api/evaluations', async (req, res) => {
 
 app.delete('/api/evaluations/:id', async (req, res) => {
   await db.execute({ sql: 'DELETE FROM evaluations WHERE id = ?', args: [req.params.id] });
+  res.json({ ok: true });
+});
+
+// --- MATCH NOTES (Crónica del Mister) ---
+app.get('/api/match-notes', async (req, res) => {
+  const notes = (await db.execute('SELECT * FROM match_notes ORDER BY date DESC')).rows;
+  res.json(notes);
+});
+
+app.post('/api/match-notes', async (req, res) => {
+  const { matchId, author, content } = req.body;
+  const info = await db.execute({ sql: 'INSERT INTO match_notes (matchId, author, content) VALUES (?, ?, ?)', args: [matchId || null, author || null, content] });
+  res.json({ id: Number(info.lastInsertRowid) });
+});
+
+app.delete('/api/match-notes/:id', async (req, res) => {
+  await db.execute({ sql: 'DELETE FROM match_notes WHERE id = ?', args: [req.params.id] });
   res.json({ ok: true });
 });
 

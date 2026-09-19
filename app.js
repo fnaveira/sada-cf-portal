@@ -3,6 +3,7 @@ let CLUB_INFO = {}, STAFF = [], BOARD = [], NEWS = [], MATCHES = [], RESULTS = [
 let USERS = [];
 let APPEARANCE = {};
 let CURRENT_USER = null;
+let MATCH_NOTES = [];
 
 async function initApp() {
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
@@ -31,6 +32,7 @@ async function loadAllData() {
     STANDINGS = data.standings;
     USERS = data.users;
     APPEARANCE = data.appearance || {};
+    MATCH_NOTES = data.matchNotes || [];
     applyAppearanceLocal(APPEARANCE);
 }
 
@@ -905,9 +907,27 @@ async function renderPlayerEvaluations() {
     const catLabels = { technique: 'Técnica', tactics: 'Táctica', physical: 'Física', mental: 'Mental', attitude: 'Actitud' };
     const renderStars = (val) => '★'.repeat(val) + '☆'.repeat(5 - val);
 
+    // Show match notes from coach
+    let notesHtml = '';
+    if (MATCH_NOTES.length > 0) {
+        notesHtml = '<div class="match-notes-section"><h2 style="margin-bottom:1rem;"><i class="fas fa-clipboard-check"></i> Notas del Mister</h2>' +
+            MATCH_NOTES.map(note => {
+                const match = MATCHES.find(m => m.id === note.matchId);
+                const matchLabel = match ? `${match.competition} ${match.round}: ${match.home ? 'vs ' + match.rival : match.rival + ' (F)'} (${match.date})` : '';
+                return `<div class="eval-card" style="margin-bottom:1rem;border-left:4px solid var(--primary);">
+                    <div class="eval-header">
+                        ${matchLabel ? `<span class="eval-evaluator" style="color:var(--primary);font-weight:600;"><i class="fas fa-futbol"></i> ${matchLabel}</span>` : ''}
+                        <span class="eval-date">${note.date}</span>
+                        <span class="eval-evaluator">${note.author || 'Mister'}</span>
+                    </div>
+                    <div class="eval-comment" style="white-space:pre-line;margin-top:0.5rem;"><i class="fas fa-comment-dots"></i> ${note.content}</div>
+                </div>`;
+            }).join('') + '</div>';
+    }
+
     if (CURRENT_USER.type === 'admin') {
         const allEvals = await Api.getEvaluations();
-        if (allEvals.length === 0) {
+        if (allEvals.length === 0 && MATCH_NOTES.length === 0) {
             container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No hay evaluaciones aún</p>';
             return;
         }
@@ -916,7 +936,7 @@ async function renderPlayerEvaluations() {
             if (!grouped[ev.playerId]) grouped[ev.playerId] = [];
             grouped[ev.playerId].push(ev);
         });
-        container.innerHTML = Object.entries(grouped).map(([playerId, evals]) => {
+        container.innerHTML = notesHtml + Object.entries(grouped).map(([playerId, evals]) => {
             const player = PLAYERS.find(p => p.id == playerId);
             const pName = player ? (player.nickname || player.name) : `Jugador #${playerId}`;
             return `
@@ -954,12 +974,12 @@ async function renderPlayerEvaluations() {
     if (!player) { container.innerHTML = '<p>No se encontró tu perfil de jugador</p>'; return; }
 
     const evals = await Api.getPlayerEvaluations(player.id);
-    if (evals.length === 0) {
+    if (evals.length === 0 && MATCH_NOTES.length === 0) {
         container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">Aún no tienes evaluaciones</p>';
         return;
     }
 
-    container.innerHTML = evals.map(ev => {
+    container.innerHTML = notesHtml + evals.map(ev => {
         const avg = ((ev.technique + ev.tactics + ev.physical + ev.mental + ev.attitude) / 5).toFixed(1);
         const matchInfo = ev.matchRival ? (ev.matchHome ? `vs ${ev.matchRival}` : `${ev.matchRival} (F)`) : '';
         return `
