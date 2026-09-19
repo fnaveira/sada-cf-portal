@@ -969,7 +969,10 @@ async function renderPlayerEvaluations() {
         return;
     }
 
-    if (!CURRENT_USER.playerName) return;
+    if (!CURRENT_USER.playerName) {
+        container.innerHTML = notesHtml || '<p style="color:var(--text-muted);text-align:center;padding:2rem;">Aún no tienes evaluaciones</p>';
+        return;
+    }
     const player = PLAYERS.find(p => p.name === CURRENT_USER.playerName || p.nickname === CURRENT_USER.playerName);
     if (!player) { container.innerHTML = '<p>No se encontró tu perfil de jugador</p>'; return; }
 
