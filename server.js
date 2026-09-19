@@ -226,6 +226,14 @@ async function initDB() {
     evaluator TEXT,
     date TEXT DEFAULT (date('now'))
   )`);
+  await db.execute(`CREATE TABLE IF NOT EXISTS match_notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    matchId INTEGER,
+    author TEXT,
+    content TEXT,
+    date TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (matchId) REFERENCES matches(id)
+  )`);
 }
 
 async function seedNeeded() {
