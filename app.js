@@ -440,52 +440,44 @@ function showPlayerProfile(id) {
 
 // MATCH ACTA - J1 Narón 3-3 Sada
 const MATCH_ACTA = {
-    rival: 'Club Deportivo Narón Silver Catering',
-    result: '3 - 3',
-    date: '2026-09-13',
+    rival: 'Sporting Cambre As Travesas',
+    result: '2 - 0',
+    date: '2026-09-19',
     time: '10:00',
-    venue: 'O Cadaval',
-    city: 'Narón',
-    referee: 'Vicente Hortelano, Daniel',
+    venue: 'Dani Mallo',
+    city: 'Cambre',
+    referee: 'Belmonte Martell, Gonzalo',
     competition: 'Liga | 1ª División Veteranos',
-    round: 'Jornada 1',
+    round: 'Jornada 2',
     goals: [
-        { minute: 17, scorer: 'Mallo López, Jose Luis', team: 'sada', score: '0-1' },
-        { minute: 30, scorer: 'Gómez López, Francisco J', team: 'rival', score: '1-1' },
-        { minute: 37, scorer: 'Segade Fandiño, Iván', team: 'rival', score: '2-1' },
-        { minute: 58, scorer: 'Segade Fandiño, Iván', team: 'rival', score: '3-1' },
-        { minute: 79, scorer: 'Boo Fernández, Miguel A', team: 'sada', score: '3-2' },
-        { minute: 86, scorer: 'Graña Pita, Pablo', team: 'sada', score: '3-3' }
+        { minute: 3, scorer: 'Ferro Rozas, Gonzalo', team: 'sada', score: '1-0' },
+        { minute: 11, scorer: 'Ferro Rozas, Gonzalo', team: 'sada', score: '2-0' }
     ],
-    cards: [
-        { minute: 66, player: 'Sedes Lorenzo, Carlos', team: 'rival', type: 'yellow' },
-        { minute: 70, player: 'Otero Rodríguez, Óscar', team: 'rival', type: 'yellow' },
-        { minute: 81, player: 'González Coto, Manuel', team: 'rival', type: 'yellow' }
-    ],
+    cards: [],
     lineup: [
-        { dorsal: 12, name: 'Fernández Álvarez, Iván', position: 'Portero' },
-        { dorsal: 25, name: 'Roibás Naveiro, Alberto', position: 'Defensa' },
+        { dorsal: 1, name: 'Caamaño Cambón, Carlos', position: 'Portero' },
         { dorsal: 4, name: 'Martínez Vázquez, Alfonso', position: 'Defensa' },
         { dorsal: 7, name: 'Amor Haz, Miguel', position: 'Defensa' },
-        { dorsal: 29, name: 'Mallo López, Jose Luis', position: 'Mediocentro' },
+        { dorsal: 9, name: 'Fernández Álvarez, Iván', position: 'Defensa' },
+        { dorsal: 10, name: 'Ferro Rozas, Gonzalo', position: 'Mediocentro' },
+        { dorsal: 11, name: 'Boo Fernández, Miguel A', position: 'Mediocentro' },
+        { dorsal: 16, name: 'Gómez Cagiao, Enrique Bernardo', position: 'Mediocentro' },
+        { dorsal: 19, name: 'Mallo López, José Luis', position: 'Mediocentro' },
         { dorsal: 22, name: 'París Labandeira, Damián', position: 'Mediocentro' },
-        { dorsal: 21, name: 'Seoane Barros, Antonio', position: 'Mediocentro' },
-        { dorsal: 15, name: 'Teixeira Fernández, Julio', position: 'Mediocentro' },
-        { dorsal: 11, name: 'Boo Fernández, Miguel', position: 'Mediapunta' },
-        { dorsal: 23, name: 'Freire Lesta, César', position: 'Mediocentro' },
-        { dorsal: 26, name: 'Graña Pita, Pablo', position: 'Delantero' }
+        { dorsal: 23, name: 'Freire Lesta, César', position: 'Delantero' },
+        { dorsal: 25, name: 'Roibás Naveiro, Alberto', position: 'Delantero' }
     ],
     subs: [
-        { dorsal: 2, name: 'Garea Parga, Miguel Á' },
-        { dorsal: 5, name: 'Álvarez Labora, Carlos' },
-        { dorsal: 13, name: 'Teixeira Fernández, Julio' },
+        { dorsal: 5, name: 'Álvarez Labora, Carlos Manuel' },
         { dorsal: 14, name: 'Seijo Cancelo, Santiago' },
         { dorsal: 17, name: 'Albarracín, Miguel Ángel' },
+        { dorsal: 21, name: 'Seoane Barros, Antonio M' },
         { dorsal: 27, name: 'Vizoso Guerra, Javier' },
+        { dorsal: 28, name: 'Iglesias Castro, Marcos' },
         { dorsal: 30, name: 'Lata Cortes, Francisco' }
     ],
-    delegado: 'Navaira García, Francisco',
-    summary: 'Gran remontada del Sada en O Cadaval. Con el 3-1 en el marcador tras un doblete de Segade Fandiño, el equipo reaccionó con goles de Mallo (17\'), Boo (79\') y el empate de Graña Pita en el 86\'. El Sada no se rindió y sacó un punto de oro en campo rival.'
+    delegado: 'Naveira García, Francisco',
+    summary: 'Victoria contundente del Sada en Dani Mallo. Ferro Rozas sentenció el partido con un doblete rápido (3\' y 11\'). El equipo fue sólido defensivamente y no encajó ningún gol. Gran partido de todo el equipo.'
 };
 
 function renderMatchActa() {
