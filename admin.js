@@ -690,6 +690,8 @@ const Admin = {
             if (fi !== -1) { FORMATION.positions.splice(fi, 1); changed = true; }
             const ci = CONVOCATORIA.indexOf(nid);
             if (ci !== -1) { CONVOCATORIA.splice(ci, 1); changed = true; }
+            const pi = PENDING_CONFIRM.indexOf(nid);
+            if (pi !== -1) { PENDING_CONFIRM.splice(pi, 1); changed = true; }
         });
         if (changed) {
             Api.saveConvocatoria(CONVOCATORIA);
@@ -705,12 +707,18 @@ const Admin = {
         const renderRow = (p, buttons) => {
             const pName = p.nickname || p.name;
             const statusIcon = p.status === 'lesionado' ? ' 🤕' : p.status === 'no_disponible' ? ' 🚫' : p.status === 'baja' ? ' ❌' : '';
+            const pendBadge = typeof PENDING_CONFIRM !== 'undefined' && PENDING_CONFIRM.includes(p.id)
+                ? ' <span class="pending-confirm-badge" title="Falta de confirmación"><i class="fas fa-question-circle"></i> Falta confirmación</span>'
+                : '';
             const photoHtml = p.photo
                 ? `<div style="position:relative;width:32px;height:32px;flex-shrink:0;"><img src="${p.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"><span style="position:absolute;bottom:-2px;right:-4px;background:var(--primary);color:#fff;font-size:0.6rem;font-weight:700;padding:1px 4px;border-radius:8px;border:1.5px solid #fff;">${p.number}</span></div>`
                 : `<div class="admin-player-num">${p.number}</div>`;
+            const photoBlock = pendBadge
+                ? `<div class="admin-avatar-col">${photoHtml}<span class="pending-confirm-badge pending-under-photo" title="Falta de confirmación"><i class="fas fa-question-circle"></i> Falta confirmación</span></div>`
+                : photoHtml;
             return `
             <div class="admin-player-row${p.status === 'lesionado' ? ' lesionado' : ''}" data-id="${p.id}">
-                ${photoHtml}
+                ${photoBlock}
                 <div class="admin-player-info">
                     <span class="admin-player-name">${pName}${statusIcon}</span>
                     <span class="admin-player-pos">${formatPosition(p.position)}</span>
@@ -726,14 +734,20 @@ const Admin = {
 
         titularesList.innerHTML = titularesPlayers.length > 0 ? titularesPlayers.map(p =>
             renderRow(p,
-                btn('arrow-down', 'warning', 'Bajar a preconvocado', `Admin.demoteToPreconvocado(${p.id})`)
+                btn('arrow-down', 'warning', 'Bajar a preconvocado', `Admin.demoteToPreconvocado(${p.id})`) +
+                (PENDING_CONFIRM.includes(p.id)
+                    ? btn('check', 'success', 'Confirmar asistencia', `Admin.toggleConfirm(${p.id})`)
+                    : btn('question-circle', 'warning', 'Marcar falta de confirmación', `Admin.toggleConfirm(${p.id})`))
             )
         ).join('') : '<p style="color:var(--text-muted);padding:0.5rem;font-size:0.85rem;">Sin titulares</p>';
 
         disponiblesList.innerHTML = suplentes.length > 0 ? suplentes.map(p =>
             renderRow(p,
                 (canPromote ? btn('arrow-up', 'success', 'Promover a titular', `Admin.promoteToTitular(${p.id})`) : '') +
-                btn('arrow-down', 'warning', 'Bajar a preconvocado', `Admin.demoteToPreconvocado(${p.id})`)
+                btn('arrow-down', 'warning', 'Bajar a preconvocado', `Admin.demoteToPreconvocado(${p.id})`) +
+                (PENDING_CONFIRM.includes(p.id)
+                    ? btn('check', 'success', 'Confirmar asistencia', `Admin.toggleConfirm(${p.id})`)
+                    : btn('question-circle', 'warning', 'Marcar falta de confirmación', `Admin.toggleConfirm(${p.id})`))
             )
         ).join('') : '<p style="color:var(--text-muted);padding:0.5rem;font-size:0.85rem;">Sin suplentes</p>';
 
@@ -792,7 +806,18 @@ const Admin = {
     async removeConvocado(playerId) {
         const inConv = CONVOCATORIA.indexOf(playerId);
         if (inConv !== -1) CONVOCATORIA.splice(inConv, 1);
-        await Api.saveConvocatoria(CONVOCATORIA);
+        const pi = PENDING_CONFIRM.indexOf(playerId);
+        if (pi !== -1) PENDING_CONFIRM.splice(pi, 1);
+        await Api.saveConvocatoria(CONVOCATORIA, PENDING_CONFIRM);
+        this.renderAdminConvocatoria();
+        renderConvocatoria();
+    },
+
+    async toggleConfirm(playerId) {
+        const i = PENDING_CONFIRM.indexOf(playerId);
+        if (i !== -1) PENDING_CONFIRM.splice(i, 1);
+        else PENDING_CONFIRM.push(playerId);
+        await Api.saveConvocatoria(CONVOCATORIA, PENDING_CONFIRM);
         this.renderAdminConvocatoria();
         renderConvocatoria();
     },
@@ -817,9 +842,11 @@ const Admin = {
     async demoteToPreconvocado(playerId) {
         const inConv = CONVOCATORIA.indexOf(playerId);
         if (inConv !== -1) CONVOCATORIA.splice(inConv, 1);
+        const pi = PENDING_CONFIRM.indexOf(playerId);
+        if (pi !== -1) PENDING_CONFIRM.splice(pi, 1);
         const fi = FORMATION.positions.findIndex(p => p.playerId === playerId);
         if (fi !== -1) FORMATION.positions.splice(fi, 1);
-        await Api.saveConvocatoria(CONVOCATORIA);
+        await Api.saveConvocatoria(CONVOCATORIA, PENDING_CONFIRM);
         await Api.saveFormation(FORMATION.name, FORMATION.positions);
         this.renderAdminConvocatoria();
         renderConvocatoria();
@@ -845,6 +872,8 @@ const Admin = {
         if (inFormation !== -1) {
             FORMATION.positions.splice(inFormation, 1);
             if (inConv !== -1) CONVOCATORIA.splice(inConv, 1);
+            const pi = PENDING_CONFIRM.indexOf(playerId);
+            if (pi !== -1) PENDING_CONFIRM.splice(pi, 1);
         } else {
             if (FORMATION.positions.length >= 11) {
                 alert('Ya hay 11 titulares. Quitá uno antes de agregar otro.');

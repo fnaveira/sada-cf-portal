@@ -2074,6 +2074,43 @@ input, button, textarea, select {
     50% { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0); }
 }
 
+.pending-confirm-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #b45309;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+    white-space: nowrap;
+    animation: cardPulse 2s infinite;
+}
+
+.conv-bench-avatar,
+.admin-avatar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.pending-confirm-badge.pending-under-photo {
+    margin-left: 0;
+    font-size: 0.55rem;
+    padding: 1px 4px;
+    max-width: 72px;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.2;
+    white-space: normal;
+}
+
 /* ADMIN PITCH (kept for admin panel) */
 .admin-pitch {
     max-width: 350px;

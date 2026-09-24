@@ -80,6 +80,7 @@ async function initDB() {
   await db.execute(`CREATE TABLE IF NOT EXISTS convocatoria (
     playerId INTEGER PRIMARY KEY
   )`);
+  try { await db.execute(`ALTER TABLE convocatoria ADD COLUMN pendingConfirm INTEGER DEFAULT 0`); } catch(e) {}
   await db.execute(`CREATE TABLE IF NOT EXISTS formation (
     id INTEGER PRIMARY KEY,
     name TEXT DEFAULT '4-4-2',
@@ -327,7 +328,9 @@ async function seedData() {
 // --- API: INIT (load all data) ---
 app.get('/api/init', async (req, res) => {
   const players = (await db.execute('SELECT * FROM players ORDER BY id')).rows;
-  const convocatoria = (await db.execute('SELECT playerId FROM convocatoria')).rows.map(r => r.playerId);
+  const convRows = (await db.execute('SELECT playerId, pendingConfirm FROM convocatoria')).rows;
+  const convocatoria = convRows.map(r => r.playerId);
+  const pendingConfirm = convRows.filter(r => r.pendingConfirm).map(r => r.playerId);
   const formationRow = (await db.execute('SELECT * FROM formation WHERE id = 1')).rows[0];
   const formation = { name: formationRow.name, positions: JSON.parse(formationRow.positions) };
 
@@ -349,7 +352,7 @@ app.get('/api/init', async (req, res) => {
   const users = (await db.execute('SELECT id, username, type, playerName FROM users')).rows;
 
   const matchNotes = (await db.execute('SELECT * FROM match_notes ORDER BY date DESC')).rows;
-  res.json({ players, convocatoria, formation, clubInfo, staff, board, news, matches, results, standings, appearance, users, matchNotes });
+  res.json({ players, convocatoria, pendingConfirm, formation, clubInfo, staff, board, news, matches, results, standings, appearance, users, matchNotes });
 });
 
 // --- API: PLAYERS ---
@@ -424,10 +427,11 @@ app.put('/api/players/:id/photo', upload.single('photo'), async (req, res) => {
 
 // --- API: CONVOCATORIA ---
 app.put('/api/convocatoria', async (req, res) => {
-  const { playerIds } = req.body;
+  const { playerIds, pendingIds } = req.body;
+  const pending = Array.isArray(pendingIds) ? pendingIds : [];
   const stmts = [{ sql: 'DELETE FROM convocatoria' }];
   for (const id of playerIds) {
-    stmts.push({ sql: 'INSERT OR IGNORE INTO convocatoria (playerId) VALUES (?)', args: [id] });
+    stmts.push({ sql: 'INSERT OR IGNORE INTO convocatoria (playerId, pendingConfirm) VALUES (?, ?)', args: [id, pending.includes(id) ? 1 : 0] });
   }
   await db.batch(stmts);
   res.json({ ok: true });

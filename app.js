@@ -1,4 +1,4 @@
-let PLAYERS = [], CONVOCATORIA = [], FORMATION = { name: '4-4-2', positions: [] };
+let PLAYERS = [], CONVOCATORIA = [], PENDING_CONFIRM = [], FORMATION = { name: '4-4-2', positions: [] };
 let CLUB_INFO = {}, STAFF = [], BOARD = [], NEWS = [], MATCHES = [], RESULTS = [], STANDINGS = [];
 let USERS = [];
 let APPEARANCE = {};
@@ -22,6 +22,7 @@ async function loadAllData() {
     const data = await Api.loadAll();
     PLAYERS = data.players;
     CONVOCATORIA = data.convocatoria;
+    PENDING_CONFIRM = data.pendingConfirm || [];
     FORMATION = data.formation;
     CLUB_INFO = data.clubInfo;
     STAFF = data.staff;
@@ -191,6 +192,8 @@ function renderConvocatoria() {
 
     const posLabels = { portero: 'GK', defensa: 'DEF', centrocampista: 'MED', delantero: 'DEL' };
 
+    const isPending = (p) => PENDING_CONFIRM.includes(p.id);
+
     const displayName = (p) => p.nickname || p.name.split(' ').pop();
 
     let html = '';
@@ -325,12 +328,14 @@ function renderConvocatoria() {
                         const statusIcon = suspended ? ' 🚫' : player.status === 'lesionado' ? ' 🤕' : player.status === 'no_disponible' ? ' ✖' : '';
                         return `
                         <div class="conv-bench-item${statusClass}">
-                            ${player.photo ? `<img src="${player.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : `<div class="conv-bench-number">${player.number}</div>`}
-                            <div class="conv-bench-info">
-                                <span class="conv-bench-name">${pName}${statusIcon}</span>
+                            <div class="conv-bench-avatar">
+                                ${player.photo ? `<img src="${player.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : `<div class="conv-bench-number">${player.number}</div>`}
+                                ${isPending(player) ? '<span class="pending-confirm-badge pending-under-photo" title="Falta de confirmación"><i class="fas fa-question-circle"></i> Falta confirmación</span>' : ''}
+                            </div>
+                        <div class="conv-bench-info">
+                                <span class="conv-bench-name">${pName}</span>
                                 <span class="conv-bench-pos">${formatPosition(player.position)}</span>
                                 ${getCardBadges(player)}
-                                ${player.status === 'lesionado' && player.recoveryDate ? `<span class="conv-recovery">Vuelve: ${player.recoveryDate}</span>` : ''}
                             </div>
                             ${suspended ? '<span class="conv-suspended-text" title="Sancionado - suspendido 1 partido"><i class="fas fa-exclamation-triangle"></i> Sancionado</span>' : ''}
                         </div>`;
@@ -357,7 +362,10 @@ function renderConvocatoria() {
                         const statusIcon = suspended ? ' 🚫' : player.status === 'lesionado' ? ' 🤕' : player.status === 'no_disponible' ? ' ✖' : '';
                         return `
                         <div class="conv-bench-item">
-                            ${player.photo ? `<img src="${player.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : `<div class="conv-bench-number">${player.number}</div>`}
+                            <div class="conv-bench-avatar">
+                                ${player.photo ? `<img src="${player.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : `<div class="conv-bench-number">${player.number}</div>`}
+                                ${isPending(player) ? '<span class="pending-confirm-badge pending-under-photo" title="Falta de confirmación"><i class="fas fa-question-circle"></i> Falta confirmación</span>' : ''}
+                            </div>
                             <div class="conv-bench-info">
                                 <span class="conv-bench-name">${pName}${statusIcon}</span>
                                 <span class="conv-bench-pos">${formatPosition(player.position)}</span>

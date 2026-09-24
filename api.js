@@ -50,7 +50,10 @@ const Api = {
     return res.json();
   },
 
-  async saveConvocatoria(playerIds) { return this.put('/api/convocatoria', { playerIds }); },
+  async saveConvocatoria(playerIds, pendingIds) {
+    const pending = Array.isArray(pendingIds) ? pendingIds : (typeof PENDING_CONFIRM !== 'undefined' ? PENDING_CONFIRM : []);
+    return this.put('/api/convocatoria', { playerIds, pendingIds: pending });
+  },
   async saveFormation(name, positions) { return this.put('/api/formation', { name, positions }); },
 
   async saveClubInfo(data) { return this.put('/api/club-info', data); },
