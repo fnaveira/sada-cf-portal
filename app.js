@@ -207,17 +207,27 @@ function renderConvocatoria() {
     const rivalShield = nextMatch && nextMatch.shieldUrl ? nextMatch.shieldUrl : '';
     const matchComp = nextMatch && nextMatch.competition === 'Copa' ? '<span class="badge-copa">COPA</span>' : '';
     const matchRound = nextMatch && nextMatch.round ? nextMatch.round : '';
+    const isAway = nextMatch ? !nextMatch.home : false;
+    const homeLabel = isAway ? 'VISITANTES' : 'LOCALES';
+    const ourTeamHtml = `
+            <div class="conv-matchday-team">
+                <div class="conv-matchday-crest"><img src="${APPEARANCE.teamLogo || '/assets/logo.jpeg'}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;"></div>
+                <span>${APPEARANCE.brandName || 'Sada CF'}</span>
+            </div>`;
+    const rivalTeamHtml = `
+            <div class="conv-matchday-team">
+                <div class="conv-matchday-crest rival">${rivalShield ? `<img src="${rivalShield}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;">` : '?'}</div>
+                <span>${rivalTeam}</span>
+            </div>`;
 
     html += `
     <div class="conv-matchday">
         <div class="conv-matchday-inner">
-            <div class="conv-matchday-team">
-                <div class="conv-matchday-crest"><img src="${APPEARANCE.teamLogo || '/assets/logo.jpeg'}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;"></div>
-                <span>${APPEARANCE.brandName || 'Sada CF'}</span>
-            </div>
+            ${isAway ? rivalTeamHtml : ourTeamHtml}
             <div class="conv-matchday-vs">
                 <div class="conv-matchday-badge">${matchRound || 'ALINEACIÓN'}</div>
                 ${matchComp ? '<div style="margin-top:4px;">' + matchComp + '</div>' : ''}
+                <div style="margin-top:4px;display:inline-block;padding:2px 10px;border-radius:12px;font-size:0.65rem;font-weight:700;letter-spacing:0.05em;background:rgba(255,255,255,0.18);color:#fff;border:1px solid rgba(255,255,255,0.35);">${homeLabel}</div>
                 <div class="conv-matchday-formation" style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">${matchDateStr}${nextMatch && nextMatch.time ? ' · ' + nextMatch.time : ''}</div>
                 ${nextMatch ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">${nextMatch.home ? '🏠' : '🚌'} <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nextMatch.venue || '')}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;border-bottom:1px dashed var(--accent);">${nextMatch.venue || ''}</a></div>` : ''}
                 <div style="font-size:0.7rem;color:var(--text-muted);margin-top:6px;padding:4px 8px;background:rgba(255,255,255,0.08);border-radius:6px;">
@@ -230,10 +240,7 @@ function renderConvocatoria() {
                     <i class="fas fa-print" style="margin-right:4px;"></i>Hoja de Partido
                 </button>` : ''}
             </div>
-            <div class="conv-matchday-team">
-                <div class="conv-matchday-crest rival">${rivalShield ? `<img src="${rivalShield}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;">` : '?'}</div>
-                <span>${rivalTeam}</span>
-            </div>
+            ${isAway ? ourTeamHtml : rivalTeamHtml}
         </div>
     </div>
     `;
