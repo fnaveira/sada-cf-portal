@@ -6,3 +6,7 @@ sada.db-wal
 .DS_Store
 uploads/
 fotos_jugadores/
+FichaPartido/FichaPartido
+FichaPartido/*.app/
+nohup.out
+

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Ficha del Partido</title>
+<style>
+  :root {
+    --blue: #1e3a8a; --blue2: #1e40af; --red: #c41e3a;
+    --bg: #f4f6fb; --card: #fff; --text: #1a1a2e; --muted: #6b7280;
+    --green: #2e8b4e; --amber: #f59e0b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 1.5rem; }
+  h1 { font-size: 1.5rem; color: var(--blue); margin-bottom: .25rem; }
+  h2 { font-size: 1.05rem; color: var(--blue); margin: 1.6rem 0 .6rem; display: flex; align-items: center; gap: .5rem; }
+  h2 .n { background: var(--blue2); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .75rem; }
+  .sub { color: var(--muted); font-size: .85rem; margin-bottom: 1rem; }
+  .card { background: var(--card); border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: .8rem; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+  .badge { display: inline-block; background: var(--blue2); color: #fff; font-size: .7rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; letter-spacing: .05em; }
+  .badge.away { background: var(--red); }
+  ul { padding-left: 1.2rem; } li { margin: .3rem 0; font-size: .92rem; line-height: 1.45; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th { text-align: left; background: var(--blue2); color: #fff; padding: 7px 10px; font-size: .78rem; text-transform: uppercase; }
+  td { padding: 8px 10px; border-bottom: 1px solid #eee; }
+  tr:nth-child(even) td { background: #f9fafb; }
+  .star { color: var(--amber); font-weight: 800; }
+
+  .scheme { background: var(--card); border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+  .scheme h3 { font-size: .95rem; color: var(--blue); margin-bottom: .6rem; }
+  .scheme .notes { font-size: .83rem; color: #444; margin-top: .6rem; line-height: 1.45; }
+  .pitch { background: linear-gradient(#2e8b4e 0%, #2a7e46 100%); border-radius: 10px; padding: 10px 8px; display: flex; flex-direction: column; gap: 8px; position: relative; }
+  .pitch::before { content: ''; position: absolute; inset: 6px; border: 2px solid rgba(255,255,255,.35); border-radius: 8px; pointer-events: none; }
+  .line { display: flex; justify-content: space-evenly; align-items: center; position: relative; z-index: 1; }
+  .tk { background: #fff; border: 2px solid var(--blue2); color: var(--blue); font-size: .62rem; font-weight: 800; padding: 4px 6px; border-radius: 14px; text-align: center; min-width: 54px; box-shadow: 0 2px 4px rgba(0,0,0,.25); }
+  .tk.gk { border-color: #f59e0b; color: #b45309; }
+  .tk.anchor { border-color: #7c3aed; color: #7c3aed; background: #f5f3ff; }
+  .tk.cap { border-color: var(--amber); background: #fffbeb; color: #92400e; }
+  .tk.fixed { border-color: #16a34a; background: #f0fdf4; color: #166534; }
+  .tk small { display: block; font-size: .5rem; font-weight: 600; color: var(--muted); }
+
+  .players { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .5rem; }
+  .pl { display: flex; align-items: center; gap: .5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: .45rem .6rem; font-size: .82rem; }
+  .pl .num { background: var(--blue2); color: #fff; font-weight: 800; font-size: .7rem; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pl .pend { margin-left: auto; background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.5); color: #b45309; font-size: .58rem; font-weight: 700; padding: 2px 5px; border-radius: 8px; }
+  .live-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; font-size: .85rem; color: var(--muted); }
+
+  .match-hero { background: linear-gradient(135deg, var(--blue), var(--blue2)); color: #fff; border-radius: 14px; padding: 1.2rem 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .match-hero .vs { text-align: center; }
+  .match-hero .vs .r { font-weight: 800; font-size: 1.05rem; }
+  .match-hero .vs .d { font-size: .85rem; opacity: .9; margin-top: 2px; }
+  .match-hero .team { font-weight: 700; font-size: .95rem; text-align: center; max-width: 180px; }
+  .rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  @media (max-width: 700px) { .rules-grid { grid-template-columns: 1fr; } }
+  .rule { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: .55rem .75rem; font-size: .85rem; }
+  .rule b { color: var(--blue2); }
+  .rule.must { background: #f0fdf4; border-color: #86efac; }
+  .rule.must b { color: #166534; }
+</style>
+</head>
+<body>
+
+<h1>Ficha del Partido</h1>
+<p class="sub">Sada F.C. A Nosa Viña (Veteranos) — Instrucciones, esquemas y convocatoria</p>
+
+<div class="match-hero">
+  <div class="team" id="teamL">Portazgo S.D.</div>
+  <div class="vs">
+    <span class="badge away" id="homeBadge">VISITANTES</span>
+    <div class="r" id="mDate">domingo, 27 de septiembre · 12:00</div>
+    <div class="d" id="mVenue">A Lavandeira (Culleredo)</div>
+    <div class="d" style="margin-top:4px;font-size:.75rem;">Llegar 30 min antes · 11 titular según llegadas</div>
+  </div>
+  <div class="team" id="teamR">Sada F.C. A Nosa Viña</div>
+</div>
+
+<h2><span class="n">1</span> Reglas fijas — TODOS los partidos</h2>
+<div class="rules-grid">
+  <div class="rule must"><b>Miguel Amor</b> — TITULAR (lateral izq.): cambio posible por Alfonso o Lata</div>
+  <div class="rule must"><b>Pepe</b> — titular siempre</div>
+  <div class="rule"><b>Albarracin</b> — lateral DERECHO — solo juega en la derecha</div>
+  <div class="rule"><b>Lata</b> — defensa TITULAR; sale al descanso</div>
+  <div class="rule must"><b>★Gonzalo (Ferro)</b> — nuestro DELANTERO y ESTRELLA: TITULAR. Si sale o no, lo decide el staff en el partido</div>
+  <div class="rule"><b>César</b> — anclado en el MEDIO. Nunca de delantero</div>
+  <div class="rule"><b>Sergio</b> — SOLO centrocampista, pocos minutos (pretemporada). Nunca de defensa</div>
+  <div class="rule"><b>Vizoso</b> — NUNCA titular: recambio para gente cansada (igual que Charlie). Nunca lateral ni cierre</div>
+  <div class="rule must"><b>Yuyi</b> — bien físicamente: rota en el medio desde la 1ª parte. Prioridad medio centro</div>
+  <div class="rule"><b>Graña</b> — centro o delantero si Ferro no está</div>
+  <div class="rule"><b>Eje</b> — <span class="star">★Bernardo</span> (estrella del medio), Roibás, Alfonso, Marcos</div>
+  <div class="rule"><b>Balones parados</b> — Bernardo; si no, Miguel Boo / Miguel Amor · César al remate</div>
+  <div class="rule"><b>Corners (ataque)</b> — suben Roibás, Alfonso y César; <b>★M.Amor se queda de CIERRE</b> atrás</div>
+  <div class="rule"><b>Corners en contra</b> — cierran: Roibás, Lata, Alfonso, César, ★Bernardo (dentro). <b>★M.Amor cierra FUERA</b> con Albarracin · Pepe suelto de contra</div>
+</div>
+
+<h2><span class="n">2</span> Instrucciones de juego</h2>
+<div class="card">
+  <ul>
+    <li><b>Construcción:</b> desde atrás, sin complicarnos. Ante el mínimo riesgo → balón a los laterales o fuera.</li>
+    <li><b>Comunicación:</b> hablar mucho en el campo, ayudas al compañero siempre.</li>
+    <li><b>Ofensiva:</b> delanteros sin reventarse; en contraataque rápido → diagonales. Laterales suben al medio con balón.</li>
+    <li><b>Actitud:</b> partido difícil, ellos arriba. Si nos cansamos → <b>pedimos cambio, salís todos</b>.</li>
+    <li><b>★Gonzalo (Ferro):</b> estrella del equipo — <b>TITULAR</b>. Si sale o no, lo decide el staff en el partido según lo que vea.</li>
+    <li><b>Minutos:</b> <b>NADIE juega 90' fijos</b> — se rotan todos según lo que se vea. Lata → sale al descanso (Alfonso entra). <b>Bernardo no aguanta toda la 1ª parte</b> — rótale ~30-35': baja ★Marcos a su sitio y entra Yuyi.</li>
+  </ul>
+</div>
+
+<h2><span class="n">3</span> Esquemas — César en el medio, Miguel Amor titular</h2>
+
+<div class="scheme">
+  <h3>1 · 4-4-2 (oficial)</h3>
+  <div class="pitch">
+    <div class="line"><span class="tk gk">POR<small>Caamaño</small></span></div>
+    <div class="line">
+      <span class="tk">LD<small>Albarracin</small></span>
+      <span class="tk cap">CAD<small>Roibás</small></span>
+      <span class="tk">CAI<small>Lata (tit)</small></span>
+      <span class="tk fixed">LI<small>★M.Amor</small></span>
+    </div>
+    <div class="line">
+      <span class="tk">MD<small>Boo</small></span>
+      <span class="tk cap">MC<small>★Bernardo</small></span>
+      <span class="tk anchor">MC<small>César</small></span>
+      <span class="tk cap">MC<small>★Marcos</small></span>
+    </div>
+    <div class="line">
+      <span class="tk cap">DEL<small>★Pepe</small></span>
+      <span class="tk">DEL<small>★Ferro</small></span>
+    </div>
+  </div>
+  <div class="notes">★M.Amor titular (cambio: Alfonso o Lata). César anclado con ★Bernardo. ★Pepe + ★Gonzalo (Ferro) minutos según lo que se vea. ~30-35': sale ★Bernardo → ★Marcos baja → entra Yuyi. Si Ferro falta → Graña.</div>
+</div>
+
+<div class="scheme">
+  <h3>2 · 4-2-3-1 (César + Bernardo, doble pivote)</h3>
+  <div class="pitch">
+    <div class="line"><span class="tk gk">POR<small>Caamaño</small></span></div>
+    <div class="line">
+      <span class="tk">LD<small>Albarracin</small></span>
+      <span class="tk cap">CAD<small>Roibás</small></span>
+      <span class="tk">CAI<small>Lata (tit)</small></span>
+      <span class="tk fixed">LI<small>★M.Amor</small></span>
+    </div>
+    <div class="line">
+      <span class="tk anchor">MCD<small>César</small></span>
+      <span class="tk cap">MCD<small>★Bernardo</small></span>
+    </div>
+    <div class="line">
+      <span class="tk">MD<small>Boo</small></span>
+      <span class="tk cap">MCO<small>★Marcos</small></span>
+      <span class="tk">MI<small>★Ferro</small></span>
+    </div>
+    <div class="line"><span class="tk cap">DEL<small>★Pepe</small></span></div>
+  </div>
+  <div class="notes">César anclado de 5 con ★Bernardo. ★Marcos de mediapunta; ★Gonzalo (Ferro) en banda — minutos según lo que se vea. ~30-35': sale ★Bernardo → ★Marcos baja → entra Yuyi.</div>
+</div>
+
+<div class="scheme">
+  <h3>3 · 5-3-2 (muro)</h3>
+  <div class="pitch">
+    <div class="line"><span class="tk gk">POR<small>Caamaño</small></span></div>
+    <div class="line">
+      <span class="tk">CAD<small>Albarracin</small></span>
+      <span class="tk cap">C<small>Roibás</small></span>
+      <span class="tk">C<small>Lata (tit)</small></span>
+      <span class="tk cap">C<small>Alfonso</small></span>
+      <span class="tk fixed">CAI<small>★M.Amor</small></span>
+    </div>
+    <div class="line">
+      <span class="tk anchor">MC<small>César</small></span>
+      <span class="tk cap">MC<small>★Bernardo</small></span>
+      <span class="tk cap">MC<small>★Marcos</small></span>
+    </div>
+    <div class="line">
+      <span class="tk cap">DEL<small>★Pepe</small></span>
+      <span class="tk">DEL<small>★Ferro</small></span>
+    </div>
+  </div>
+  <div class="notes">Mediocampo triple: César - ★Bernardo - ★Marcos. ★Pepe + ★Gonzalo (Ferro) TITULARES (minutos según lo que se vea). Si Ferro falta → Graña.</div>
+</div>
+
+<div class="scheme">
+  <h3>4 · 4-5-1 (dominio)</h3>
+  <div class="pitch">
+    <div class="line"><span class="tk gk">POR<small>Caamaño</small></span></div>
+    <div class="line">
+      <span class="tk">LD<small>Albarracin</small></span>
+      <span class="tk cap">CAD<small>Roibás</small></span>
+      <span class="tk">CAI<small>Lata (tit)</small></span>
+      <span class="tk fixed">LI<small>★M.Amor</small></span>
+    </div>
+    <div class="line">
+      <span class="tk">M<small>★Ferro</small></span>
+      <span class="tk anchor">MC<small>César</small></span>
+      <span class="tk cap">MC<small>★Bernardo</small></span>
+      <span class="tk cap">MC<small>★Marcos</small></span>
+      <span class="tk">M<small>Boo</small></span>
+    </div>
+    <div class="line"><span class="tk cap">DEL<small>★Pepe</small></span></div>
+  </div>
+  <div class="notes">César en el eje de los 5. ★Pepe y ★Gonzalo (Ferro) TITULARES — minutos según lo que se vea. Al descanso sale LATA → Alfonso. ~30-35': sale ★Bernardo → ★Marcos baja → entra Yuyi.</div>
+</div>
+
+<div class="scheme">
+  <h3>5 · 3-5-2 (si vamos perdiendo)</h3>
+  <div class="pitch">
+    <div class="line"><span class="tk gk">POR<small>Caamaño</small></span></div>
+    <div class="line">
+      <span class="tk cap">C<small>Roibás</small></span>
+      <span class="tk">C<small>Lata (tit)</small></span>
+      <span class="tk cap">C<small>Alfonso</small></span>
+    </div>
+    <div class="line">
+      <span class="tk">LD<small>Albarracin↑</small></span>
+      <span class="tk anchor">MC<small>César</small></span>
+      <span class="tk cap">MC<small>★Bernardo</small></span>
+      <span class="tk cap">MC<small>★Marcos</small></span>
+      <span class="tk fixed">LI<small>★M.Amor↑</small></span>
+    </div>
+    <div class="line">
+      <span class="tk cap">DEL<small>★Pepe</small></span>
+      <span class="tk">DEL<small>★Ferro</small></span>
+    </div>
+  </div>
+  <div class="notes">César sigue anclado en el 5. ★Gonzalo (Ferro) TITULAR — si sale, lo decide el staff en el partido. Si Ferro falta → Graña. Vizoso solo recambio (nunca lateral ni cierre).</div>
+</div>
+
+<h2><span class="n">4</span> Rotación — salen todos</h2>
+<div class="card">
+  <table>
+    <tr><th>Momento</th><th>Salen</th><th>Entran</th></tr>
+    <tr><td>~30-35' (1ª parte)</td><td><b>★Bernardo</b> (no aguanta toda la 1ª)</td><td><b>★Marcos baja</b> al sitio de Bernardo · entra <b>Yuyi</b> y coge el sitio de ★Marcos (Bernardo fresco para la 2ª)</td></tr>
+    <tr><td>DESCANSO</td><td><b>Lata</b> (defensa)</td><td><b>Alfonso</b> (o Graña). ★Ferro: si sale o no, lo decide el staff en el partido. Si Yuyi cansado → Toni</td></tr>
+    <tr><td>~60'</td><td>Toni</td><td><b>Sergio</b> (solo medio, ~20' máx — nunca de defensa)</td></tr>
+    <tr><td>~70'</td><td>Roibás</td><td>No se cambia (sin central de recambio tras salir Lata; solo con ventaja clara y Alfonso tapando)</td></tr>
+    <tr><td>~80'</td><td>Boo</td><td>Charlie (confirmado)</td></tr>
+  </table>
+  <p style="font-size:.85rem;margin-top:.6rem;color:#444;"><b>★Gonzalo (Ferro): estrella — TITULAR; si sale o no, se decide en el partido. NADIE juega 90' fijos.</b> <b>★Miguel Amor: titular</b> — si hay que cambiarle, entra Alfonso o Lata (Alba SOLO derecha). ★Pepe, ★Bernardo y César: todo lo que el cuerpo dé. <b>Vizoso: nunca titular — recambio (igual que Charlie), nunca de cierre.</b> <b>Sergio: solo medio, pocos minutos.</b> <b>Corners en contra: ★M.Amor cierra FUERA</b> con Albarracin; dentro: Roibás, Lata, Alfonso, César, ★Bernardo.</p>
+</div>
+
+<h2><span class="n">5</span> Convocatoria (en vivo)</h2>
+<div class="card">
+  <div class="live-head"><span id="liveCount">Cargando…</span><span id="liveDate"></span></div>
+  <div class="players" id="livePlayers"><span style="color:#999;font-size:.85rem;">Sincronizando con el portal…</span></div>
+</div>
+
+<p style="font-size:.7rem;color:#9ca3af;margin-top:1.4rem;text-align:center;">Ficha generada automáticamente · Datos de convocatoria: sada-cf-portal.onrender.com</p>
+
+<script>
+const LIVE = /*__LIVE__*/null;
+
+function fmtDate(iso) {
+  try { return new Date(iso + 'T00:00:00').toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'}); }
+  catch(e) { return iso; }
+}
+
+(function renderLive() {
+  const box = document.getElementById('livePlayers');
+  const count = document.getElementById('liveCount');
+  if (!LIVE || !LIVE.players) { count.textContent = 'Sin conexión — muestra offline'; return; }
+
+  const players = Object.fromEntries(LIVE.players.map(p => [p.id, p]));
+  const pend = new Set(LIVE.pendingConfirm || []);
+  const ids = (LIVE.convocatoria || []).slice().sort((a,b) => {
+    const pa = players[a], pb = players[b];
+    if (!pa || !pb) return a - b;
+    const ord = {portero:0, defensa:1, centrocampista:2, delantero:3};
+    const ga = (pa.position||'').split(',')[0], gb = (pb.position||'').split(',')[0];
+    return (ord[ga]??9) - (ord[gb]??9) || (pa.number||0) - (pb.number||0);
+  });
+
+  count.textContent = ids.length + ' convocados' + (pend.size ? ' · ' + pend.size + ' sin confirmar' : '');
+  box.innerHTML = ids.map(id => {
+    const p = players[id]; if (!p) return '';
+    const name = p.nickname || (p.name||'').split(' ').pop();
+    return '<div class="pl"><span class="num">' + (p.number||'') + '</span><span>' + name +
+      '</span>' + (pend.has(id) ? '<span class="pend">⚠ sin confirmar</span>' : '') + '</div>';
+  }).join('');
+
+  const next = (LIVE.matches || []).filter(m => new Date(m.date + 'T23:59:59') >= new Date())
+    .sort((a,b) => a.date.localeCompare(b.date))[0];
+  if (next) {
+    document.getElementById('mDate').textContent = fmtDate(next.date) + (next.time ? ' · ' + next.time : '');
+    document.getElementById('mVenue').textContent = next.venue || '';
+    document.getElementById('teamL').textContent = next.home ? 'Sada F.C. A Nosa Viña' : next.rival;
+    document.getElementById('teamR').textContent = next.home ? next.rival : 'Sada F.C. A Nosa Viña';
+    const b = document.getElementById('homeBadge');
+    b.textContent = next.home ? 'LOCALES' : 'VISITANTES';
+    b.className = next.home ? 'badge' : 'badge away';
+    document.title = 'Ficha — ' + next.rival;
+  }
+})();
+</script>
+</body>
+</html>
