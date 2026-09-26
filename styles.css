@@ -1419,9 +1419,13 @@ input, button, textarea, select {
     height: 100%;
     background: rgba(0,0,0,0.5);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     z-index: 200;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 5vh 0.75rem;
+    overscroll-behavior: contain;
 }
 
 .modal-content {
@@ -1429,8 +1433,7 @@ input, button, textarea, select {
     border-radius: var(--radius);
     width: 100%;
     max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
+    margin: auto;
     box-shadow: var(--shadow-lg);
 }
 

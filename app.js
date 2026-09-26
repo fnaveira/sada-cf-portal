@@ -1190,10 +1190,13 @@ function openMatchSheet() {
     </div>`;
 
     document.getElementById('modalTitle').textContent = 'Hoja de Partido';
-    document.getElementById('modalBody').innerHTML = sheetHtml;
+    document.getElementById('modalBody').innerHTML = sheetHtml + `
+        <div style="margin-top:1rem;text-align:center;">
+            <button onclick="window.print()" style="padding:0.6rem 1.4rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;">
+                <i class="fas fa-print" style="margin-right:6px;"></i>Imprimir
+            </button>
+        </div>`;
     document.getElementById('modal').style.display = 'flex';
-
-    setTimeout(() => window.print(), 500);
 }
 
 document.addEventListener("DOMContentLoaded", initApp);
