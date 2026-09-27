@@ -72,47 +72,34 @@ function parseGoalsFromText(text) {
 // ====== SCRAPER: CLASIFICACIÓN ======
 async function scrapeClasificacion(page) {
   console.log('\n📊 Scraping clasificación...');
-  const url = `${FUTGAL_URL}NPcd/NFG_ImpClasCal?cod_primaria=${LIGA.cod_primaria}&CodCompeticion=${LIGA.CodCompeticion}&CodGrupo=${LIGA.CodGrupo}&CodTemporada=${LIGA.CodTemporada}`;
-  await safeGoto(page, url);
-  await WAIT(3000);
+  const baseUrl = `${FUTGAL_URL}NPcd/NFG_CmpJornada?cod_primaria=${LIGA.cod_primaria}&CodCompeticion=${LIGA.CodCompeticion}&CodGrupo=${LIGA.CodGrupo}&CodTemporada=${LIGA.CodTemporada}`;
+  await safeGoto(page, baseUrl);
+
+  const href = await page.evaluate(() => {
+    const a = [...document.querySelectorAll('a')].find(x => /Clasificaci/i.test(x.textContent || ''));
+    return a ? a.getAttribute('href') : null;
+  });
+  if (!href) {
+    console.log('  ⚠️ Enlace Clasificación no encontrado');
+    return [];
+  }
+  await safeGoto(page, `${FUTGAL_URL}NPcd/${href}`);
 
   const standings = await page.evaluate(() => {
-    const tables = document.querySelectorAll('table');
-    for (const table of tables) {
-      const headers = [...(table.rows[0]?.querySelectorAll('th,td') || [])].map(h => h.textContent.trim().toLowerCase());
-      if (headers.some(h => h.includes('equipo') || h.includes('pos'))) {
-        const rows = [];
-        for (let i = 1; i < table.rows.length; i++) {
-          const cells = [...table.rows[i].querySelectorAll('td')];
-          if (cells.length >= 9) {
-            rows.push({
-              pos: parseInt(cells[0]?.textContent?.trim()) || i,
-              team: cells[1]?.textContent?.trim() || '',
-              played: parseInt(cells[2]?.textContent?.trim()) || 0,
-              won: parseInt(cells[3]?.textContent?.trim()) || 0,
-              drawn: parseInt(cells[4]?.textContent?.trim()) || 0,
-              lost: parseInt(cells[5]?.textContent?.trim()) || 0,
-              gf: parseInt(cells[6]?.textContent?.trim()) || 0,
-              ga: parseInt(cells[7]?.textContent?.trim()) || 0,
-              pts: parseInt(cells[8]?.textContent?.trim()) || 0,
-            });
-          }
-        }
-        if (rows.length > 0) return rows;
-      }
-    }
-
-    const allText = document.body.innerText;
     const rows = [];
-    const lines = allText.split('\n');
-    for (const line of lines) {
-      const match = line.match(/^\s*(\d+)\s+(.+?)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/);
-      if (match) {
+    for (const tr of document.querySelectorAll('table tr')) {
+      const cells = [...tr.querySelectorAll('td')].map(c => c.textContent.replace(/\s+/g, ' ').trim());
+      if (cells.length === 11 && /^\d+$/.test(cells[0])) {
         rows.push({
-          pos: parseInt(match[1]), team: match[2].trim(),
-          played: parseInt(match[3]), won: parseInt(match[4]), drawn: parseInt(match[5]),
-          lost: parseInt(match[6]), gf: parseInt(match[7]), ga: parseInt(match[8]),
-          pts: parseInt(match[9]),
+          pos: parseInt(cells[0]) || 0,
+          team: cells[1] || '',
+          pts: parseInt(cells[2]) || 0,
+          played: parseInt(cells[3]) || 0,
+          won: parseInt(cells[4]) || 0,
+          drawn: parseInt(cells[5]) || 0,
+          lost: parseInt(cells[6]) || 0,
+          gf: parseInt(cells[7]) || 0,
+          ga: parseInt(cells[8]) || 0,
         });
       }
     }
@@ -120,30 +107,30 @@ async function scrapeClasificacion(page) {
   });
 
   if (standings.length === 0) {
-    console.log('  ⚠️ No standings found via tables, trying raw HTML...');
+    console.log('  ⚠️ No standings found, page text:');
     const raw = await page.evaluate(() => document.body.innerText);
     console.log('  Page text (first 500):', raw.substring(0, 500));
+    return [];
   }
 
   console.log(`  Found ${standings.length} teams`);
 
+  await db.execute('DELETE FROM standings');
   for (const row of standings) {
+    const team = /^SADA F\.C\. A NOSA VIÑA$/i.test(row.team) ? 'Sada F.C. A Nosa Viña' : row.team;
     try {
       await db.execute({
-        sql: `INSERT INTO standings (pos, team, played, won, drawn, lost, gf, ga, pts)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-              ON CONFLICT(pos) DO UPDATE SET team=?, played=?, won=?, drawn=?, lost=?, gf=?, ga=?, pts=?`,
-        args: [row.pos, row.team, row.played, row.won, row.drawn, row.lost, row.gf, row.ga, row.pts,
-               row.team, row.played, row.won, row.drawn, row.lost, row.gf, row.ga, row.pts]
+        sql: 'INSERT INTO standings (pos, team, played, won, drawn, lost, gf, ga, pts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        args: [row.pos, team, row.played, row.won, row.drawn, row.lost, row.gf, row.ga, row.pts]
       });
     } catch (e) {
-      console.error(`  ❌ Error inserting ${row.team}:`, e.message);
+      console.error(`  ❌ Error inserting ${team}:`, e.message);
     }
   }
 
   for (const row of standings) {
     if (row.team.includes('SADA') || row.team.includes('NOSA VI')) {
-      console.log(`  📈 Sada CF: #${row.pos} - ${row.pts}pts (${row.won}V ${row.drawn}E ${row.lost}D) GF:${row.fg} GA:${row.ga}`);
+      console.log(`  📈 Sada F.C. A Nosa Viña: #${row.pos} - ${row.pts}pts (${row.won}V ${row.drawn}E ${row.lost}D) GF:${row.gf} GA:${row.ga}`);
     }
   }
 
@@ -589,7 +576,7 @@ async function updateDBFromStats(allStats) {
 
 // ====== MAIN ======
 (async () => {
-  console.log('⚽ FUTGAL Scraper - Sada CF');
+  console.log('⚽ FUTGAL Scraper - Sada F.C. A Nosa Viña');
   console.log('===========================\n');
 
   const browser = await puppeteer.launch({

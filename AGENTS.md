@@ -1,7 +1,7 @@
 # AGENTS.md — Memoria del proyecto
 
 ## Qué es esto
-- **Portal del Sada F.C. A Nosa Viña (Veteranos)**: web estática + Node (`server.js`) con convocatoria, actas, clasificación y estadísticas.
+- **Portal del Sada F.C. A Nosa Viña**: web estática + Node (`server.js`) con convocatoria, actas, clasificación y estadísticas.
 - **DB**: Turso (cloud) vía `@libsql/client` — ver `db.js` + `.env` (`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`). **NO** usar `sada.db` local (obsoleto).
 - **Deploy**: `git push` a `github.com:fnaveira/sada-cf-portal` → Render auto-despliega en https://sada-cf-portal.onrender.com/
 - **API clave**: `GET /api/init` (todo el estado), `PUT /api/convocatoria` (marcar pendingConfirm).

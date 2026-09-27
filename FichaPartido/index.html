@@ -55,12 +55,31 @@
   .rule b { color: var(--blue2); }
   .rule.must { background: #f0fdf4; border-color: #86efac; }
   .rule.must b { color: #166534; }
+
+  .toolbar { display: flex; gap: .6rem; margin: .8rem 0 0; }
+  .btn { background: var(--blue2); color: #fff; border: 0; border-radius: 10px; padding: .6rem 1.1rem; font-size: .9rem; font-weight: 700; cursor: pointer; }
+  .btn:active { transform: scale(.97); }
+  .btn.ghost { background: #fff; color: var(--blue2); border: 1px solid var(--blue2); }
+
+  @media print {
+    body { padding: 0; background: #fff; }
+    .toolbar { display: none; }
+    .scheme, .card, .rule, .match-hero, .pl { break-inside: avoid; page-break-inside: avoid; }
+    .pitch, .tk, th, .badge, .rule { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    h2 { margin-top: 1rem; }
+    .match-hero { background: var(--blue) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
 </style>
 </head>
 <body>
 
 <h1>Ficha del Partido</h1>
-<p class="sub">Sada F.C. A Nosa Viña (Veteranos) — Instrucciones, esquemas y convocatoria</p>
+<p class="sub">Sada F.C. A Nosa Viña — Instrucciones, esquemas y convocatoria</p>
+
+<div class="toolbar">
+  <button class="btn" onclick="(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.print)?window.webkit.messageHandlers.print.postMessage(null):window.print()">🖨️ Imprimir / PDF</button>
+  <button class="btn ghost" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Arriba</button>
+</div>
 
 <div class="match-hero">
   <div class="team" id="teamL">Portazgo S.D.</div>
@@ -68,7 +87,7 @@
     <span class="badge away" id="homeBadge">VISITANTES</span>
     <div class="r" id="mDate">domingo, 27 de septiembre · 12:00</div>
     <div class="d" id="mVenue">A Lavandeira (Culleredo)</div>
-    <div class="d" style="margin-top:4px;font-size:.75rem;">Llegar 30 min antes · 11 titular según llegadas</div>
+    <div class="d" style="margin-top:4px;font-size:.75rem;">Llegar 30 min antes · XI: 4-3-3 definido</div>
   </div>
   <div class="team" id="teamR">Sada F.C. A Nosa Viña</div>
 </div>
@@ -76,19 +95,19 @@
 <h2><span class="n">1</span> Reglas fijas — TODOS los partidos</h2>
 <div class="rules-grid">
   <div class="rule must"><b>Miguel Amor</b> — TITULAR (lateral izq.): cambio posible por Alfonso o Lata</div>
-  <div class="rule must"><b>Pepe</b> — titular siempre</div>
+  <div class="rule must"><b>Pepe</b> — titular siempre (hoy, lateral derecho)</div>
   <div class="rule"><b>Albarracin</b> — lateral DERECHO — solo juega en la derecha</div>
-  <div class="rule"><b>Lata</b> — defensa TITULAR; sale al descanso</div>
+  <div class="rule"><b>Lata</b> — recambio de DEFENSA (hoy en el banco): entra si alguien se cansa o para cerrar</div>
   <div class="rule must"><b>★Gonzalo (Ferro)</b> — nuestro DELANTERO y ESTRELLA: TITULAR. Si sale o no, lo decide el staff en el partido</div>
   <div class="rule"><b>César</b> — anclado en el MEDIO. Nunca de delantero</div>
   <div class="rule"><b>Sergio</b> — SOLO centrocampista, pocos minutos (pretemporada). Nunca de defensa</div>
   <div class="rule"><b>Vizoso</b> — NUNCA titular: recambio para gente cansada (igual que Charlie). Nunca lateral ni cierre</div>
   <div class="rule must"><b>Yuyi</b> — bien físicamente: rota en el medio desde la 1ª parte. Prioridad medio centro</div>
-  <div class="rule"><b>Graña</b> — centro o delantero si Ferro no está</div>
-  <div class="rule"><b>Eje</b> — <span class="star">★Bernardo</span> (estrella del medio), Roibás, Alfonso, Marcos</div>
+  <div class="rule"><b>Graña</b> — hoy PUNTA IZQUIERDO titular — si Ferro no está, coge el9</div>
+  <div class="rule"><b>Eje</b> — <span class="star">★Bernardo</span> (estrella del medio), Roibás, Alfonso</div>
   <div class="rule"><b>Balones parados</b> — Bernardo; si no, Miguel Boo / Miguel Amor · César al remate</div>
-  <div class="rule"><b>Corners (ataque)</b> — suben Roibás, Alfonso y César; <b>★M.Amor se queda de CIERRE</b> atrás</div>
-  <div class="rule"><b>Corners en contra</b> — cierran: Roibás, Lata, Alfonso, César, ★Bernardo (dentro). <b>★M.Amor cierra FUERA</b> con Albarracin · Pepe suelto de contra</div>
+  <div class="rule"><b>Corners (ataque)</b> — suben Roibás, Alfonso y César; <b>★M.Amor se queda de CIERRE</b> atrás (si saca él, cierra Pepe)</div>
+  <div class="rule"><b>Corners en contra</b> — cierran: Roibás, Pepe, Alfonso, César, ★Bernardo (dentro). <b>★M.Amor cierra FUERA</b> con Toni · Graña y Ferro fuera de opción</div>
 </div>
 
 <h2><span class="n">2</span> Instrucciones de juego</h2>
@@ -99,141 +118,141 @@
     <li><b>Ofensiva:</b> delanteros sin reventarse; en contraataque rápido → diagonales. Laterales suben al medio con balón.</li>
     <li><b>Actitud:</b> partido difícil, ellos arriba. Si nos cansamos → <b>pedimos cambio, salís todos</b>.</li>
     <li><b>★Gonzalo (Ferro):</b> estrella del equipo — <b>TITULAR</b>. Si sale o no, lo decide el staff en el partido según lo que vea.</li>
-    <li><b>Minutos:</b> <b>NADIE juega 90' fijos</b> — se rotan todos según lo que se vea. Lata → sale al descanso (Alfonso entra). <b>Bernardo no aguanta toda la 1ª parte</b> — rótale ~30-35': baja ★Marcos a su sitio y entra Yuyi.</li>
+    <li><b>Minutos:</b> <b>NADIE juega 90' fijos</b> — se rotan todos según lo que se vea. <b>Bernardo no aguanta toda la 1ª parte</b> — rótale ~30-35': entra Yuyi en el centro.</li>
   </ul>
 </div>
 
-<h2><span class="n">3</span> Esquemas — César en el medio, Miguel Amor titular</h2>
+<h2><span class="n">3</span> Esquema titular y variantes</h2>
 
 <div class="scheme">
-  <h3>1 · 4-4-2 (oficial)</h3>
+  <h3>1 · 4-3-3 — TITULAR (salida)</h3>
   <div class="pitch">
     <div class="line"><span class="tk gk">POR<small>Caamaño</small></span></div>
     <div class="line">
-      <span class="tk">LD<small>Albarracin</small></span>
-      <span class="tk cap">CAD<small>Roibás</small></span>
-      <span class="tk">CAI<small>Lata (tit)</small></span>
       <span class="tk fixed">LI<small>★M.Amor</small></span>
+      <span class="tk">CAI<small>Alfonso</small></span>
+      <span class="tk cap">CAD<small>Roibás</small></span>
+      <span class="tk cap">LD<small>Pepe</small></span>
     </div>
     <div class="line">
-      <span class="tk">MD<small>Boo</small></span>
-      <span class="tk cap">MC<small>★Bernardo</small></span>
       <span class="tk anchor">MC<small>César</small></span>
-      <span class="tk cap">MC<small>★Marcos</small></span>
+      <span class="tk cap">MC<small>★Bernardo</small></span>
+      <span class="tk">MC<small>Toni</small></span>
     </div>
     <div class="line">
-      <span class="tk cap">DEL<small>★Pepe</small></span>
-      <span class="tk">DEL<small>★Ferro</small></span>
+      <span class="tk">EI<small>Graña</small></span>
+      <span class="tk cap">DEL<small>★Ferro</small></span>
+      <span class="tk">ED<small>Boo</small></span>
     </div>
   </div>
-  <div class="notes">★M.Amor titular (cambio: Alfonso o Lata). César anclado con ★Bernardo. ★Pepe + ★Gonzalo (Ferro) minutos según lo que se vea. ~30-35': sale ★Bernardo → ★Marcos baja → entra Yuyi. Si Ferro falta → Graña.</div>
+  <div class="notes"><b>BANCO (7):</b> Charlie, Sergio, Vizoso, Lata, Albarracín, Marcos, Yuyi. — César anclado, ★Bernardo manda. Laterales (★M.Amor y Pepe) suben con balón. ★Ferro de9 — si sale, lo decide el staff en el partido. Si Ferro no está → Graña al9.</div>
 </div>
 
 <div class="scheme">
-  <h3>2 · 4-2-3-1 (César + Bernardo, doble pivote)</h3>
+  <h3>2 · 4-4-2 (más contención)</h3>
   <div class="pitch">
     <div class="line"><span class="tk gk">POR<small>Caamaño</small></span></div>
     <div class="line">
-      <span class="tk">LD<small>Albarracin</small></span>
-      <span class="tk cap">CAD<small>Roibás</small></span>
-      <span class="tk">CAI<small>Lata (tit)</small></span>
       <span class="tk fixed">LI<small>★M.Amor</small></span>
+      <span class="tk">CAI<small>Alfonso</small></span>
+      <span class="tk cap">CAD<small>Roibás</small></span>
+      <span class="tk cap">LD<small>Pepe</small></span>
+    </div>
+    <div class="line">
+      <span class="tk">MI<small>Graña</small></span>
+      <span class="tk anchor">MC<small>César</small></span>
+      <span class="tk cap">MC<small>★Bernardo</small></span>
+      <span class="tk">MD<small>Boo</small></span>
+    </div>
+    <div class="line">
+      <span class="tk cap">DEL<small>★Ferro</small></span>
+      <span class="tk">DEL<small>Toni</small></span>
+    </div>
+  </div>
+  <div class="notes">GRAÑA baja a banda izq. y TONI sube a2º punta con ★FERRO. Opción: TONI y GRAÑA bandas, arriba ★FERRO + BOO. Medio compacto: CÉSAR + ★BERNARDO por el centro.</div>
+</div>
+
+<div class="scheme">
+  <h3>3 · 4-2-3-1 (control)</h3>
+  <div class="pitch">
+    <div class="line"><span class="tk gk">POR<small>Caamaño</small></span></div>
+    <div class="line">
+      <span class="tk fixed">LI<small>★M.Amor</small></span>
+      <span class="tk">CAI<small>Alfonso</small></span>
+      <span class="tk cap">CAD<small>Roibás</small></span>
+      <span class="tk cap">LD<small>Pepe</small></span>
     </div>
     <div class="line">
       <span class="tk anchor">MCD<small>César</small></span>
       <span class="tk cap">MCD<small>★Bernardo</small></span>
     </div>
     <div class="line">
+      <span class="tk">MI<small>Graña</small></span>
+      <span class="tk">MCO<small>Toni</small></span>
       <span class="tk">MD<small>Boo</small></span>
-      <span class="tk cap">MCO<small>★Marcos</small></span>
-      <span class="tk">MI<small>★Ferro</small></span>
     </div>
-    <div class="line"><span class="tk cap">DEL<small>★Pepe</small></span></div>
+    <div class="line"><span class="tk cap">DEL<small>★Ferro</small></span></div>
   </div>
-  <div class="notes">César anclado de 5 con ★Bernardo. ★Marcos de mediapunta; ★Gonzalo (Ferro) en banda — minutos según lo que se vea. ~30-35': sale ★Bernardo → ★Marcos baja → entra Yuyi.</div>
+  <div class="notes">Doble pivote: CÉSAR anclado + ★BERNARDO libre. TONI de mediapunta; GRAÑA y BOO por bandas. Si hay que dar aire: entra MARCOS o YUYI por TONI.</div>
 </div>
 
 <div class="scheme">
-  <h3>3 · 5-3-2 (muro)</h3>
+  <h3>4 · 5-4-1 (cerrar resultado)</h3>
   <div class="pitch">
     <div class="line"><span class="tk gk">POR<small>Caamaño</small></span></div>
     <div class="line">
-      <span class="tk">CAD<small>Albarracin</small></span>
-      <span class="tk cap">C<small>Roibás</small></span>
-      <span class="tk">C<small>Lata (tit)</small></span>
-      <span class="tk cap">C<small>Alfonso</small></span>
-      <span class="tk fixed">CAI<small>★M.Amor</small></span>
-    </div>
-    <div class="line">
-      <span class="tk anchor">MC<small>César</small></span>
-      <span class="tk cap">MC<small>★Bernardo</small></span>
-      <span class="tk cap">MC<small>★Marcos</small></span>
-    </div>
-    <div class="line">
-      <span class="tk cap">DEL<small>★Pepe</small></span>
-      <span class="tk">DEL<small>★Ferro</small></span>
-    </div>
-  </div>
-  <div class="notes">Mediocampo triple: César - ★Bernardo - ★Marcos. ★Pepe + ★Gonzalo (Ferro) TITULARES (minutos según lo que se vea). Si Ferro falta → Graña.</div>
-</div>
-
-<div class="scheme">
-  <h3>4 · 4-5-1 (dominio)</h3>
-  <div class="pitch">
-    <div class="line"><span class="tk gk">POR<small>Caamaño</small></span></div>
-    <div class="line">
-      <span class="tk">LD<small>Albarracin</small></span>
-      <span class="tk cap">CAD<small>Roibás</small></span>
-      <span class="tk">CAI<small>Lata (tit)</small></span>
       <span class="tk fixed">LI<small>★M.Amor</small></span>
+      <span class="tk">C<small>Alfonso</small></span>
+      <span class="tk cap">C<small>Roibás</small></span>
+      <span class="tk">C<small>Lata (entra)</small></span>
+      <span class="tk cap">LD<small>Pepe</small></span>
     </div>
     <div class="line">
-      <span class="tk">M<small>★Ferro</small></span>
+      <span class="tk">MI<small>Graña</small></span>
       <span class="tk anchor">MC<small>César</small></span>
       <span class="tk cap">MC<small>★Bernardo</small></span>
-      <span class="tk cap">MC<small>★Marcos</small></span>
-      <span class="tk">M<small>Boo</small></span>
+      <span class="tk">MD<small>Boo</small></span>
     </div>
-    <div class="line"><span class="tk cap">DEL<small>★Pepe</small></span></div>
+    <div class="line"><span class="tk cap">DEL<small>★Ferro</small></span></div>
   </div>
-  <div class="notes">César en el eje de los 5. ★Pepe y ★Gonzalo (Ferro) TITULARES — minutos según lo que se vea. Al descanso sale LATA → Alfonso. ~30-35': sale ★Bernardo → ★Marcos baja → entra Yuyi.</div>
+  <div class="notes">Entra LATA (o Albarracín) por TONI — línea de5. CÉSAR + ★BERNARDO cierran el centro. <b>VIZOSO NUNCA para cerrar</b> (recambio solo si hay gente cansada en el medio).</div>
 </div>
 
 <div class="scheme">
-  <h3>5 · 3-5-2 (si vamos perdiendo)</h3>
+  <h3>5 · 4-2-4 (si vamos perdiendo — apretar)</h3>
   <div class="pitch">
     <div class="line"><span class="tk gk">POR<small>Caamaño</small></span></div>
     <div class="line">
-      <span class="tk cap">C<small>Roibás</small></span>
-      <span class="tk">C<small>Lata (tit)</small></span>
-      <span class="tk cap">C<small>Alfonso</small></span>
-    </div>
-    <div class="line">
-      <span class="tk">LD<small>Albarracin↑</small></span>
-      <span class="tk anchor">MC<small>César</small></span>
-      <span class="tk cap">MC<small>★Bernardo</small></span>
-      <span class="tk cap">MC<small>★Marcos</small></span>
       <span class="tk fixed">LI<small>★M.Amor↑</small></span>
+      <span class="tk">CAI<small>Alfonso</small></span>
+      <span class="tk cap">CAD<small>Roibás</small></span>
+      <span class="tk cap">LD<small>Pepe↑</small></span>
     </div>
     <div class="line">
-      <span class="tk cap">DEL<small>★Pepe</small></span>
-      <span class="tk">DEL<small>★Ferro</small></span>
+      <span class="tk anchor">MCD<small>César</small></span>
+      <span class="tk cap">MCD<small>★Bernardo</small></span>
+    </div>
+    <div class="line">
+      <span class="tk">EI<small>Graña</small></span>
+      <span class="tk cap">DEL<small>★Ferro</small></span>
+      <span class="tk">ED<small>Boo</small></span>
+      <span class="tk cap">DEL<small>Marcos (entra)</small></span>
     </div>
   </div>
-  <div class="notes">César sigue anclado en el 5. ★Gonzalo (Ferro) TITULAR — si sale, lo decide el staff en el partido. Si Ferro falta → Graña. Vizoso solo recambio (nunca lateral ni cierre).</div>
+  <div class="notes">Entra MARCOS (o CHARLIE) por TONI. Laterales (★M.AMOR y Pepe) suben hasta el medio. CÉSAR anclado con ★BERNARDO — nunca descuidar el centro.</div>
 </div>
 
 <h2><span class="n">4</span> Rotación — salen todos</h2>
 <div class="card">
   <table>
     <tr><th>Momento</th><th>Salen</th><th>Entran</th></tr>
-    <tr><td>~30-35' (1ª parte)</td><td><b>★Bernardo</b> (no aguanta toda la 1ª)</td><td><b>★Marcos baja</b> al sitio de Bernardo · entra <b>Yuyi</b> y coge el sitio de ★Marcos (Bernardo fresco para la 2ª)</td></tr>
-    <tr><td>DESCANSO</td><td><b>Lata</b> (defensa)</td><td><b>Alfonso</b> (o Graña). ★Ferro: si sale o no, lo decide el staff en el partido. Si Yuyi cansado → Toni</td></tr>
+    <tr><td>~30-35' (1ª parte)</td><td><b>★Bernardo</b> (no aguanta toda la 1ª)</td><td><b>Yuyi</b> coge el centro (★Bernardo fresco para la 2ª)</td></tr>
+    <tr><td>DESCANSO</td><td>El que esté cansado (rota el cuerpo)</td><td><b>Marcos</b> o <b>Charlie</b>. ★Ferro: si sale o no, lo decide el staff en el partido</td></tr>
     <tr><td>~60'</td><td>Toni</td><td><b>Sergio</b> (solo medio, ~20' máx — nunca de defensa)</td></tr>
-    <tr><td>~70'</td><td>Roibás</td><td>No se cambia (sin central de recambio tras salir Lata; solo con ventaja clara y Alfonso tapando)</td></tr>
+    <tr><td>~70'</td><td>Roibás</td><td>No se cambia (sin central de recambio; solo con ventaja clara y Alfonso tapando)</td></tr>
     <tr><td>~80'</td><td>Boo</td><td>Charlie (confirmado)</td></tr>
   </table>
-  <p style="font-size:.85rem;margin-top:.6rem;color:#444;"><b>★Gonzalo (Ferro): estrella — TITULAR; si sale o no, se decide en el partido. NADIE juega 90' fijos.</b> <b>★Miguel Amor: titular</b> — si hay que cambiarle, entra Alfonso o Lata (Alba SOLO derecha). ★Pepe, ★Bernardo y César: todo lo que el cuerpo dé. <b>Vizoso: nunca titular — recambio (igual que Charlie), nunca de cierre.</b> <b>Sergio: solo medio, pocos minutos.</b> <b>Corners en contra: ★M.Amor cierra FUERA</b> con Albarracin; dentro: Roibás, Lata, Alfonso, César, ★Bernardo.</p>
+  <p style="font-size:.85rem;margin-top:.6rem;color:#444;"><b>★Gonzalo (Ferro): estrella — TITULAR; si sale o no, se decide en el partido. NADIE juega 90' fijos.</b> <b>★Miguel Amor: titular</b> — si hay que cambiarle, entra Alfonso o Lata (Alba SOLO derecha). Lata: recambio de defensa (hoy en el banco). ★Bernardo y César: todo lo que el cuerpo dé. <b>Vizoso: nunca titular — recambio (igual que Charlie), nunca de cierre.</b> <b>Sergio: solo medio, pocos minutos.</b> <b>Corners en contra: ★M.Amor cierra FUERA</b> con Toni; dentro: Roibás, Pepe, Alfonso, César, ★Bernardo.</p>
 </div>
 
 <h2><span class="n">5</span> Convocatoria (en vivo)</h2>

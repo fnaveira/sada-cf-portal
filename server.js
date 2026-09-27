@@ -273,7 +273,7 @@ async function seedData() {
   await P(PS, [26,"Damián Paris Labandeira","Damián",16,"defensa,centrocampista",37,"disponible",0,0,0,"53303285A","1988-11-05","PAZOS","682658072","damian-pl@hotmail.es","Mazaricos","A Coruña","Sada","Española"]);
   for (const id of [7,12,26,20,2,14,16,15,19,24,23,4,5,8,18]) await P('INSERT OR IGNORE INTO convocatoria (playerId) VALUES (?)', [id]);
   await P('INSERT OR IGNORE INTO formation (id,name,positions) VALUES (1,?,?)', ['4-3-3',JSON.stringify([{playerId:8,x:50,y:85},{playerId:2,x:20,y:65},{playerId:13,x:37,y:65},{playerId:26,x:63,y:65},{playerId:7,x:80,y:65},{playerId:15,x:30,y:45},{playerId:12,x:50,y:45},{playerId:19,x:70,y:45},{playerId:14,x:20,y:20},{playerId:4,x:50,y:20},{playerId:16,x:80,y:20}])]);
-  for (const [k,v] of Object.entries({federationName:"Sada F.C. A Nosa Viña (Veteranos)",federationAddress:"Reboredo, 20 Ouces - 15165 Bergondo, A Coruña",stadium:"Campo Municipal de Sada",stadiumAddress:"Avda. de la Marina, s/n - 15160 Sada",stadiumCapacity:"2.000 espectadores",founded:"1975",president:"D. Diego Fernández Cabana",cif:"G70501242",phone1:"663495926",phone2:"659833245",email:"diegofernandezcabana@gmail.com"})) await P('INSERT OR IGNORE INTO club_info (key,value) VALUES (?,?)', [k,v]);
+  for (const [k,v] of Object.entries({federationName:"Sada F.C. A Nosa Viña",federationAddress:"Reboredo, 20 Ouces - 15165 Bergondo, A Coruña",stadium:"Campo Municipal de Sada",stadiumAddress:"Avda. de la Marina, s/n - 15160 Sada",stadiumCapacity:"2.000 espectadores",founded:"1975",president:"D. Diego Fernández Cabana",cif:"G70501242",phone1:"663495926",phone2:"659833245",email:"diegofernandezcabana@gmail.com"})) await P('INSERT OR IGNORE INTO club_info (key,value) VALUES (?,?)', [k,v]);
   await P('INSERT OR IGNORE INTO staff (id,name,role) VALUES (?,?,?)', [1,"Fran Naveira","Entrenador"]);
   await P('INSERT OR IGNORE INTO staff (id,name,role) VALUES (?,?,?)', [2,"Santi Seijo","Entrenador Auxiliar"]);
   await P('INSERT OR IGNORE INTO board (id,name,role) VALUES (?,?,?)', [1,"Diego Fernández Cabana","Presidente"]);
@@ -305,10 +305,10 @@ async function seedData() {
     [15,"Oza de los Ríos","2026-12-12",null,"O Loureiro (Oza De Los Rios)",0,"Liga","J13",null,null],
     [16,"San Martín S.D.","2026-12-19",null,"A Revolta (Queixas)",0,"Liga","J14",null,"https://www.futbuteo.com/escudos/80/gal-7576246.webp"]
   ]) await P('INSERT OR IGNORE INTO matches (id,rival,date,time,venue,home,competition,round,result,shieldUrl) VALUES (?,?,?,?,?,?,?,?,?,?)', m);
-  for (const r of [[1,"2026-07-25","Sada CF","CD Pilar",3,1,"Campo de Sada"],[2,"2026-07-18","UD Ponte","Sada CF",0,2,"Campo da Ponte"],[3,"2026-07-11","Sada CF","CF Narón",1,1,"Campo de Sada"],[4,"2026-07-04","SD Bergondo","Sada CF",2,1,"Campo de Bergondo"],[5,"2026-06-27","Sada CF","CD Meira",4,0,"Campo de Sada"],[6,"2026-06-20","UD Montaña","Sada CF",1,3,"Campo da Montaña"]]) await P('INSERT OR IGNORE INTO results (id,date,home,away,homeScore,awayScore,venue) VALUES (?,?,?,?,?,?,?)', r);
-  for (const st of [[1,"Sada CF",14,10,2,2,28,10,32],[2,"CD Pilar",14,9,3,2,25,12,30],[3,"UD Ponte",14,8,2,4,22,15,26],[4,"CF Narón",14,7,4,3,20,14,25],[5,"SD Bergondo",14,7,2,5,19,16,23],[6,"CD Meira",14,6,3,5,18,17,21],[7,"UD Montaña",14,5,2,7,15,20,17],[8,"CD Oleiros",14,4,3,7,14,21,15],[9,"SD Culleredo",14,4,1,9,12,24,13],[10,"CF Cambre",14,3,2,9,10,26,11]]) await P('INSERT OR IGNORE INTO standings (pos,team,played,won,drawn,lost,gf,ga,pts) VALUES (?,?,?,?,?,?,?,?,?)', st);
+  for (const r of [[1,"2026-07-25","Sada F.C. A Nosa Viña","CD Pilar",3,1,"Campo de Sada"],[2,"2026-07-18","UD Ponte","Sada F.C. A Nosa Viña",0,2,"Campo da Ponte"],[3,"2026-07-11","Sada F.C. A Nosa Viña","CF Narón",1,1,"Campo de Sada"],[4,"2026-07-04","SD Bergondo","Sada F.C. A Nosa Viña",2,1,"Campo de Bergondo"],[5,"2026-06-27","Sada F.C. A Nosa Viña","CD Meira",4,0,"Campo de Sada"],[6,"2026-06-20","UD Montaña","Sada F.C. A Nosa Viña",1,3,"Campo da Montaña"]]) await P('INSERT OR IGNORE INTO results (id,date,home,away,homeScore,awayScore,venue) VALUES (?,?,?,?,?,?,?)', r);
+  for (const st of [[1,"Sada F.C. A Nosa Viña",14,10,2,2,28,10,32],[2,"CD Pilar",14,9,3,2,25,12,30],[3,"UD Ponte",14,8,2,4,22,15,26],[4,"CF Narón",14,7,4,3,20,14,25],[5,"SD Bergondo",14,7,2,5,19,16,23],[6,"CD Meira",14,6,3,5,18,17,21],[7,"UD Montaña",14,5,2,7,15,20,17],[8,"CD Oleiros",14,4,3,7,14,21,15],[9,"SD Culleredo",14,4,1,9,12,24,13],[10,"CF Cambre",14,3,2,9,10,26,11]]) await P('INSERT OR IGNORE INTO standings (pos,team,played,won,drawn,lost,gf,ga,pts) VALUES (?,?,?,?,?,?,?,?,?)', st);
   await P('INSERT OR IGNORE INTO appearance (key,value) VALUES (?,?)', ['primaryColor','#1e40af']);
-  await P('INSERT OR IGNORE INTO appearance (key,value) VALUES (?,?)', ['brandName','Sada F.C. A Nosa Viña (Veteranos)']);
+  await P('INSERT OR IGNORE INTO appearance (key,value) VALUES (?,?)', ['brandName','Sada F.C. A Nosa Viña']);
   await P('INSERT OR IGNORE INTO appearance (key,value) VALUES (?,?)', ['logoText','SADA']);
   await P('INSERT OR IGNORE INTO appearance (key,value) VALUES (?,?)', ['teamLogo','/assets/logo.jpeg']);
   const salt = crypto.randomBytes(16).toString('hex');
@@ -630,7 +630,7 @@ async function start() {
   await initDB();
   if (await seedNeeded()) await seedData();
   app.listen(PORT, () => {
-    console.log(`Sada CF Portal running at http://localhost:${PORT}`);
+    console.log(`Sada F.C. A Nosa Viña Portal running at http://localhost:${PORT}`);
   });
 }
 

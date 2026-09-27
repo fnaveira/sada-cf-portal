@@ -1,3 +1,9 @@
+const OUR_TEAM = 'Sada F.C. A Nosa Viña';
+const isOurTeam = (name) => {
+    const norm = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    return norm(name) === norm(OUR_TEAM);
+};
+
 let PLAYERS = [], CONVOCATORIA = [], PENDING_CONFIRM = [], FORMATION = { name: '4-4-2', positions: [] };
 let CLUB_INFO = {}, STAFF = [], BOARD = [], NEWS = [], MATCHES = [], RESULTS = [], STANDINGS = [];
 let USERS = [];
@@ -212,7 +218,7 @@ function renderConvocatoria() {
     const ourTeamHtml = `
             <div class="conv-matchday-team">
                 <div class="conv-matchday-crest"><img src="${APPEARANCE.teamLogo || '/assets/logo.jpeg'}" style="height:48px;width:48px;object-fit:contain;border-radius:50%;"></div>
-                <span>${APPEARANCE.brandName || 'Sada CF'}</span>
+                <span>${APPEARANCE.brandName || OUR_TEAM}</span>
             </div>`;
     const rivalTeamHtml = `
             <div class="conv-matchday-team">
@@ -506,7 +512,7 @@ function renderMatchActa() {
         <div class="acta-card">
             <div class="acta-header">
                 <div class="acta-teams">
-                    <span class="acta-team acta-team-sada">Sada F.C.</span>
+                    <span class="acta-team acta-team-sada">${OUR_TEAM}</span>
                     <span class="acta-result">${MATCH_ACTA.result}</span>
                     <span class="acta-team acta-team-rival">${MATCH_ACTA.rival.replace('Club Deportivo ', '')}</span>
                 </div>
@@ -656,15 +662,15 @@ function renderCalendar() {
         const day = d.getDate();
         const month = d.toLocaleString("es", { month: "short" }).toUpperCase();
 
-        const homeTeam = match.home ? "Sada CF" : match.rival;
-        const awayTeam = match.home ? match.rival : "Sada CF";
+        const homeTeam = match.home ? OUR_TEAM : match.rival;
+        const awayTeam = match.home ? match.rival : OUR_TEAM;
         const compBadge = match.competition === 'Copa' ? '<span class="badge-copa">COPA</span>' : '';
         const roundLabel = match.round ? `<span class="match-round">${match.round}</span>` : '';
         const resultLabel = match.result ? `<span class="match-result">${match.result}</span>` : '';
         const rivalShield = match.shieldUrl ? `<img src="${match.shieldUrl}" style="height:28px;width:28px;object-fit:contain;vertical-align:middle;margin-right:6px;">` : '';
         const sadaShield = `<img src="${APPEARANCE.teamLogo || '/assets/logo.jpeg'}" style="height:28px;width:28px;object-fit:contain;border-radius:50%;vertical-align:middle;margin-right:6px;">`;
-        const homeHtml = match.home ? sadaShield + 'Sada CF' : rivalShield + match.rival;
-        const awayHtml = match.home ? rivalShield + match.rival : sadaShield + 'Sada CF';
+        const homeHtml = match.home ? sadaShield + OUR_TEAM : rivalShield + match.rival;
+        const awayHtml = match.home ? rivalShield + match.rival : sadaShield + OUR_TEAM;
 
         return `
             <div class="calendar-card">
@@ -690,7 +696,7 @@ function renderResults() {
     const container = document.getElementById("resultsList");
 
     container.innerHTML = RESULTS.map(result => {
-        const isHome = result.home === "Sada CF";
+        const isHome = isOurTeam(result.home);
         const ourScore = isHome ? result.homeScore : result.awayScore;
         const theirScore = isHome ? result.awayScore : result.homeScore;
 
@@ -709,13 +715,13 @@ function renderResults() {
                     <div class="month">${d.toLocaleString("es", { month: "short" })}</div>
                 </div>
                 <div class="result-teams">
-                    <div class="result-team-row ${ourScore > theirScore ? 'winner' : ''}">
-                        <span>${isHome ? "Sada CF" : rival}</span>
-                        <span class="result-score">${isHome ? result.homeScore : result.awayScore}</span>
+                    <div class="result-team-row ${result.homeScore > result.awayScore ? 'winner' : ''}">
+                        <span>${isHome ? OUR_TEAM : rival}</span>
+                        <span class="result-score">${result.homeScore}</span>
                     </div>
-                    <div class="result-team-row ${theirScore > ourScore ? 'winner' : ''}">
-                        <span>${isHome ? rival : "Sada CF"}</span>
-                        <span class="result-score">${isHome ? result.awayScore : result.homeScore}</span>
+                    <div class="result-team-row ${result.awayScore > result.homeScore ? 'winner' : ''}">
+                        <span>${isHome ? rival : OUR_TEAM}</span>
+                        <span class="result-score">${result.awayScore}</span>
                     </div>
                 </div>
                 <span class="result-badge ${resultType}">
@@ -747,7 +753,7 @@ function renderStandings() {
             </thead>
             <tbody>
                 ${STANDINGS.map(team => `
-                    <tr class="${team.team === "Sada CF" ? "highlight" : ""}">
+                    <tr class="${isOurTeam(team.team) ? "highlight" : ""}">
                         <td class="pos">${team.pos}</td>
                         <td class="team-name">${team.team}</td>
                         <td>${team.played}</td>
@@ -1093,7 +1099,7 @@ function openMatchSheet() {
         <div class="ms-header">
             <div class="ms-header-left">
                 <img src="${APPEARANCE.teamLogo || '/assets/logo.jpeg'}" alt="Logo">
-                <h3>${APPEARANCE.brandName || 'Sada CF'}</h3>
+                <h3>${APPEARANCE.brandName || OUR_TEAM}</h3>
             </div>
             <div class="ms-header-right">
                 <div style="font-weight:700;">Hoja de Partido</div>
@@ -1108,9 +1114,9 @@ function openMatchSheet() {
         </div>
 
         <div class="ms-vs">
-            <span class="ms-vs-team">${home ? (APPEARANCE.brandName || 'Sada CF') : rival}</span>
+            <span class="ms-vs-team">${home ? (APPEARANCE.brandName || OUR_TEAM) : rival}</span>
             <span class="ms-vs-text">${round} · ${comp || 'Liga'}</span>
-            <span class="ms-vs-team">${home ? rival : (APPEARANCE.brandName || 'Sada CF')}</span>
+            <span class="ms-vs-team">${home ? rival : (APPEARANCE.brandName || OUR_TEAM)}</span>
         </div>
 
         <div class="ms-section">
@@ -1184,7 +1190,7 @@ function openMatchSheet() {
         </div>
 
         <div class="ms-footer">
-            <span>Sada F.C. A Nosa Viña (Veteranos)</span>
+            <span>Sada F.C. A Nosa Viña</span>
             <span>Firma del entrenador: _________________</span>
         </div>
     </div>`;

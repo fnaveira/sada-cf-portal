@@ -1,7 +1,7 @@
 {
   "name": "sada-cf-portal",
   "version": "1.0.0",
-  "description": "Portal interno Sada CF",
+  "description": "Portal interno Sada F.C. A Nosa Viña",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

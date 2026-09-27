@@ -530,7 +530,7 @@ const Admin = {
         try { current = await Api.get('/api/init').then(d => d.appearance); } catch(e) { current = {}; }
         const app = {
             primaryColor: current.primaryColor || '#1e40af',
-            brandName: current.brandName || 'Sada CF',
+            brandName: current.brandName || 'Sada F.C. A Nosa Viña',
             logoText: current.logoText || 'SADA',
             teamLogo: current.teamLogo || '⚽'
         };
@@ -627,7 +627,7 @@ const Admin = {
         document.getElementById('saveAppearanceBtn').addEventListener('click', async () => {
             const data = {
                 primaryColor: colorInput.value,
-                brandName: brandInput.value || 'Sada CF',
+                brandName: brandInput.value || 'Sada F.C. A Nosa Viña',
                 logoText: logoInput.value || 'SADA',
                 teamLogo: teamLogoInput.value || '⚽'
             };
@@ -648,7 +648,7 @@ const Admin = {
         root.style.setProperty('--primary-dark', dark);
         root.style.setProperty('--primary-light', light);
         document.querySelectorAll('.nav-brand span').forEach(el => el.textContent = data.brandName);
-        document.title = (data.brandName || 'Sada CF') + ' - Portal Interno';
+        document.title = (data.brandName || 'Sada F.C. A Nosa Viña') + ' - Portal Interno';
     },
 
     async loadAndApplyAppearance() {

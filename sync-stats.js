@@ -14,7 +14,7 @@ const db = createClient({ url: TURSO_URL, authToken: TURSO_TOKEN });
 
 // Our team ID on futbuteo: 4261861
 const TEAM_ID = 4261861;
-const TEAM_NAME = 'Sada F.C. a Nosa Viña';
+const TEAM_NAME = 'Sada F.C. A Nosa Viña';
 
 async function fetchTeamStats() {
   console.log('📊 Fetching stats from futbuteo.com...');
@@ -220,7 +220,7 @@ async function updatePlayerStats(playerName, goals, yellowCards, redCards) {
 }
 
 async function main() {
-  console.log('⚽ Sada CF Stats Sync');
+  console.log('⚽ Sada F.C. A Nosa Viña Stats Sync');
   console.log('====================\n');
 
   // For now, we'll manually set the stats from the acta the user provided
