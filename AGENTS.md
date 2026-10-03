@@ -48,12 +48,12 @@
 ### Balones parados y corners
 - Faltas/corners: **1º ★Bernardo · 2º Miguel Boo o Miguel Amor** · César al remate. **★Miguel Amor NO centra córners: es el CIERRE.**
 - **Corners (ataque)**: **suben a rematar César, Alfonso y Roibás**; **cierran ★Lata y ★Miguel Amor**.
-- **Corners en contra**: dentro Caamaño, Roibás (ancla), Lata (1er palo), Alfonso (2º palo), César (marca), ★Bernardo (rebotes). **★M.Amor cierra FUERA** con Albarracin; ★Pepe suelto de contra. No cierran: Vizoso, Sergio.
+- **Corners en contra**: dentro Roibás (ancla), Lata (1er palo), Alfonso (2º palo), César (marca), ★Bernardo (rebotes); portero en la portería. **★M.Amor cierra FUERA**; ★Pepe suelto de contra. No cierran: Vizoso, Durán (Albarracín y Sergio NO convocados).
 
 ### Rotación
 - **~30-35' (1ª)**: sale ★Bernardo → ★Marcos baja a su sitio → entra **Yuyi** (Bernardo fresco para la 2ª).
-- **Descanso**: sale Lata → Alfonso (o Graña). Ferro: decisión del staff. Si Yuyi cansado → Toni.
-- **~60'**: Toni → Sergio (solo medio ~20' máx). **~80'**: Boo → Charlie.
+- **Descanso**: salen **Mourelo** (portería 2ª parte: a decidir en el partido), **Damián** y **Lata** → entran los que decida el staff (Charlie / Durán / Yuyi). Ferro: decisión del staff.
+- **~60'**: entra **Toni** o **Durán** (Sergio NO convocado). **~80'**: sale **Graña o Pepe** → Charlie.
 - Roibás no se cambia (sin central de recambio tras salir Lata).
 
 ## Partido: Liceo de Monelos S.D. (id=5) — J4
@@ -62,18 +62,20 @@
 - **Convocatoria: 18** (`pendingConfirm = []`). IDs: 3,4,5,7,9,10,13,14,15,16,17,18,19,20,21,25,26,100.
   - Fuera: **Caamaño (`no_disponible`)**, Cabana (`baja`), Garea/Santi/Julio (`lesionado`), Pirulo, Sergio, Albarracin.
   - "Miguel B" = **Miguel Boo** (id 10) ✓ confirmado por el mister. Mourelo (3) y Durán (17) pasan a `disponible` (estaban `no_disponible`).
-  - `formation` = **4-3-3 J4, 11 titulares montados** (ids): POR Mourelo(3) · Roibás(18) Lata(21) Alfonso(4) Miguel(7) · César(16) Bernardo(13) Damián(26) · Pepe(14) Ferro(9) Boo(10). Suplentes (7): Yuyi, Toni, Graña, Vizoso, Marcos, Durán, Charlie.
-  - **Plan (`MATCH_PLAN` en app.js → alimenta la "Hoja de Partido")**: Mourelo en portería la **1ª parte** (en la 2ª se decide en el vestuario: Vizoso o Graña); **Damián y Lata salen al descanso**; zaga titular Roibás-Lata-Alfonso-Miguel Amor; nadie juega 90'.
+  - `formation` = **4-3-3 J4, 11 titulares montados** (ids): POR Mourelo(3) · ★Miguel Amor(7) Roibás(18) Alfonso(4) Lata(21) · César(16) ★Bernardo(13) Damián(26) · Graña(19) ★Ferro(9) Pepe(14). Suplentes (7): Boo, Yuyi, Toni, Vizoso, Marcos, Durán, Charlie.
+  - **Plan (`MATCH_PLAN` en app.js → alimenta la "Hoja de Partido")**: Mourelo en portería la **1ª parte** (en la 2ª se decide en el partido); **Damián y Lata salen al descanso**; zaga titular ★Miguel Amor-Roibás-Alfonso-Lata; nadie juega 90'.
 
 ### Dorsales — fuente oficial
 - `players.number` **NO** eran dorsales: eran los números de calle del campo "Número" de las fichas de licencia `NFG_GC_VisLicencia` (por eso había duplicados: Mourelo/César 10, etc.).
-- Dorsales reales = columna `Nº` de `NFG_CMP_Alineacion_Resultados` (actas de J1/J2/J3 y Copa). **24/26 confirmados y ya aplicados** (commit `479d6f0`): Caamaño 1 · Garea 2 · Mourelo 3 · Alfonso 4 · Charlie 5 · Miguel 7 · Pirulo 9 · Ferro 10 · Boo 11 · **Durán 12 (asignado por indicación del usuario)** · Julio 13 · Santi 14 · Sergio 15 · Bernardo 16 · Yuyi 18 · Pepe 19 · Toni 21 · Damián 22 · César 23 · Roibás 25 · Graña 26 · Vizoso 27 · Marcos 28 · Lata 30.
-- **Sin dorsal confirmado: Albarracin (id24), Cabana (id6)** → preguntar al mister o mirar actas futuras.
+- Dorsales reales = columna `Nº` de `NFG_CMP_Alineacion_Resultados` (actas de J1/J2/J3 y Copa). **25/26 con dorsal** (commit `479d6f0`): Caamaño 1 · Garea 2 · Mourelo 3 · Alfonso 4 · Charlie 5 · Miguel 7 · Pirulo 9 · Ferro 10 · Boo 11 · **Durán 12 (asignado por el usuario)** · Julio 13 · Santi 14 · Sergio 15 · Bernardo 16 · **Albarracín 17 (según acta J2 en `app.js`)** · Yuyi 18 · Pepe 19 · Toni 21 · Damián 22 · César 23 · Roibás 25 · Graña 26 · Vizoso 27 · Marcos 28 · Lata 30.
+- **Ojo**: el **12** lo usó **Iván Fernández Álvarez** (portero) en Copa y J1 — Iván NO va convocado en J4; si algún día juega, cambiar el dorsal de Durán.
+- **Sin dorsal confirmado: Cabana (id6)** → preguntar al mister o mirar actas futuras.
 
 ### Tarjetas — fuente oficial
-- Las **actas solo listan las tarjetas del equipo local** → no sirven para contar las nuestras fuera de casa. No usar `NFG_CmpPartido` para tarjetas.
+- Las actas tienen **dos bloques TARJETAS** (local y visitante), así que sí listan las nuestras fuera de casa, pero **no marcan el cómputo oficial**.
 - Fuente correcta: **ficha de sanciones** `NFG_ShwSancionesJugSnc?CodTemporada=22&CodParticipante=<id>&cod_primaria=1000129` (ids en los enlaces `NFG_EQ_VisSanciones_jugador` de la plantilla `NFG_VisEquipos?cod_primaria=1000102&Codigo_Equipo=4261861`).
 - **Recuento (03/10/2026)**: 🟨 Miguel 1 (J1 Narón) · 🟨 Graña 1 (J1 Narón) · 🟨 Yuyi 1 (J3 Portazgo) · 🟨 Julio 1 (Copa Larín) · 🟥 0 → **nadie suspendido**.
+- **⚠ Discrepancia**: las actas ponen minutos de 🟨 a **Mallo (88' J1), César (67' Copa) y Miguel Amor (79' J1)** que la ficha de sanciones no refleja, y esta última sí cuenta Graña y Julio → **manda la ficha de sanciones**; revalidar si cambia el recuento.
 - Sync: `node -r dotenv/config scrape-futgal.js sanciones` → reconstruye `match_cards` + `players.yellowCards/redCards` (respeta los minutos ya guardados).
 
 ## Comandos útiles
