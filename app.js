@@ -245,7 +245,7 @@ function renderConvocatoria() {
                     <i class="fas fa-clock" style="margin-right:3px;"></i>Llegar <strong>30 min antes</strong> del saque inicial. El <strong>11 titular</strong> se confirmará según los jugadores que lleguen.
                 </div>
                 <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;padding:4px 8px;background:rgba(255,255,255,0.08);border-radius:6px;">
-                    <i class="fas fa-futbol" style="margin-right:3px;"></i><strong>Faltas/Corners:</strong> 1º Bernardo · 2º Miguel Boo · César al remate &nbsp;|&nbsp; <strong>Penaltis:</strong> Decisión del staff
+                    <i class="fas fa-futbol" style="margin-right:3px;"></i><strong>Faltas/Corners:</strong> 1º Bernardo · 2º Miguel Boo o Miguel Amor · César al remate &nbsp;|&nbsp; <strong>Penaltis:</strong> Decisión del staff
                 </div>
                 ${isAdmin ? `<button onclick="openMatchSheet()" style="margin-top:8px;padding:6px 14px;background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4);border-radius:8px;font-size:0.75rem;cursor:pointer;font-weight:600;">
                     <i class="fas fa-print" style="margin-right:4px;"></i>Hoja de Partido
@@ -1108,8 +1108,8 @@ const MATCH_PLAN = {
         'Lo demás: decisión del staff en el vestuario',
     ],
     setPieces: {
-        faltas: '1º Bernardo · 2º Miguel Boo · César al remate',
-        cornersFor: 'Suben Roibás y Alfonso (César al remate) — ★Lata y ★Miguel Amor cierran atrás',
+        faltas: '1º Bernardo · 2º Miguel Boo o Miguel Amor · César al remate',
+        cornersFor: 'Suben a rematar César, Alfonso y Roibás — ★Lata y ★Miguel Amor cierran atrás (M.Amor NO centra)',
         cornersAgainst: 'Dentro: Roibás (ancla), Lata (1er palo), Alfonso (2º palo), César (marca), Bernardo (rebotes). Fuera: ★Miguel Amor. ★Pepe suelto de contra. No cierran: Vizoso, Durán',
         penaltis: 'Decisión del staff',
     },
