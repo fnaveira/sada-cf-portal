@@ -245,7 +245,7 @@ function renderConvocatoria() {
                     <i class="fas fa-clock" style="margin-right:3px;"></i>Llegar <strong>30 min antes</strong> del saque inicial. El <strong>11 titular</strong> se confirmará según los jugadores que lleguen.
                 </div>
                 <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;padding:4px 8px;background:rgba(255,255,255,0.08);border-radius:6px;">
-                    <i class="fas fa-futbol" style="margin-right:3px;"></i><strong>Faltas/Corners:</strong> 1º Bernardo · 2º Miguel Boo o Miguel Amor · César al remate &nbsp;|&nbsp; <strong>Penaltis:</strong> Decisión del staff
+                    <i class="fas fa-futbol" style="margin-right:3px;"></i><strong>Faltas/Corners:</strong> 1º Bernardo · 2º Miguel Boo · César al remate &nbsp;|&nbsp; <strong>Penaltis:</strong> Decisión del staff
                 </div>
                 ${isAdmin ? `<button onclick="openMatchSheet()" style="margin-top:8px;padding:6px 14px;background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4);border-radius:8px;font-size:0.75rem;cursor:pointer;font-weight:600;">
                     <i class="fas fa-print" style="margin-right:4px;"></i>Hoja de Partido
@@ -1092,22 +1092,24 @@ const MATCH_PLAN = {
     matchId: 5,
     gkFirstHalf: 3,                 // Mourelo
     outAtHalf: [3, 26, 21],         // Mourelo (portería), Damián, Lata
-    secondHalfGk: 'A decidir en el vestuario (Vizoso o Graña)',
+    secondHalfGk: 'A decidir en el vestuario',
     notes: [
-        'Mourelo empieza en portería en la 1ª parte; en la 2ª parte se decide en el vestuario (Vizoso o Graña).',
+        'Mourelo empieza en portería en la 1ª parte; en la 2ª parte se decide en el vestuario.',
         'Damián juega la 1ª parte y se va al descanso.',
-        'Zaga titular: Roibás, Lata, Alfonso y Miguel Amor. Lata sale al descanso.',
+        'Zaga titular: ★Miguel Amor, Roibás, Alfonso y Lata. Lata sale al descanso.',
+        'Delantera: Graña, ★Ferro y Pepe. César anclado en el medio, ★Bernardo manda.',
         'Nadie juega los 90 minutos: decisiones del staff según el partido.',
     ],
     rotations: [
-        "~30-35' (1ª): sale Bernardo → Marcos baja a su sitio → entra Yuyi",
+        "~30-35' (1ª): sale ★Bernardo → entra Yuyi (Marcos baja a su sitio)",
         'Descanso: fuera Mourelo (portería), Damián y Lata → entran los que decida el staff',
-        "~80': sale Boo → entra Charlie",
+        "~60': entra Toni o Durán si hace falta frescura en el medio",
+        "~80': sale Graña o Pepe → entra Charlie",
         'Lo demás: decisión del staff en el vestuario',
     ],
     setPieces: {
-        faltas: '1º Bernardo · 2º Miguel Boo o Miguel Amor · César al remate',
-        cornersFor: 'Suben Roibás, Alfonso y César — ★Miguel Amor se queda de cierre atrás',
+        faltas: '1º Bernardo · 2º Miguel Boo · César al remate',
+        cornersFor: 'Suben Roibás y Alfonso (César al remate) — ★Lata y ★Miguel Amor cierran atrás',
         cornersAgainst: 'Dentro: Roibás (ancla), Lata (1er palo), Alfonso (2º palo), César (marca), Bernardo (rebotes). Fuera: ★Miguel Amor. ★Pepe suelto de contra. No cierran: Vizoso, Durán',
         penaltis: 'Decisión del staff',
     },

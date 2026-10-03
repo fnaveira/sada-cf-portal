@@ -46,8 +46,8 @@
 - **Alfonso**: defensa central (3º zaga / cierre por Lata); `delantero,defensa`.
 
 ### Balones parados y corners
-- Faltas/corners: **1º ★Bernardo · 2º Miguel Boo o Miguel Amor** · César al remate.
-- **Corners (ataque)**: suben Roibás, Alfonso y César; **★M.Amor queda de CIERRE atrás**.
+- Faltas/corners: **1º ★Bernardo · 2º Miguel Boo** · César al remate. **★Miguel Amor NO saca/finaliza córners: es el CIERRE.**
+- **Corners (ataque)**: **suben Roibás y Alfonso** (César al remate); **cierran ★Lata y ★Miguel Amor**.
 - **Corners en contra**: dentro Caamaño, Roibás (ancla), Lata (1er palo), Alfonso (2º palo), César (marca), ★Bernardo (rebotes). **★M.Amor cierra FUERA** con Albarracin; ★Pepe suelto de contra. No cierran: Vizoso, Sergio.
 
 ### Rotación
