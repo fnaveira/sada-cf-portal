@@ -245,7 +245,7 @@ function renderConvocatoria() {
                     <i class="fas fa-clock" style="margin-right:3px;"></i>Llegar <strong>30 min antes</strong> del saque inicial. El <strong>11 titular</strong> se confirmará según los jugadores que lleguen.
                 </div>
                 <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;padding:4px 8px;background:rgba(255,255,255,0.08);border-radius:6px;">
-                    <i class="fas fa-futbol" style="margin-right:3px;"></i><strong>Faltas/Corners:</strong> 1º Bernardo · 2º César &nbsp;|&nbsp; <strong>Penaltis:</strong> Decisión del staff
+                    <i class="fas fa-futbol" style="margin-right:3px;"></i><strong>Faltas/Corners:</strong> 1º Bernardo · 2º Miguel Boo o Miguel Amor · César al remate &nbsp;|&nbsp; <strong>Penaltis:</strong> Decisión del staff
                 </div>
                 ${isAdmin ? `<button onclick="openMatchSheet()" style="margin-top:8px;padding:6px 14px;background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4);border-radius:8px;font-size:0.75rem;cursor:pointer;font-weight:600;">
                     <i class="fas fa-print" style="margin-right:4px;"></i>Hoja de Partido
@@ -1087,6 +1087,32 @@ function closeLightbox(e) {
     }
 }
 
+// PLAN DEL PARTIDO — se actualiza cada jornada (usado por la Hoja de Partido)
+const MATCH_PLAN = {
+    matchId: 5,
+    gkFirstHalf: 3,                 // Mourelo
+    outAtHalf: [3, 26, 21],         // Mourelo (portería), Damián, Lata
+    secondHalfGk: 'A decidir en el vestuario (Vizoso o Graña)',
+    notes: [
+        'Mourelo empieza en portería en la 1ª parte; en la 2ª parte se decide en el vestuario (Vizoso o Graña).',
+        'Damián juega la 1ª parte y se va al descanso.',
+        'Zaga titular: Roibás, Lata, Alfonso y Miguel Amor. Lata sale al descanso.',
+        'Nadie juega los 90 minutos: decisiones del staff según el partido.',
+    ],
+    rotations: [
+        "~30-35' (1ª): sale Bernardo → Marcos baja a su sitio → entra Yuyi",
+        'Descanso: fuera Mourelo (portería), Damián y Lata → entran los que decida el staff',
+        "~80': sale Boo → entra Charlie",
+        'Lo demás: decisión del staff en el vestuario',
+    ],
+    setPieces: {
+        faltas: '1º Bernardo · 2º Miguel Boo o Miguel Amor · César al remate',
+        cornersFor: 'Suben Roibás, Alfonso y César — ★Miguel Amor se queda de cierre atrás',
+        cornersAgainst: 'Dentro: Roibás (ancla), Lata (1er palo), Alfonso (2º palo), César (marca), Bernardo (rebotes). Fuera: ★Miguel Amor. ★Pepe suelto de contra. No cierran: Vizoso, Durán',
+        penaltis: 'Decisión del staff',
+    },
+};
+
 // MATCH SHEET (PRINTABLE)
 function openMatchSheet() {
     const today = new Date();
@@ -1111,9 +1137,17 @@ function openMatchSheet() {
 
     const posLabels = { portero: 'Portero', defensa: 'Defensa', centrocampista: 'Centrocampista', delantero: 'Delantero' };
     const formatPos = (p) => {
-        const primary = getPrimaryPosition(p);
+        const primary = getPrimaryPosition(p.position);
         return posLabels[primary] || p.position || '';
     };
+
+    const plan = (typeof MATCH_PLAN !== 'undefined' && MATCH_PLAN && nextMatch && MATCH_PLAN.matchId === nextMatch.id) ? MATCH_PLAN : null;
+    const isGk = (p) => !!(plan && p.id === plan.gkFirstHalf);
+    const sheetPos = (p) => (isGk(p) ? 'Portero' : formatPos(p));
+    const orderedTitulares = [...titularesPlayers].sort((a, b) => (isGk(b) ? 1 : 0) - (isGk(a) ? 1 : 0));
+    const shortName = (p) => p.nickname || p.name;
+    const isOutAtHalf = (p) => !!(plan && plan.outAtHalf.includes(p.id));
+    const halfFlag = (p) => isOutAtHalf(p) ? ' <span style="color:#b45309;font-size:9px;font-weight:700;">(1ª parte)</span>' : '';
 
     const sheetHtml = `
     <div class="match-sheet" id="matchSheetContent">
@@ -1174,55 +1208,64 @@ function openMatchSheet() {
         <div class="ms-section">
             <div class="ms-section-title">1ª Parte - Alineación Titular</div>
             <table>
-                <thead><tr><th style="width:30px;">#</th><th style="width:30px;">Dorsal</th><th>Jugador</th><th style="width:100px;">Posición</th></tr></thead>
+                <thead><tr><th style="width:30px;">#</th><th style="width:40px;">Dorsal</th><th>Jugador</th><th style="width:120px;">Posición</th></tr></thead>
                 <tbody>
-                    <tr><td style="font-weight:700;color:#1e40af;">1</td><td>12</td><td>Fernández Álvarez, Iván</td><td class="ms-pos">Portero</td></tr>
-                    <tr><td style="font-weight:700;color:#1e40af;">2</td><td>25</td><td>Roibás Naveiro, Alberto</td><td class="ms-pos">Defensa</td></tr>
-                    <tr><td style="font-weight:700;color:#1e40af;">3</td><td>4</td><td>Martínez Vázquez, Alfonso</td><td class="ms-pos">Defensa</td></tr>
-                    <tr><td style="font-weight:700;color:#1e40af;">4</td><td>7</td><td>Amor Haz, Miguel</td><td class="ms-pos">Defensa</td></tr>
-                    <tr><td style="font-weight:700;color:#1e40af;">5</td><td>29</td><td>Mallo López, Jose Luis</td><td class="ms-pos">Mediocentro</td></tr>
-                    <tr><td style="font-weight:700;color:#1e40af;">6</td><td>22</td><td>París Labandeira, Damián</td><td class="ms-pos">Mediocentro</td></tr>
-                    <tr><td style="font-weight:700;color:#1e40af;">7</td><td>21</td><td>Seoane Barros, Antonio</td><td class="ms-pos">Mediocentro</td></tr>
-                    <tr><td style="font-weight:700;color:#1e40af;">8</td><td>15</td><td>Teixeira Fernández, Julio</td><td class="ms-pos">Mediocentro</td></tr>
-                    <tr><td style="font-weight:700;color:#1e40af;">9</td><td>11</td><td>Boo Fernández, Miguel</td><td class="ms-pos">Mediapunta</td></tr>
-                    <tr><td style="font-weight:700;color:#1e40af;">10</td><td>23</td><td>Freire Lesta, César</td><td class="ms-pos">Mediocentro</td></tr>
-                    <tr><td style="font-weight:700;color:#1e40af;">11</td><td>26</td><td>Graña Pita, Pablo</td><td class="ms-pos">Delantero</td></tr>
+                    ${orderedTitulares.length ? orderedTitulares.map((p, i) => `
+                    <tr><td style="font-weight:700;color:#1e40af;">${i + 1}</td><td>${p.number}</td><td>${p.name}${halfFlag(p)}</td><td class="ms-pos">${sheetPos(p)}</td></tr>`).join('') :
+                    `<tr><td colspan="4" style="color:#999;">Sin 11 montado — ve a Admin y arrastra los titulares al campo</td></tr>`}
                 </tbody>
             </table>
         </div>
 
         <div class="ms-section">
-            <div class="ms-section-title">2ª Parte - Cambios</div>
+            <div class="ms-section-title">2ª Parte - Plan de cambios (a decidir)</div>
             <table>
-                <thead><tr><th style="width:25px;">#</th><th style="width:40px;">Entra</th><th>Jugador entra</th><th style="width:40px;">Sale</th><th>Jugador sale</th></tr></thead>
+                <thead><tr><th style="width:25px;">#</th><th style="width:35%;">Sale (descansa)</th><th>Entra / Decide el staff</th></tr></thead>
                 <tbody>
-                    ${[1,2,3,4,5].map(num => `<tr><td style="font-weight:700;color:#1e40af;">${num}</td><td></td><td></td><td></td><td></td></tr>`).join('')}
+                    ${(plan ? [
+                        `Mourelo <span style="color:#888;font-size:9px;">(POR)</span>`,
+                        'Damián',
+                        'Lata',
+                    ].map((out, i) => `
+                    <tr><td style="font-weight:700;color:#1e40af;">${i + 1}</td><td>${out}</td><td style="color:#666;">${i === 0 ? plan.secondHalfGk : '&nbsp;'}</td></tr>`).join('') : '')}
+                    ${[1, 2, 3].map(num => `<tr><td style="font-weight:700;color:#1e40af;">${(plan ? 3 : 0) + num}</td><td></td><td></td></tr>`).join('')}
                 </tbody>
             </table>
+            ${plan ? `<div style="font-size:9px;color:#666;margin-top:4px;"><strong>Rotaciones orientativas:</strong> ${plan.rotations.join(' · ')}</div>` : ''}
         </div>
 
         <div class="ms-section">
             <div class="ms-section-title">Suplentes</div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;">
-                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#2</strong> Garea, Miguel Á. <span style="color:#888;font-size:9px;">DF/CC</span></div>
-                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#3</strong> Charlie <span style="color:#888;font-size:9px;">DL/DF</span></div>
-                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#13</strong> Seijo, Sergio <span style="color:#888;font-size:9px;">CC/DF</span></div>
-                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#18</strong> Vizoso <span style="color:#888;font-size:9px;">CC</span></div>
-                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#1</strong> Albarracín, Miguel Á. <span style="color:#888;font-size:9px;">DF/CC/DL</span></div>
+                ${suplentesPlayers.length ? suplentesPlayers.map(p => `
+                <div style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:10px;"><strong style="color:#1e40af;">#${p.number}</strong> ${shortName(p)} <span style="color:#888;font-size:9px;">${formatPos(p)}</span></div>`).join('') :
+                `<div style="color:#999;font-size:10px;">Sin suplentes</div>`}
+            </div>
+            <div style="font-size:9px;color:#666;margin-top:4px;">${convocados.length} convocados · ${orderedTitulares.length} titulares · ${suplentesPlayers.length} en el banco</div>
+        </div>
+
+        <div class="ms-section">
+            <div class="ms-section-title">Plan del partido</div>
+            <div style="font-size:10px;color:#444;line-height:1.5;">
+                ${(plan ? plan.notes : ['Rotaciones y cambios: decisión del staff en el vestuario.']).map(n => `<div>• ${n}</div>`).join('')}
             </div>
         </div>
 
         <div class="ms-section">
             <div class="ms-section-title">Cuerpo Técnico</div>
-            <div style="font-size:10px;color:#555;">Delegado: Francisco Navaira García</div>
+            <div style="font-size:10px;color:#555;">Delegado: Francisco Naveira García</div>
         </div>
 
         <div class="ms-grid-2">
             <div>
                 <div class="ms-notes-title">Faltas Directas</div>
-                <div style="font-size:10px;font-weight:600;color:#1e40af;padding:4px 0;">César Freire Lesta (#23)</div>
-                <div class="ms-notes-title" style="margin-top:6px;">Córners</div>
-                <div style="font-size:10px;font-weight:600;color:#1e40af;padding:4px 0;">Miguel Boo (#11) / Toni (#15)</div>
+                <div style="font-size:10px;font-weight:600;color:#1e40af;padding:4px 0;">${plan ? plan.setPieces.faltas : 'César Freire Lesta'}</div>
+                <div class="ms-notes-title" style="margin-top:6px;">Córners (ataque)</div>
+                <div style="font-size:10px;font-weight:600;color:#1e40af;padding:4px 0;">${plan ? plan.setPieces.cornersFor : 'Miguel Boo / Toni'}</div>
+                <div class="ms-notes-title" style="margin-top:6px;">Córners (en contra)</div>
+                <div style="font-size:9px;color:#555;padding:2px 0;">${plan ? plan.setPieces.cornersAgainst : ''}</div>
+                <div class="ms-notes-title" style="margin-top:6px;">Penaltis</div>
+                <div style="font-size:10px;font-weight:600;color:#1e40af;padding:4px 0;">${plan ? plan.setPieces.penaltis : 'Decisión del staff'}</div>
             </div>
             <div>
                 <div class="ms-notes-title">Notas del Partido</div>
