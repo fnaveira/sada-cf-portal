@@ -57,7 +57,7 @@
 - Roibás no se cambia (sin central de recambio tras salir Lata).
 
 ## Partido: Liceo de Monelos S.D. (id=5) — J4
-- **03/10/2026 (domingo) · 12:00 · O Loureiro (Oza dos Ríos) · LOCALES** (`home=1`, así lo lista FGF: "SADA vs LICEO").
+- **04/10/2026 (domingo) · 12:00 · O Loureiro (Oza dos Ríos) · LOCALES** (`home=1`, así lo lista FGF: "SADA vs LICEO"; la FGF pone la jornada en sábado 03, el partido es el domingo).
   - **Somos locales pero jugamos en el campo de Oza dos Ríos — "O Loureiro", Loureiro 3, 15380 (mismo campo que J13 vs Oza): el campo del Sada (As Mariñas/Carnoedo) está en obras** → los próximos partidos en casa pueden cambiar de sede; preguntar al mister.
 - **Convocatoria: 18** (`pendingConfirm = []`). IDs: 3,4,5,7,9,10,13,14,15,16,17,18,19,20,21,25,26,100.
   - Fuera: **Caamaño (`no_disponible`)**, Cabana (`baja`), Garea/Santi/Julio (`lesionado`), Pirulo, Sergio, Albarracin.
