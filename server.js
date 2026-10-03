@@ -159,7 +159,7 @@ async function initDB() {
       [2,"Narón Silver Catering","2026-09-13","10:00","O Cadaval (Narón)",0,"Liga","J1",null,"https://www.futbuteo.com/escudos/80/gal-17520434.webp"],
 [3,"Sporting Cambre As Travesas","2026-09-19",null,"O Campo do Cambre",0,"Liga","J2",null,"https://www.futbuteo.com/escudos/80/gal-4227660.webp"],
       [4,"Portazgo S.D.","2026-09-27","12:00","A Lavandeira (Culleredo)",0,"Liga","J3",null,null],
-      [5,"Liceo de Monelos S.D.","2026-10-03","12:00","Oza de los Ríos",1,"Liga","J4",null,"https://www.futbuteo.com/escudos/80/gal-564.webp"],
+      [5,"Liceo de Monelos S.D.","2026-10-03","12:00","O Loureiro (Oza dos Ríos)",1,"Liga","J4",null,"https://www.futbuteo.com/escudos/80/gal-564.webp"],
       [6,"Xuventude Dorneda","2026-10-10",null,"A Marola",0,"Liga","J5",null,"https://www.futbuteo.com/escudos/80/gal-2409271.webp"],
       [7,"Cedeira S.D.","2026-10-17",null,"As Mariñas/Carnoedo",1,"Liga","J6",null,null],
       [8,"Betanzos Norte","2026-10-24",null,"O Carregal (Betanzos)",0,"Liga","J7",null,"https://www.futbuteo.com/escudos/80/gal-4214191.webp"],
@@ -169,7 +169,7 @@ async function initDB() {
       [12,"U.D. Narahío","2026-11-21",null,"As Mariñas/Carnoedo",1,"Liga","J10",null,"https://www.futbuteo.com/escudos/80/gal-14119716.webp"],
       [13,"Sporting Burgo","2026-11-28",null,"A Lavandeira (Culleredo)",0,"Liga","J11",null,"https://www.futbuteo.com/escudos/80/gal-24259450.webp"],
       [14,"U.D. Paiosaco H.Añón","2026-12-05",null,"As Mariñas/Carnoedo",1,"Liga","J12",null,"https://www.futbuteo.com/escudos/80/gal-734.webp"],
-      [15,"Oza de los Ríos","2026-12-12",null,"O Loureiro (Oza De Los Rios)",0,"Liga","J13",null,null],
+      [15,"Oza de los Ríos","2026-12-12",null,"O Loureiro (Oza dos Ríos)",0,"Liga","J13",null,null],
       [16,"San Martín S.D.","2026-12-19",null,"A Revolta (Queixas)",0,"Liga","J14",null,"https://www.futbuteo.com/escudos/80/gal-7576246.webp"]
     ]) await db.execute({ sql: 'INSERT OR IGNORE INTO matches (id,rival,date,time,venue,home,competition,round,result,shieldUrl) VALUES (?,?,?,?,?,?,?,?,?,?)', args: m.map(a => a === undefined ? null : a) });
     console.log('✅ Matches inserted (was empty)');
@@ -292,7 +292,7 @@ async function seedData() {
     [2,"Narón Silver Catering","2026-09-13","10:00","O Cadaval (Narón)",0,"Liga","J1",null,"https://www.futbuteo.com/escudos/80/gal-17520434.webp"],
     [3,"Sporting Cambre As Travesas","2026-09-19",null,"O Campo do Cambre",0,"Liga","J2",null,"https://www.futbuteo.com/escudos/80/gal-4227660.webp"],
     [4,"Portazgo S.D.","2026-09-27","12:00","A Lavandeira (Culleredo)",0,"Liga","J3",null,null],
-    [5,"Liceo de Monelos S.D.","2026-10-03","12:00","Oza de los Ríos",1,"Liga","J4",null,"https://www.futbuteo.com/escudos/80/gal-564.webp"],
+    [5,"Liceo de Monelos S.D.","2026-10-03","12:00","O Loureiro (Oza dos Ríos)",1,"Liga","J4",null,"https://www.futbuteo.com/escudos/80/gal-564.webp"],
     [6,"Xuventude Dorneda","2026-10-10",null,"A Marola",0,"Liga","J5",null,"https://www.futbuteo.com/escudos/80/gal-2409271.webp"],
     [7,"Cedeira S.D.","2026-10-17",null,"As Mariñas/Carnoedo",1,"Liga","J6",null,null],
     [8,"Betanzos Norte","2026-10-24",null,"O Carregal (Betanzos)",0,"Liga","J7",null,"https://www.futbuteo.com/escudos/80/gal-4214191.webp"],
@@ -302,7 +302,7 @@ async function seedData() {
     [12,"U.D. Narahío","2026-11-21",null,"As Mariñas/Carnoedo",1,"Liga","J10",null,"https://www.futbuteo.com/escudos/80/gal-14119716.webp"],
     [13,"Sporting Burgo","2026-11-28",null,"A Lavandeira (Culleredo)",0,"Liga","J11",null,"https://www.futbuteo.com/escudos/80/gal-24259450.webp"],
     [14,"U.D. Paiosaco H.Añón","2026-12-05",null,"As Mariñas/Carnoedo",1,"Liga","J12",null,"https://www.futbuteo.com/escudos/80/gal-734.webp"],
-    [15,"Oza de los Ríos","2026-12-12",null,"O Loureiro (Oza De Los Rios)",0,"Liga","J13",null,null],
+    [15,"Oza de los Ríos","2026-12-12",null,"O Loureiro (Oza dos Ríos)",0,"Liga","J13",null,null],
     [16,"San Martín S.D.","2026-12-19",null,"A Revolta (Queixas)",0,"Liga","J14",null,"https://www.futbuteo.com/escudos/80/gal-7576246.webp"]
   ]) await P('INSERT OR IGNORE INTO matches (id,rival,date,time,venue,home,competition,round,result,shieldUrl) VALUES (?,?,?,?,?,?,?,?,?,?)', m);
   for (const r of [[1,"2026-07-25","Sada F.C. A Nosa Viña","CD Pilar",3,1,"Campo de Sada"],[2,"2026-07-18","UD Ponte","Sada F.C. A Nosa Viña",0,2,"Campo da Ponte"],[3,"2026-07-11","Sada F.C. A Nosa Viña","CF Narón",1,1,"Campo de Sada"],[4,"2026-07-04","SD Bergondo","Sada F.C. A Nosa Viña",2,1,"Campo de Bergondo"],[5,"2026-06-27","Sada F.C. A Nosa Viña","CD Meira",4,0,"Campo de Sada"],[6,"2026-06-20","UD Montaña","Sada F.C. A Nosa Viña",1,3,"Campo da Montaña"]]) await P('INSERT OR IGNORE INTO results (id,date,home,away,homeScore,awayScore,venue) VALUES (?,?,?,?,?,?,?)', r);
