@@ -67,8 +67,8 @@
 
 ### Dorsales — fuente oficial
 - `players.number` **NO** eran dorsales: eran los números de calle del campo "Número" de las fichas de licencia `NFG_GC_VisLicencia` (por eso había duplicados: Mourelo/César 10, etc.).
-- Dorsales reales = columna `Nº` de `NFG_CMP_Alineacion_Resultados` (actas de J1/J2/J3 y Copa). **23/26 confirmados y ya aplicados** (commit `479d6f0`): Caamaño 1 · Garea 2 · Mourelo 3 · Alfonso 4 · Charlie 5 · Miguel 7 · Pirulo 9 · Ferro 10 · Boo 11 · Julio 13 · Santi 14 · Sergio 15 · Bernardo 16 · Yuyi 18 · Pepe 19 · Toni 21 · Damián 22 · César 23 · Roibás 25 · Graña 26 · Vizoso 27 · Marcos 28 · Lata 30.
-- **Sin dorsal confirmado: Durán (id17, CONVOCADO J4), Albarracin (id24), Cabana (id6)** → preguntar al mister o mirar actas futuras.
+- Dorsales reales = columna `Nº` de `NFG_CMP_Alineacion_Resultados` (actas de J1/J2/J3 y Copa). **24/26 confirmados y ya aplicados** (commit `479d6f0`): Caamaño 1 · Garea 2 · Mourelo 3 · Alfonso 4 · Charlie 5 · Miguel 7 · Pirulo 9 · Ferro 10 · Boo 11 · **Durán 12 (asignado por indicación del usuario)** · Julio 13 · Santi 14 · Sergio 15 · Bernardo 16 · Yuyi 18 · Pepe 19 · Toni 21 · Damián 22 · César 23 · Roibás 25 · Graña 26 · Vizoso 27 · Marcos 28 · Lata 30.
+- **Sin dorsal confirmado: Albarracin (id24), Cabana (id6)** → preguntar al mister o mirar actas futuras.
 
 ### Tarjetas — fuente oficial
 - Las **actas solo listan las tarjetas del equipo local** → no sirven para contar las nuestras fuera de casa. No usar `NFG_CmpPartido` para tarjetas.

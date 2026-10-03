@@ -262,7 +262,7 @@ async function seedData() {
   await P(PS, [14,"Jose Luis Mallo López","Pepe",19,"delantero,defensa",41,"disponible",0,0,0,"47372440F","1984-10-21","FONTAN","607366765","pepitosada@gmail.com","Sada","A Coruña","Sada","Española"]);
   await P(PS, [15,"Antonio Seoane Barros","Toni",21,"centrocampista,defensa",39,"disponible",0,0,0,"53305250J","1987-01-15","PUERTO","670283555","antoseoane87@gmail.com","Sada","A Coruña","Sada","Española"]);
   await P(PS, [16,"César Freire Lesta","César",23,"centrocampista,defensa,delantero",46,"disponible",0,0,0,"79325247H","1980-02-08","XOAN VICENTE","663495926","cesarfreirelesta@gmail.com","Sada","A Coruña","Sada","Española"]);
-  await P(PS, [17,"Alberto Durán Alfonsín","Durán",34,"centrocampista",42,"no_disponible",0,0,0,"32839757N","1984-02-24","C/PARAMO","632145678","duriflexia@hotmail.com","A Coruña","A Coruña","A Coruña","Española"]);
+  await P(PS, [17,"Alberto Durán Alfonsín","Durán",12,"centrocampista",42,"no_disponible",0,0,0,"32839757N","1984-02-24","C/PARAMO","632145678","duriflexia@hotmail.com","A Coruña","A Coruña","A Coruña","Española"]);
   await P(PS, [18,"Alberto Roibás Naveiro","Roibás",25,"defensa,centrocampista",45,"disponible",0,0,0,"46917135X","1981-06-03","DE LA PLAYA","632147258","roi.mendezsua@gmail.com","Sada","A Coruña","Oleiros","Española"]);
   await P(PS, [19,"Pablo Graña Pita","Graña",26,"centrocampista,defensa",42,"disponible",0,0,0,"79336019A","1984-05-31","LGAR A PENA","625635910","pablogranapita84@gmail.com","Paderne","A Coruña","Paderne","Española"]);
   await P(PS, [20,"Javier Vizoso Guerra","Vizoso",27,"centrocampista",54,"disponible",0,0,0,"79311954L","1971-09-19","PLAZA CORMELANA","647804232","javi@geonor.es","A Coruña","A Coruña","Sada","Española"]);
