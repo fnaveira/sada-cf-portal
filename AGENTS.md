@@ -56,6 +56,19 @@
 - **~60'**: Toni → Sergio (solo medio ~20' máx). **~80'**: Boo → Charlie.
 - Roibás no se cambia (sin central de recambio tras salir Lata).
 
+## Partido: Liceo de Monelos S.D. (id=5) — J4
+- **03/10/2026 (domingo) · 12:00 · Oza de los Ríos · LOCALES** (`home=1`, así lo lista FGF: "SADA vs LICEO"); **venue corregido por el mister: NO es As Mariñas**.
+- **Convocatoria: 18** (`pendingConfirm = []`). IDs: 3,4,5,7,9,10,13,14,15,16,17,18,19,20,21,25,26,100.
+  - Fuera: **Caamaño (`no_disponible`)**, Cabana (`baja`), Garea/Santi/Julio (`lesionado`), Pirulo, Sergio, Albarracin.
+  - "Miguel B" = **Miguel Boo** (id 10). Mourelo (3) y Durán (17) pasan a `disponible` (estaban `no_disponible`).
+  - `formation` limpiada de Pirulo (no convocado); XI actual = 13,26,15,14,4,16 (11 lo monta el staff).
+
+### Tarjetas — fuente oficial
+- Las **actas solo listan las tarjetas del equipo local** → no sirven para contar las nuestras fuera de casa. No usar `NFG_CmpPartido` para tarjetas.
+- Fuente correcta: **ficha de sanciones** `NFG_ShwSancionesJugSnc?CodTemporada=22&CodParticipante=<id>&cod_primaria=1000129` (ids en los enlaces `NFG_EQ_VisSanciones_jugador` de la plantilla `NFG_VisEquipos?cod_primaria=1000102&Codigo_Equipo=4261861`).
+- **Recuento (03/10/2026)**: 🟨 Miguel 1 (J1 Narón) · 🟨 Graña 1 (J1 Narón) · 🟨 Yuyi 1 (J3 Portazgo) · 🟨 Julio 1 (Copa Larín) · 🟥 0 → **nadie suspendido**.
+- Sync: `node -r dotenv/config scrape-futgal.js sanciones` → reconstruye `match_cards` + `players.yellowCards/redCards` (respeta los minutos ya guardados).
+
 ## Comandos útiles
 - Verificar API en vivo: `curl -s https://sada-cf-portal.onrender.com/api/init | head -c 300`
 - Consultar Turso: `node -e "const db=require('./db.js'); db.execute({sql:'...'}).then(r=>console.log(r.rows))"`

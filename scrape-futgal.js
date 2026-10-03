@@ -19,7 +19,7 @@ const FUTGAL_MAP = {
   28369765: 'Marcos', 7344010: 'Lata', 7343840: 'Pepe', 80216: 'Alfonso',
   106700: 'Mourelo', 116203: 'Damián', 56475: 'Roibás', 39879: 'Santi',
   87776: 'Sergio', 90618: 'Toni', 40747: 'Julio', 18231689: 'Vizoso',
-  27599289: 'Fran', 17298560: 'Albarracin',
+  27599289: 'Fran', 17298560: 'Albarracin', 56074: 'Yuyi',
 };
 
 const REVERSE_MAP = {};
@@ -261,6 +261,116 @@ async function scrapeSanciones(page) {
   }
 
   return results;
+}
+
+// ====== SCRAPER: FICHAS DE SANCIONES (fuente oficial de tarjetas) ======
+// Las actas solo muestran las tarjetas del equipo LOCAL, así que las nuestras
+// en partidos fuera no aparecen. La ficha de sanciones de cada jugador sí es oficial.
+async function syncCardsFromFichas(page) {
+  console.log('\n🟨 Scrapando fichas de sanciones de jugadores...');
+  await safeGoto(page, `${FUTGAL_URL}NPcd/NFG_VisEquipos?cod_primaria=1000102&Codigo_Equipo=4261861`);
+
+  const sanctioned = await page.evaluate(() => {
+    const out = [];
+    document.querySelectorAll('a[href*="VisSanciones_jugador"]').forEach(a => {
+      const m = (a.getAttribute('href') || '').match(/VisSanciones_jugador\((\d+)/);
+      const tr = a.closest('tr');
+      const row = tr ? tr.innerText.replace(/\s+/g, ' ').trim() : '';
+      if (m) out.push({ fid: parseInt(m[1], 10), name: row.replace(/\s+VETERANO.*$/i, '').trim() });
+    });
+    return out;
+  });
+
+  if (!sanctioned.length) {
+    console.log('  Ningún jugador con sanciones en FGF');
+    return [];
+  }
+  console.log(`  ${sanctioned.length} jugadores con sanciones`);
+
+  const sanctions = [];
+  for (const s of sanctioned) {
+    await safeGoto(page, `${FUTGAL_URL}NFG_ShwSancionesJugSnc?CodTemporada=22&CodParticipante=${s.fid}&cod_primaria=1000129&nueva_ventana=1`);
+    const text = await page.evaluate(() => document.body.innerText);
+    const nickname = FUTGAL_MAP[s.fid] || null;
+    const parts = text.split(/DETALLE COMPETICIÓN:/i).slice(1);
+    if (!parts.length) { console.log(`  ⚠ ${s.name}: sin detalle de sanciones`); continue; }
+    for (const part of parts) {
+      const head = part.split(/Fecha\s+Partido/i)[0] || '';
+      const comp = /COPA/i.test(head) ? 'Copa' : 'Liga';
+      const tipo = ((part.match(/TIPO DE SANCIÓN:\s*([^\n]+)/i) || [])[1] || '').trim();
+      const type = /EXPULSI/i.test(tipo) ? 'red' : 'yellow';
+      const dates = [...part.matchAll(/(\d{2})-(\d{2})-(\d{4})/g)].map(d => `${d[3]}-${d[2]}-${d[1]}`);
+      for (const date of dates) sanctions.push({ fid: s.fid, name: s.name, nickname, comp, type, date });
+      if (dates.length) {
+        console.log(`  ${type === 'red' ? '🟥' : '🟨'} ${nickname || s.name} · ${comp} · ${dates.length} → ${dates.join(', ')}${tipo ? ' [' + tipo + ']' : ''}`);
+      }
+    }
+  }
+  return sanctions;
+}
+
+async function applySanctionsToDB(sanctions) {
+  if (!sanctions.length) return;
+
+  const matchRows = (await db.execute({ sql: 'SELECT id, date, competition FROM matches' })).rows;
+  const playerRows = (await db.execute({ sql: 'SELECT id, nickname, name FROM players' })).rows;
+  const norm = t => (t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z, ]/g, '');
+
+  const findPlayer = (s) => {
+    if (s.nickname) {
+      const byNick = playerRows.find(p => p.nickname === s.nickname);
+      if (byNick) return byNick;
+    }
+    const target = norm(s.name);
+    return playerRows.find(p => norm(p.name).includes(target) || (target && norm(p.name).split(',')[0] && target.includes(norm(p.name).split(',')[0]))) || null;
+  };
+  const findMatch = (date, comp) => {
+    const t = Date.parse(date + 'T00:00:00');
+    let best = null, diff = Infinity;
+    for (const m of matchRows) {
+      if (m.competition !== comp) continue;
+      const d = Math.abs(Date.parse(m.date + 'T00:00:00') - t);
+      if (d <= 7 * 86400000 && d < diff) { best = m; diff = d; }
+    }
+    return best;
+  };
+
+  const desired = [];
+  for (const s of sanctions) {
+    const p = findPlayer(s);
+    const m = findMatch(s.date, s.comp);
+    if (!p) { console.log(`  ⚠ Sin jugador para "${s.name}"`); continue; }
+    if (!m) { console.log(`  ⚠ Sin partido para ${s.comp} ${s.date} (${s.name})`); continue; }
+    desired.push({ playerId: p.id, matchId: m.id, type: s.type, competition: s.comp });
+  }
+
+  const existing = (await db.execute({ sql: "SELECT id, playerId, matchId, type FROM match_cards WHERE competition IN ('Liga','Copa')" })).rows;
+  const consumed = new Set();
+  const toInsert = [];
+  for (const d of desired) {
+    const idx = existing.findIndex(e => !consumed.has(e.id) && e.playerId === d.playerId && e.matchId === d.matchId && e.type === d.type);
+    if (idx >= 0) consumed.add(existing[idx].id);
+    else toInsert.push(d);
+  }
+  const toDelete = existing.filter(e => !consumed.has(e.id));
+
+  for (const d of toInsert) {
+    await db.execute({ sql: 'INSERT INTO match_cards (playerId, matchId, type, competition) VALUES (?, ?, ?, ?)', args: [d.playerId, d.matchId, d.type, d.competition] });
+    console.log(`  ➕ ${d.type === 'red' ? 'roja' : 'amarilla'} nueva → jugador ${d.playerId}, partido ${d.matchId} (${d.competition})`);
+  }
+  for (const e of toDelete) {
+    await db.execute({ sql: 'DELETE FROM match_cards WHERE id=?', args: [e.id] });
+    console.log(`  ➖ borrada tarjeta id=${e.id} (jugador ${e.playerId}, partido ${e.matchId})`);
+  }
+
+  await db.execute({
+    sql: `UPDATE players SET
+      yellowCards = (SELECT COUNT(*) FROM match_cards c WHERE c.playerId = players.id AND c.type = 'yellow'),
+      redCards = (SELECT COUNT(*) FROM match_cards c WHERE c.playerId = players.id AND c.type = 'red')`
+  });
+
+  const counts = (await db.execute({ sql: 'SELECT nickname, yellowCards, redCards FROM players WHERE yellowCards > 0 OR redCards > 0 ORDER BY yellowCards DESC, redCards DESC' })).rows;
+  console.log('  📊 Recuento: ' + (counts.map(c => `${c.nickname} ${c.yellowCards}🟨${c.redCards ? ' ' + c.redCards + '🟥' : ''}`).join(' · ') || 'sin tarjetas'));
 }
 
 // ====== SCRAPER: PLANTILLA OFICIAL ======
@@ -631,6 +741,8 @@ async function updateDBFromStats(allStats) {
 
     if (mode === 'all' || mode === 'sanciones') {
       await scrapeSanciones(page);
+      const sanctions = await syncCardsFromFichas(page);
+      await applySanctionsToDB(sanctions);
     }
 
     console.log('\n✅ Scraping complete');
