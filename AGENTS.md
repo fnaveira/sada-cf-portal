@@ -62,7 +62,13 @@
 - **Convocatoria: 18** (`pendingConfirm = []`). IDs: 3,4,5,7,9,10,13,14,15,16,17,18,19,20,21,25,26,100.
   - Fuera: **Caamaño (`no_disponible`)**, Cabana (`baja`), Garea/Santi/Julio (`lesionado`), Pirulo, Sergio, Albarracin.
   - "Miguel B" = **Miguel Boo** (id 10) ✓ confirmado por el mister. Mourelo (3) y Durán (17) pasan a `disponible` (estaban `no_disponible`).
-  - `formation` limpiada de Pirulo (no convocado); XI actual = 13,26,15,14,4,16 (11 lo monta el staff).
+  - `formation` = **4-3-3 J4, 11 titulares montados** (ids): POR Mourelo(3) · Roibás(18) Lata(21) Alfonso(4) Miguel(7) · César(16) Bernardo(13) Damián(26) · Pepe(14) Ferro(9) Boo(10). Suplentes (7): Yuyi, Toni, Graña, Vizoso, Marcos, Durán, Charlie.
+  - **Plan (`MATCH_PLAN` en app.js → alimenta la "Hoja de Partido")**: Mourelo en portería la **1ª parte** (en la 2ª se decide en el vestuario: Vizoso o Graña); **Damián y Lata salen al descanso**; zaga titular Roibás-Lata-Alfonso-Miguel Amor; nadie juega 90'.
+
+### Dorsales — fuente oficial
+- `players.number` **NO** eran dorsales: eran los números de calle del campo "Número" de las fichas de licencia `NFG_GC_VisLicencia` (por eso había duplicados: Mourelo/César 10, etc.).
+- Dorsales reales = columna `Nº` de `NFG_CMP_Alineacion_Resultados` (actas de J1/J2/J3 y Copa). **23/26 confirmados y ya aplicados** (commit `479d6f0`): Caamaño 1 · Garea 2 · Mourelo 3 · Alfonso 4 · Charlie 5 · Miguel 7 · Pirulo 9 · Ferro 10 · Boo 11 · Julio 13 · Santi 14 · Sergio 15 · Bernardo 16 · Yuyi 18 · Pepe 19 · Toni 21 · Damián 22 · César 23 · Roibás 25 · Graña 26 · Vizoso 27 · Marcos 28 · Lata 30.
+- **Sin dorsal confirmado: Durán (id17, CONVOCADO J4), Albarracin (id24), Cabana (id6)** → preguntar al mister o mirar actas futuras.
 
 ### Tarjetas — fuente oficial
 - Las **actas solo listan las tarjetas del equipo local** → no sirven para contar las nuestras fuera de casa. No usar `NFG_CmpPartido` para tarjetas.
