@@ -72,41 +72,44 @@ function parseGoalsFromText(text) {
 // ====== SCRAPER: CLASIFICACIÓN ======
 async function scrapeClasificacion(page) {
   console.log('\n📊 Scraping clasificación...');
-  const baseUrl = `${FUTGAL_URL}NPcd/NFG_CmpJornada?cod_primaria=${LIGA.cod_primaria}&CodCompeticion=${LIGA.CodCompeticion}&CodGrupo=${LIGA.CodGrupo}&CodTemporada=${LIGA.CodTemporada}`;
-  await safeGoto(page, baseUrl);
-
-  const href = await page.evaluate(() => {
-    const a = [...document.querySelectorAll('a')].find(x => /Clasificaci/i.test(x.textContent || ''));
-    return a ? a.getAttribute('href') : null;
-  });
-  if (!href) {
-    console.log('  ⚠️ Enlace Clasificación no encontrado');
-    return [];
-  }
-  await safeGoto(page, `${FUTGAL_URL}NPcd/${href}`);
+  const JORNADA = process.env.FUTGAL_JORNADA || '4';
+  const url = `${FUTGAL_URL}NPcd/NFG_VisClasificacion?cod_primaria=${LIGA.cod_primaria}&codjornada=${JORNADA}&codcompeticion=${LIGA.CodCompeticion}&codgrupo=${LIGA.CodGrupo}`;
+  await safeGoto(page, url);
+  await WAIT(1500);
 
   const standings = await page.evaluate(() => {
     const rows = [];
+    const seen = new Set();
     for (const tr of document.querySelectorAll('table tr')) {
       const cells = [...tr.querySelectorAll('td')].map(c => c.textContent.replace(/\s+/g, ' ').trim());
-      if (cells.length === 11 && /^\d+$/.test(cells[0])) {
-        rows.push({
-          pos: parseInt(cells[0]) || 0,
-          team: cells[1] || '',
-          pts: parseInt(cells[2]) || 0,
-          played: parseInt(cells[3]) || 0,
-          won: parseInt(cells[4]) || 0,
-          drawn: parseInt(cells[5]) || 0,
-          lost: parseInt(cells[6]) || 0,
-          gf: parseInt(cells[7]) || 0,
-          ga: parseInt(cells[8]) || 0,
-        });
-      }
+      // tabla resumen: 11-13 celdas (la detallada tiene 17)
+      if (cells.length < 11 || cells.length > 13) continue;
+      let i = 0;
+      while (i < cells.length && !/^\d+$/.test(cells[i])) i++;
+      if (i + 8 >= cells.length) continue;
+      const nums = cells.slice(i + 2, i + 9).map(x => (/^\d+$/.test(x) ? parseInt(x) : NaN));
+      if (nums.some(isNaN)) continue;
+      const team = cells[i + 1];
+      if (!team || /^\d+$/.test(team)) continue;
+      const pos = parseInt(cells[i]);
+      if (seen.has(pos)) continue;
+      seen.add(pos);
+      rows.push({
+        pos,
+        team,
+        pts: nums[0],
+        played: nums[1],
+        won: nums[2],
+        drawn: nums[3],
+        lost: nums[4],
+        gf: nums[5],
+        ga: nums[6],
+      });
     }
     return rows;
   });
 
-  if (standings.length === 0) {
+  if (standings.length < 10) {
     console.log('  ⚠️ No standings found, page text:');
     const raw = await page.evaluate(() => document.body.innerText);
     console.log('  Page text (first 500):', raw.substring(0, 500));
@@ -346,8 +349,14 @@ async function scrapeAllActas(page) {
             let m;
             while ((m = teamRegex.exec(html)) !== null) teams.push(m[1].trim());
             const isOurMatch = teams.some(t => t.includes('SADA F.C.') || t.includes('NOSA VI'));
-            const resultEl = document.body.innerText.match(/(\d+)\s*[-–]\s*(\d+)/);
-            return { teams, isOurMatch, result: resultEl ? `${resultEl[1]}-${resultEl[2]}` : null };
+            const body = document.body.innerText;
+            const goles = body.match(/GOLES[\s\S]*?(?=TARJETAS|EQUIPO ARBITRAL|SUSTITUCION|$)/i);
+            const scope = goles ? goles[0] : body;
+            const cands = [...scope.matchAll(/(\d{1,2})\s*[-–]\s*(\d{1,2})(?![\d-])/g)]
+              .map(x => ({ a: parseInt(x[1], 10), b: parseInt(x[2], 10) }))
+              .filter(x => x.a <= 20 && x.b <= 20);
+            const result = cands.length ? `${cands[cands.length - 1].a}-${cands[cands.length - 1].b}` : null;
+            return { teams, isOurMatch, result };
           });
         } catch (e) {
           console.log(`  ⚠ Skip acta ${actaId} (${comp.name}): ${e.message.substring(0, 50)}`);
@@ -469,6 +478,31 @@ async function scrapeAllActas(page) {
 async function updateDBFromStats(allStats) {
   console.log('\n💾 Updating database from actas...');
 
+  // Goles de la temporada: suma de todas las actas (nunca por debajo de lo ya registrado)
+  const mapNick = (futgalName) => {
+    const entry = Object.entries(FUTGAL_MAP).find(([id, nick]) => {
+      const upper = String(futgalName).toUpperCase();
+      return upper.includes(nick.toUpperCase()) || nick.toUpperCase().includes(upper.split(',')[0]);
+    });
+    return entry ? entry[1].toLowerCase() : null;
+  };
+  const goalTotals = {};
+  for (const match of allStats) {
+    for (const [futgalName, count] of Object.entries((match.stats && match.stats.goals) || {})) {
+      const nick = mapNick(futgalName);
+      if (nick) goalTotals[nick] = (goalTotals[nick] || 0) + (parseInt(count, 10) || 0);
+    }
+  }
+  for (const [nick, total] of Object.entries(goalTotals)) {
+    const player = (await db.execute({ sql: 'SELECT id, goals FROM players WHERE LOWER(nickname)=?', args: [nick] })).rows[0];
+    if (!player) continue;
+    const newGoals = Math.max(player.goals || 0, total);
+    if (newGoals !== (player.goals || 0)) {
+      await db.execute({ sql: 'UPDATE players SET goals=? WHERE id=?', args: [newGoals, player.id] });
+      console.log(`  ⚽ ${nick}: ${player.goals || 0} → ${newGoals} goles`);
+    }
+  }
+
   for (const match of allStats) {
     const { actaId, competition, jornada, teams, result, stats, cards } = match;
 
@@ -479,36 +513,26 @@ async function updateDBFromStats(allStats) {
 
     let matchId = null;
     if (matchDate) {
-      const existing = await db.execute({ sql: 'SELECT id FROM matches WHERE date=? AND competition=?', args: [matchDate, competition] });
-      if (existing.rows.length > 0) {
-        matchId = existing.rows[0].id;
-        // Update result if not set
-        if (result && !existing.rows[0].result) {
+      // La fecha de la jornada de la FGF puede diferir en 1-2 días de la real: ventana de ±7 días
+      const cand = await db.execute({ sql: 'SELECT id, result, date FROM matches WHERE competition=?', args: [competition] });
+      const target = Date.parse(matchDate + 'T00:00:00');
+      let best = null, bestDiff = Infinity;
+      for (const row of cand.rows) {
+        const diff = Math.abs(Date.parse(row.date + 'T00:00:00') - target);
+        if (diff <= 7 * 86400000 && diff < bestDiff) { best = row; bestDiff = diff; }
+      }
+      if (best) {
+        matchId = best.id;
+        // Update result if not set (solo marcadores válidos "N-N")
+        if (result && /^\d{1,2}-\d{1,2}$/.test(result) && Number(result.split('-')[0]) <= 20 && Number(result.split('-')[1]) <= 20 && !best.result) {
           await db.execute({ sql: 'UPDATE matches SET result=? WHERE id=?', args: [result, matchId] });
-          console.log(`  📅 ${competition} ${matchDate}: result ${result}`);
+          console.log(`  📅 ${competition} ${best.date}: result ${result}`);
         }
       }
     }
 
-    // Goals aggregation
-    for (const [futgalName, count] of Object.entries(stats.goals)) {
-      const entry = Object.entries(FUTGAL_MAP).find(([id, nick]) => {
-        const upper = futgalName.toUpperCase();
-        return upper.includes(nick.toUpperCase()) || nick.toUpperCase().includes(upper.split(',')[0]);
-      });
-      if (entry) {
-        const nick = entry[1].toLowerCase();
-        const player = (await db.execute({ sql: 'SELECT id, goals FROM players WHERE LOWER(nickname)=?', args: [nick] })).rows[0];
-        if (player) {
-          const newGoals = Math.max(player.goals || 0, count);
-          await db.execute({ sql: 'UPDATE players SET goals=? WHERE id=?', args: [newGoals, player.id] });
-          if (newGoals > 0) console.log(`  ⚽ ${nick}: ${newGoals} goals`);
-        }
-      }
-    }
-
-    // Cards to match_cards table (only for Sada players)
-    if (matchId && cards && cards.sada) {
+    // Cards to match_cards table (only for Sada players) — solo si hay tarjetas extraídas
+    if (matchId && cards && cards.sada && cards.sada.length > 0) {
       // Clear existing cards for this match first
       await db.execute({ sql: 'DELETE FROM match_cards WHERE matchId=?', args: [matchId] });
 

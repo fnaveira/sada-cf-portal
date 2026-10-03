@@ -141,6 +141,11 @@ function initNavigation() {
                 loadAllData().then(() => renderConvocatoria());
             }
 
+            if (section === 'resultados' && link.dataset.view) {
+                const viewBtn = document.querySelector(`.standings-toggle .filter-btn[data-view="${link.dataset.view}"]`);
+                if (viewBtn) viewBtn.click();
+            }
+
             navLinksContainer.classList.remove("open");
         });
     });
@@ -454,9 +459,56 @@ function showPlayerProfile(id) {
                 <div class="profile-field"><strong>Teléfono:</strong><br>${p.phone || '-'}</div>
                 <div class="profile-field"><strong>Email:</strong><br>${p.email || '-'}</div>
             </div>
+            ${profileClassifications(p)}
         </div>
     `;
     modal.style.display = 'flex';
+}
+
+function profileClassifications(p) {
+    const td = 'padding:5px 7px;border-bottom:1px solid rgba(128,128,128,.2);';
+    const th = td + 'text-align:left;font-weight:700;color:var(--text-muted);font-size:.72rem;text-transform:uppercase;';
+    const me = () => `background:var(--primary-light);font-weight:700;`;
+
+    const scorers = PLAYERS.filter(x => (x.goals || 0) > 0).sort((a, b) => (b.goals || 0) - (a.goals || 0));
+    const myIdx = scorers.findIndex(x => x.id === p.id);
+    const top = scorers.slice(0, 10).map((s, i) => `
+            <tr style="${s.id === p.id ? me() : ''}">
+                <td style="${td}">${i + 1}º</td>
+                <td style="${td}">${s.nickname || s.name}</td>
+                <td style="${td + 'text-align:right;font-weight:700;'}">${s.goals || 0}</td>
+            </tr>`).join('');
+    const myRow = (myIdx >= 10 || myIdx === -1) ? `
+            <tr style="${me()}">
+                <td style="${td}">${myIdx >= 0 ? (myIdx + 1) + 'º' : '—'}</td>
+                <td style="${td}">${p.nickname || p.name}</td>
+                <td style="${td + 'text-align:right;font-weight:700;'}">${p.goals || 0}</td>
+            </tr>` : '';
+
+    const standings = STANDINGS.map(t => `
+            <tr style="${isOurTeam(t.team) ? me() : ''}">
+                <td style="${td}">${t.pos}º</td>
+                <td style="${td}">${t.team}</td>
+                <td style="${td + 'text-align:right;'}">${t.played}</td>
+                <td style="${td + 'text-align:right;'}">${t.gf - t.ga > 0 ? '+' : ''}${t.gf - t.ga}</td>
+                <td style="${td + 'text-align:right;font-weight:700;'}">${t.pts}</td>
+            </tr>`).join('');
+
+    return `
+            <div style="margin-top:1.5rem;">
+                <h4 style="margin:0 0 .5rem;font-size:.95rem;"><i class="fas fa-futbol" style="color:var(--primary);"></i> Clasificación de goleadores</h4>
+                <table style="width:100%;border-collapse:collapse;font-size:.87rem;">
+                    <thead><tr><th style="${th}">#</th><th style="${th}">Jugador</th><th style="${th + 'text-align:right;'}">Goles</th></tr></thead>
+                    <tbody>${top}${myRow}</tbody>
+                </table>
+            </div>
+            <div style="margin-top:1.5rem;">
+                <h4 style="margin:0 0 .5rem;font-size:.95rem;"><i class="fas fa-trophy" style="color:var(--primary);"></i> Clasificación general</h4>
+                <table style="width:100%;border-collapse:collapse;font-size:.87rem;">
+                    <thead><tr><th style="${th}">#</th><th style="${th}">Equipo</th><th style="${th + 'text-align:right;'}">PJ</th><th style="${th + 'text-align:right;'}">DG</th><th style="${th + 'text-align:right;'}">Pts</th></tr></thead>
+                    <tbody>${standings}</tbody>
+                </table>
+            </div>`;
 }
 
 // MATCH ACTA - J1 Narón 3-3 Sada
